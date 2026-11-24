@@ -8,7 +8,7 @@ Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a
 - Preparación de Vercel: documentados build, variables por ambiente y callbacks de Supabase Auth; no se añade configuración innecesaria porque Next.js se detecta automáticamente.
 - Repositorio remoto confirmado: `paradiseurbanproperties/Paradise`, vacío, rama `main`, permiso de escritura disponible.
 - `.env.local`, dependencias, `.vercel` y artefactos Next están excluidos del commit por `.gitignore`.
-- `pnpm build` sigue sin verificarse: Turbopack falla al abrir un puerto interno (`Operation not permitted`), incluso al repetir fuera del sandbox; `pnpm lint` y `pnpm typecheck` sí pasan.
+- `pnpm build` fija Webpack para evitar la dependencia del puerto interno de Turbopack en el entorno; la build completa con rutas estáticas/dinámicas generó correctamente. `pnpm lint` y `pnpm typecheck` también pasan.
 
 ## [0.17.11] — 2026-11-24
 

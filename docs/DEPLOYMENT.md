@@ -4,7 +4,7 @@
 
 ## Vercel — destino solicitado
 
-El proyecto usa Next.js App Router y `pnpm-lock.yaml`; Vercel detecta Next.js y configura la instalación/build por defecto, así que no necesita `vercel.json` ni un adaptador adicional. Mantener la salida estándar de Next.js (`pnpm build`) y Node.js compatible con `engines` en `package.json` (mínimo 20.9.0). El primer push a `main` puede conectarse desde el dashboard de Vercel al repositorio `paradiseurbanproperties/Paradise`; cada push posterior generará despliegues según la configuración del proyecto. Revisar build logs y abrir el deployment Preview antes de considerarlo validado.
+El proyecto usa Next.js App Router y `pnpm-lock.yaml`; Vercel detecta Next.js y configura instalación/salida por defecto, así que no necesita `vercel.json` ni adaptador. El script `pnpm build` ejecuta `next build --webpack`: se fijó Webpack porque la build completa pasó con ese modo; Turbopack no pudo enlazar un puerto en este entorno de desarrollo. Node.js mínimo `20.9.0` está declarado en `package.json`. El primer push a `main` puede conectarse desde el dashboard de Vercel al repositorio `paradiseurbanproperties/Paradise`; cada push posterior generará despliegues según la configuración del proyecto. Revisar build logs y abrir el deployment Preview antes de considerarlo validado.
 
 Variables que deben configurarse en Vercel para Production y Preview según corresponda:
 

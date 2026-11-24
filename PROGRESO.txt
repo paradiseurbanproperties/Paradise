@@ -415,7 +415,7 @@ Fase 14, incremento 4: el usuario indica que 0021 parece funcionar; no se verifi
 - El usuario añadió `PARADISE.png` (435×458, transparente). Se copió sin modificar a `public/icons/paradise.png`, configurado como icono del sitio y de Apple, además de imagen Open Graph/Twitter para vistas previas.
 - `pnpm lint` y `pnpm typecheck` pasan; `file` confirma que el asset servido es PNG RGBA 435×458.
 - El repo vacío `paradiseurbanproperties/Paradise` existe, es público, tiene rama por defecto `main` y la sesión cuenta con permiso push. No tenía remoto configurado localmente. `.gitignore` excluye `.env.local`, `node_modules`, `.next` y `.vercel`.
-- Se intentó `pnpm build` dentro y fuera del sandbox. En ambos casos Turbopack aborta al intentar enlazar un puerto interno con `Operation not permitted`; es un límite del entorno observado antes, no un error de compilación de módulo. La build de producción queda sin verificar.
+- Turbopack aborta al intentar enlazar un puerto interno con `Operation not permitted`; la build Webpack primero encontró que el sandbox bloqueaba el subproceso de TypeScript. Fuera del sandbox, `pnpm exec next build --webpack` completó compilación, TypeScript, datos, 31 páginas prerenderizadas y trazas de rutas. Se fija el script `pnpm build` en `next build --webpack` para el despliegue reproducible.
 - Archivos: `public/icons/paradise.png`, `src/app/layout.tsx`, `PROGRESO.txt`, `CHANGELOG.md`, `README.md`, `AGENTS.md`, `docs/TESTING.md`.
 - Pendiente validar entrega HTTP real del icono/meta tags y diagnosticar carga de bundles/hidratación en la URL LAN. No afirmar aún arreglo de interacciones móviles.
 
