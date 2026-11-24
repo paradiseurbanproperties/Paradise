@@ -18,7 +18,7 @@ El proyecto busca reunir el catálogo público y los procesos internos de una in
 
 Versiones fijadas en `package.json` y lockfile: Next.js 16.3.0, React/React DOM 19.3.0, TypeScript 5.9.x, Tailwind CSS 4.3.0, `@supabase/ssr` 0.12.7, `@supabase/supabase-js` 2.119.2 y Zod 4.6.7. Node.js local 26.13.1 y pnpm 12.19.0. La guía Supabase para Next recomienda el patrón SSR con cookies y clientes separados [servidor/navegador](https://supabase.com/docs/guides/auth/server-side/creating-a-client?framework=nextjs&package-manager=npm&queryGroups=framework&queryGroups=package-manager); se usa `proxy.ts` para refrescar sesión en Next 16. La configuración de correo y URL de retorno de Auth es externa.
 
-El destino solicitado es Vercel conectado al repositorio GitHub `paradiseurbanproperties/Paradise`. Next.js se detecta automáticamente; los valores Supabase y `NEXT_PUBLIC_SITE_URL` deben configurarse por ambiente en Vercel, como se detalla en [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). El repo local no contiene `.env.local`.
+El destino solicitado es Vercel conectado al repositorio GitHub `paradiseurbanproperties/Paradise`. `vercel.json` fija el framework Next.js; los valores Supabase y `NEXT_PUBLIC_SITE_URL` deben configurarse por ambiente en Vercel, como se detalla en [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). El repo no contiene `.env.local`.
 
 ## Arquitectura
 

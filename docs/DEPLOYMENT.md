@@ -4,7 +4,7 @@
 
 ## Vercel — destino solicitado
 
-El proyecto usa Next.js App Router y `pnpm-lock.yaml`; Vercel detecta Next.js y configura instalación/salida por defecto, así que no necesita `vercel.json` ni adaptador. El script `pnpm build` ejecuta `next build --webpack`: se fijó Webpack porque la build completa pasó con ese modo; Turbopack no pudo enlazar un puerto en este entorno de desarrollo. Node.js mínimo `20.9.0` está declarado en `package.json`. El primer push a `main` puede conectarse desde el dashboard de Vercel al repositorio `paradiseurbanproperties/Paradise`; cada push posterior generará despliegues según la configuración del proyecto. Revisar build logs y abrir el deployment Preview antes de considerarlo validado.
+El proyecto usa Next.js App Router y `pnpm-lock.yaml`. `vercel.json` fija `framework: "nextjs"` para que Vercel genere el manifiesto de rutas Next aunque el preset del dashboard haya quedado en “Other”; no define rewrites ni output personalizado. El script `pnpm build` ejecuta `next build --webpack`: se fijó Webpack porque la build completa pasó con ese modo; Turbopack no pudo enlazar un puerto en este entorno de desarrollo. Node.js mínimo `20.9.0` está declarado en `package.json`. Cada push a `main` genera despliegues una vez conectado el repo. Revisar build logs y abrir el deployment Preview antes de considerarlo validado.
 
 Variables que deben configurarse en Vercel para Production y Preview según corresponda:
 
@@ -21,9 +21,11 @@ Vercel detecta Next.js y ejecuta la build del proyecto por cada push según su c
 ### Diagnóstico de 404
 
 - La raíz del repositorio contiene `package.json` y la ruta `/` está en `src/app/(public)/page.tsx`; el build local confirma que `/` forma parte de las rutas generadas.
-- En Vercel usar `Production Branch: main` y `Root Directory: ./` (raíz del repositorio). Dejar `Output Directory` sin sobrescribir; no usar `/main`, `public` ni `.next` como salida de una app Next.js.
+- En Vercel usar `Production Branch: main` y `Root Directory` en la raíz del repositorio (campo vacío o `./`). Dejar `Output Directory` sin sobrescribir; no usar `/main`, `public` ni `.next` como salida de una app Next.js.
 - Revisar que `Framework Preset` sea `Next.js`, que el deployment marcado como Production corresponda al commit `main` y abrir su dominio `.vercel.app` directamente en `/`.
-- Vercel reportó estado exitoso para el último commit, pero el usuario sigue recibiendo 404. La URL exacta y el texto/código de la pantalla aún no se proporcionaron; distinguir error `NOT_FOUND` de deployment protection, URL preview caducada o dominio asignado a otro deployment.
+- La URL `https://paradise-kappa-gray.vercel.app/` respondió HTTP/2 404, `server: Vercel`, `x-vercel-error: NOT_FOUND` (PoP SFO). GitHub marca deployment completado para el commit anterior y el build local incluye `/`.
+- Causa compatible con evidencia: Vercel puede completar el build con preset “Other” pero no generar el manifiesto de rutas Next. Se añadió `vercel.json` para forzar el preset `nextjs`; el push siguiente debe crear un deployment nuevo.
+- Si persiste tras el redeploy, confirmar `Root Directory` en la raíz, `Output Directory` predeterminado, Framework Next.js y que el dominio esté asignado a ese proyecto/deployment; Vercel recomienda revisar el manifiesto/routing settings y logs.
 - Referencia: [diagnóstico oficial de 404 en Vercel](https://vercel.com/kb/guide/why-is-my-deployed-project-giving-404) y [Root Directory/build settings](https://vercel.com/docs/builds/configure-a-build).
 
 ## Componentes previstos

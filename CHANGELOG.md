@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.14] — 2026-11-24
+
+### Vercel
+- La URL `paradise-kappa-gray.vercel.app` responde HTTP 404 con `x-vercel-error: NOT_FOUND`; la página raíz existe y Vercel reportó completado el deployment anterior.
+- Añadido `vercel.json` con `framework: "nextjs"` para forzar la generación de routing metadata de Next.js aun si el preset de Project Settings es “Other”. No se añade rewrite ni output directory.
+- El commit nuevo en `main` debe generar un redeploy; verificar la URL después de que Vercel marque Ready.
+
 ## [0.17.13] — 2026-11-24
 
 ### Despliegue
