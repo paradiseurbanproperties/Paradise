@@ -1,0 +1,32 @@
+# Dependencies and package manager state
+node_modules/
+.pnp.*
+
+# Next.js output
+.next/
+/out/
+/build/
+.vercel/
+
+# Local environment and secrets
+.env*
+!.env.example
+
+# Logs and operating system files
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+.DS_Store
+*.pem
+
+# TypeScript and tooling cache
+*.tsbuildinfo
+.eslintcache
+coverage/
+playwright-report/
+test-results/
+
+# Editor and local agent state
+.idea/
+.vscode/*
+!.vscode/extensions.json

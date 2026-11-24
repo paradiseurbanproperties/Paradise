@@ -1,0 +1,433 @@
+PROYECTO: Paradise — Plataforma Inmobiliaria
+
+OBJETIVO
+Diseñar y desarrollar por fases una plataforma inmobiliaria modular con catálogo público, cuentas de cliente, agentes, CRM, administración, suscripciones Premium simuladas, analítica y controles de seguridad adecuados para un producto académico de calidad comercial.
+
+ESTADO GENERAL
+- Fase actual: FASE 14 — Seguridad y rendimiento
+- Avance estimado: 87% (Fase 13 y flujo de verificación Auth confirmados por el usuario; 0019–0020 confirmadas por reporte; el usuario indica que 0021 parece funcionar, matriz multirrol aún pendiente)
+- Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]
+- Próxima actividad: subir el primer commit a `paradiseurbanproperties/Paradise` en `main`; después conectar Vercel, configurar variables/redirects Supabase y validar una Preview desde móvil. Diagnosticar consola/network si las interacciones móviles siguen inertes. Después completar matriz RLS con identidades separadas (incluida 0021), abuso de formularios públicos y mapa con datos reales.
+
+TECNOLOGÍAS PROPUESTAS
+- Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
+- Supabase: PostgreSQL, Auth y Storage; PostGIS para consultas espaciales si el plan/entorno lo permite.
+- MapLibre GL JS, OpenStreetMap y proveedor de geocodificación configurable.
+- Zod; React Hook Form cuando los formularios lo justifiquen; Recharts para gráficas.
+- Vitest, React Testing Library y Playwright; ESLint y Prettier.
+- Node.js del entorno: 26.13.1; mínimo configurado: 20.9.0. pnpm del entorno: 12.19.0, fijado en `package.json`.
+- Dependencias `@supabase/ssr`, `@supabase/supabase-js` y Zod instaladas por el usuario; lockfile actualizado.
+- `pnpm lint` y `pnpm typecheck` pasan después de los cambios de Fase 4.
+- El usuario confirmó que las rutas públicas funcionan. El PNG `Logo.png` ahora se usa en navbar y footer desde `public/logos/paradise.png`; `Logo.svg` permanece como fuente.
+
+ARQUITECTURA
+- Monolito modular Next.js organizado por áreas de producto en App Router y `src/features`.
+- Páginas para composición; casos de uso en servicios; acceso a datos en repositorios/adaptadores Supabase; esquemas compartidos Zod.
+- Autorización obligatoria en servidor y RLS como segunda barrera en PostgreSQL.
+- Funciones privilegiadas aisladas en servidor; nunca exponer `service_role` al navegador.
+- Esquema relacional inicial y límites de cada módulo en `docs/ARCHITECTURE.md` y `docs/DATABASE.md`.
+
+ESTRUCTURA DE CARPETAS
+- Propuesta Next.js documentada en `docs/ARCHITECTURE.md`.
+- Esqueleto creado: `src/app`, layout, ruta pública inicial, estilos base, página 404 y boundary de error.
+- Configuración creada: `package.json`, `tsconfig.json`, `next.config.ts`, ESLint, PostCSS/Tailwind, `.npmrc`, `.nvmrc` y `.gitignore`.
+- Los módulos de `features/` se crearán cuando se implementen para no poblar el proyecto con directorios vacíos.
+
+ALCANCE TOTAL — LO QUE QUEREMOS CONSTRUIR
+Este resumen representa el alcance aprobado del proyecto; no significa que los módulos estén implementados. Los detalles técnicos y decisiones están en `README.md` y `docs/`.
+- [x] Sistema visual responsive: tokens, temas, persistencia local y distintivo Premium implementados; usuario confirmó tema oscuro y vista móvil. Sincronización con perfiles autenticados al implementar Auth.
+- [~] Experiencia pública: portada, catálogo demostrativo con filtros/orden/paginación y fichas implementados; agentes, contacto, SEO completo y datos reales siguen pendientes.
+- [~] Identidad y acceso: pantallas y acciones de Auth, callbacks, recuperación y perfil mínimo; el usuario reporta que el enlace de verificación ahora funciona. La interfaz de roles/permisos funciona según el usuario; faltan pruebas negativas completas de RLS.
+- [x] Propiedades: usuario confirma flujo funcional al 100%: CRUD, fotos, publicación y cambios/historial de precio. RLS negativa con otros roles aún queda en la lista global de seguridad.
+- [~] Mapas: usuario confirma mapa Admin y ficha pública; consulta de Supabase confirma columna geográfica y RPC de 0005; falta probar búsqueda con datos reales.
+- [x] Herramientas de cliente: el usuario confirma favoritos, comparación, listas e historial de actividad; 0014–0016 se consideran funcionales según su reporte, sin inspección directa del historial remoto. Solicitudes de visita siguen pendientes.
+- [ ] Visitas: solicitud, agenda/disponibilidad, cambios de estado, historial y prevención de conflictos.
+- [x] Premium: `/premium` ofrece planes, checkout simulado, historial y cancelación; distintivo por vigencia; Admin gestiona planes en `/admin/suscripciones`. El usuario confirma que el flujo completo funciona.
+- [x] Agentes y CRM: el usuario confirma perfiles, cartera, captación de leads, Kanban y notas; 0013 queda validada funcionalmente según su reporte, sin inspección directa del historial remoto.
+- [ ] Administración: usuarios, agentes, publicaciones, suscripciones, reclamaciones, ajustes, auditoría e informes.
+- [x] Analítica: dashboard `/admin` con gráfica diaria, ranking, desgloses por tipo/ciudad, exportación CSV y periodo 7/28/90 días. El usuario confirma el funcionamiento de filtro, desgloses y exportación.
+- [ ] Operación: notificaciones, configuración general, accesibilidad, rendimiento, seguridad, pruebas, CI, despliegue y documentación académica.
+
+DOCUMENTACIÓN DEL ALCANCE Y DISEÑO
+- `README.md`: descripción general, módulos planeados, instalación y estado real.
+- `AGENTS.md`: instrucciones y resumen de relevo para otras IAs/agentes de código.
+- `docs/ARCHITECTURE.md`: arquitectura, estructura, dependencias entre módulos y riesgos.
+- `docs/DATABASE.md`: entidades, relaciones, restricciones e índices propuestos.
+- `docs/SECURITY.md`: roles, matriz de acceso y diseño de RLS.
+- `docs/API.md`, `docs/TESTING.md`, `docs/DEPLOYMENT.md`, `docs/PRESENTATION.md`: contratos previstos, pruebas, operación y exposición.
+- `CHANGELOG.md`: registro de cambios por avance; este archivo conserva el estado actual y próximo paso.
+
+FASES DEL DESARROLLO
+[x] Fase 0 — Análisis y arquitectura (propuesta, esquema y documentación inicial)
+[x] Fase 1 — Entorno (esqueleto, dependencias, lockfile, lint, tipos, build y Git inicializado)
+[x] Fase 2 — Sistema visual (base, build local y revisión visual confirmados)
+[x] Fase 3 — Interfaz pública (rutas/logo revisados y confirmados por el usuario)
+[~] Fase 4 — Supabase y autenticación (usuario reporta configuración y que el enlace de verificación funciona; falta matriz completa de pruebas Auth/RLS)
+[~] Fase 5 — Roles y perfiles (usuario reporta migración/bootstrap y confirma que la interfaz funciona; pruebas negativas completas de RLS pendientes)
+[x] Fase 6 — Propiedades y administración (usuario confirma flujo completo funcional al 100%; RLS negativa multiroles pendiente en Fase 14)
+[~] Fase 7 — Mapas y búsqueda geográfica (usuario confirma mapa Admin y detalle público; migración/RPC de búsqueda por radio pendiente de confirmar)
+[x] Fase 8 — Premium (usuario confirma funcionamiento integral)
+[x] Fase 9 — Analítica y dashboard (el usuario confirma que gráficas, filtro, desgloses y CSV funcionan; 0010 se considera validada por su reporte)
+[x] Fase 10 — Agentes y CRM (el usuario confirma el flujo; 0011–0013 se consideran funcionales por su reporte)
+[x] Fase 11 — Herramientas del cliente (el usuario confirma favoritos, comparación, listas y actividad; 0014–0016 se consideran funcionales por su reporte)
+[x] Fase 12 — Historiales y notificaciones (usuario confirma funcionamiento; 0017 se considera validada por su reporte, sin inspección remota directa)
+[x] Fase 13 — Configuración y SEO (usuario confirma que configuración y experiencia funcionan; no se inspeccionó Supabase remoto)
+[~] Fase 14 — Seguridad y rendimiento (0019–0020 confirmadas; usuario reporta que 0021 parece funcionar; matriz RLS pendiente)
+[ ] Fase 15 — QA y entrega
+
+FUNCIONES TERMINADAS
+- Inspección inicial del espacio de trabajo: directorio sin archivos de aplicación y sin repositorio Git detectable.
+- Decisiones iniciales de arquitectura, modelo de datos, relaciones, permisos, riesgos y estrategia de pruebas documentadas.
+- Archivos de control y documentación inicial creados.
+- Fase 1: manifiesto Next/React, configuración TypeScript/Tailwind/ESLint, layout App Router inicial, página base y archivos de higiene de entorno.
+- Validación local de sintaxis de `eslint.config.mjs` y `postcss.config.mjs`; JSON de `package.json` y `tsconfig.json` parseable.
+- Instalación inicial de dependencias completada y `pnpm-lock.yaml` generado.
+- Git inicializado; repositorio detectado en la raíz, todavía sin commits.
+- `pnpm lint` completado con código de salida 0.
+- `pnpm typecheck` completado con código de salida 0.
+- `pnpm install --frozen-lockfile` y `pnpm build` completados por el usuario en la terminal de Arch.
+- Fase 2 parcial: tokens para la paleta y ambos temas, preferencia visitante y detección inicial de tema del sistema antes de hidratar.
+- Fase 2 parcial: componentes base de botón, avatar Premium con aro animado, navbar responsive con menú móvil, footer y portada base.
+- Fase 2 parcial: tipografía con stack local, estados de foco, enlace para saltar contenido y respeto a movimiento reducido.
+- Fase 2: lint, verificación de tipos y parseo de los archivos CSS pasaron.
+- El usuario ejecutó el build local después de los cambios de Fase 2; `.next/BUILD_ID` y `.next/server/app/index.html` tienen hora posterior a los cambios y confirman generación de salida. No se recibió la salida textual del comando.
+- Fase 2: el usuario confirmó que tema oscuro y vista móvil se ven bien; fase cerrada tras esta comprobación manual.
+- Fase 3 parcial: portada conectada al catálogo, búsqueda, tarjetas, filtros GET, ordenamiento, paginación, estado vacío y detalle con metadatos.
+- Fase 3 parcial: ocho fichas ficticias etiquetadas como demostración; fotos ilustrativas remotas optimizadas con `next/image`.
+- `pnpm lint`, `pnpm typecheck`, parseo CSS y smoke checks de filtros/paginación pasan después de los cambios de Fase 3.
+
+FUNCIONES PENDIENTES
+- Fase 4: completar pruebas Auth de registro, verificación, login, cierre, recuperación y cambio de contraseña; el usuario reporta que el enlace de verificación ya funciona.
+- Fase 4: revisar trigger y Storage en un proyecto Supabase de desarrollo.
+- Fase 5: completar matriz de pruebas negativas de roles/RLS. Fase 6 está funcionalmente validada por el usuario; completar la matriz RLS para propiedades/Storage en Fase 14.
+- Pendiente actual: validar búsqueda de mapas con datos reales, aplicar/probar notificaciones de Fase 12 y continuar Fases 13–15 (SEO/configuración, seguridad/rendimiento y entrega).
+- El build en Node 26 muestra una advertencia no fatal: `module.register()` está obsoleto (`DEP0205`).
+- El build de esta entrega también quedó bloqueado en el sandbox: Turbopack no puede crear un proceso/enlazar el puerto interno (`Operation not permitted`). `pnpm lint` y `pnpm typecheck` sí pasan; repetir build en la terminal normal de Arch.
+- Validar el esquema propuesto mediante migraciones y un proyecto Supabase de desarrollo.
+- Definir credenciales de servicios en el entorno local cuando se configure Supabase; no se solicitaron ni inventaron credenciales.
+
+ERRORES CONOCIDOS
+- Sigue pendiente completar backend, aplicar/probar migraciones restantes, pruebas de producto, CI y despliegue. El usuario ya tiene un proyecto Supabase.
+- El sandbox de esta sesión no permite repetir instalación/build: `pnpm install --frozen-lockfile` no pudo abrir el lock operativo del store y Next/Turbopack no pudo enlazar un puerto local. Estos mismos comandos se confirmaron exitosos en la terminal normal de Arch.
+- `.env.local` existe y contiene URL, publishable key y origen de sitio no-placeholder (valores secretos no se imprimieron). El usuario confirma haber terminado los pasos del dashboard, incluida la migración; no fue posible comprobar el acceso al proyecto desde este sandbox porque las solicitudes de red externa fallan.
+- Auth sigue pendiente de prueba funcional real desde el equipo del usuario: registro, correo de verificación, login, recuperación y cambio de contraseña. El usuario pidió dejar temporalmente el problema de verificación y avanzar.
+- El usuario reporta que el enlace “Verificar email” termina en una página con error bajo localhost. Navegador no disponible para ver el mensaje/ruta exactos; el callback se endureció y ahora muestra una explicación en login cuando el intercambio falla. Falta reproducir para identificar causa (URL allowlist, plantilla, caducidad/uso del enlace o navegador/servidor local).
+- El build en Node 26 imprime una advertencia no fatal deprecando `module.register()` (`DEP0205`).
+- La disponibilidad de PostGIS, proveedor de mapas, geocodificación, límites de Storage y funciones de producción depende de configuración externa aún no elegida.
+
+ERRORES SOLUCIONADOS
+- ESLint detectó actualización de estado dentro del efecto del selector de tema; se sustituyó por `useSyncExternalStore`.
+- Los errores del callback de Auth se redirigen de forma controlada a login y muestran aviso accesible, en vez de dejar el fallo sin explicación.
+
+DECISIONES TÉCNICAS
+- Premium es una suscripción asociada a una cuenta cliente, no un rol.
+- Roles en `profiles.base_role`: `client`, `agent`, `admin`; estado `active`/`suspended`. Nuevas cuentas inician como cliente activo. El usuario no puede cambiar rol/estado; primer Admin se promueve manualmente por el dueño del proyecto. Cambios posteriores usan RPC que impide auto-modificación y registra auditoría.
+- Separar estado comercial de propiedad, estado de publicación/moderación y visibilidad para evitar combinaciones ambiguas.
+- Visibilidad propuesta como ámbitos: pública, premium o ambas; listado solo si la publicación está aprobada y activa.
+- Cada inmueble real persistirá en PostgreSQL; cada foto tendrá registro `property_images` y ruta/metadata enlazadas por FK, mientras el archivo binario vivirá en Supabase Storage del mismo proyecto. Las fotos actuales del catálogo son solo material ilustrativo.
+- Los pagos son simulaciones sin datos bancarios; el valor simulado no se contabiliza como ingreso real.
+- Historial de precio y auditoría serán registros de solo inserción para usuarios comunes; actualizar/cancelar solicitudes se auditará por eventos.
+- Analítica de vistas de ficha con eventos minimizados, deduplicación por día, límite por sesión y retención de 90 días; el usuario confirma que 0008 y 0009 funcionan.
+- El modo oscuro se persistirá localmente para visitantes y en preferencias para usuarios autenticados; al iniciar sesión se resolverán preferencias en servidor.
+- Los colores de marca viven en `src/styles/tokens.css`; los componentes consumen tokens semánticos, con valores independientes por tema.
+- El tema inicial lee `localStorage` y, si no existe una preferencia válida, `prefers-color-scheme` mediante script inline en `<head>` para evitar destello. La preferencia de usuario autenticado se conectará con perfil cuando se implementen Auth/perfiles.
+- No se añadió dependencia de iconos ni fuentes remotas: los iconos actuales son SVG pequeños y la tipografía usa stacks locales para no requerir red en build.
+
+REGISTRO DE FASE 2
+- Objetivo: construir los cimientos visuales reutilizables sin implementar todavía el catálogo.
+- Estado: [x] Base implementada; build local generado, captura de escritorio revisada y usuario confirma tema oscuro/móvil.
+- Archivos añadidos/modificados: `src/styles/tokens.css`, `src/styles/components.css`, `src/constants/theme.ts`, `src/components/ui/button.tsx`, `src/components/ui/premium-avatar.tsx`, `src/components/navigation/theme-store.ts`, `src/components/navigation/theme-toggle.tsx`, `src/components/navigation/site-header.tsx`, `src/components/layout/site-footer.tsx`, `src/app/layout.tsx`, `src/app/globals.css`, `src/app/(public)/page.tsx`.
+- Resultado: paleta centrada, temas claro/oscuro, navbar/footer, portada de presentación y componentes visuales comunes.
+- Verificaciones: ESLint, TypeScript, parseo CSS y build local exitosos. El usuario confirma manualmente escritorio, tema oscuro y móvil.
+- Resultado: Fase 2 cerrada con la confirmación del usuario.
+
+REGISTRO DE FASE 3
+- Objetivo: construir inicio, catálogo y ficha pública sin adelantar autenticación, Supabase ni funciones dependientes.
+- Estado: [x] Catálogo y fichas funcionan según revisión del usuario; el usuario confirmó también el logo.
+- Archivos: `src/features/properties/`, `src/app/(public)/page.tsx`, `src/app/(public)/propiedades/page.tsx`, `src/app/(public)/propiedad/[slug]/page.tsx`, `src/components/navigation/site-header.tsx`, `src/components/layout/site-footer.tsx`, `src/styles/components.css`, `next.config.ts`, `public/logos/paradise.svg`.
+- Datos: ocho fichas ficticias etiquetadas como demostración; fotos ilustrativas de Unsplash servidas con `next/image`. No son anuncios ni estadísticas reales.
+- Verificaciones: lint, typecheck, parseo CSS y smoke checks de parseo, filtros, orden, paginación y cero resultados pasan; el usuario confirmó que las rutas funcionan. Build bloqueado en sandbox por el puerto interno de Turbopack.
+- Marca: el archivo fuente `Logo.svg` se copia a `public/logos/paradise.svg` y se usa en navbar y footer.
+- Build de producción en sandbox: no verificable por restricción de enlace de puerto de Turbopack; el usuario confirmó las rutas y el logo en su entorno.
+
+## REGISTRO DE FASE 4
+- Objetivo: conectar Supabase Auth, persistir el perfil de aplicación mínimo y preparar Storage sin anticipar roles ni CRUD inmobiliario.
+- Estado: [~] Flujos de registro/login/recuperación/cambio de contraseña, callback PKCE, clientes SSR/navegador, `proxy.ts`, validación Zod, migración de perfil y bucket privado preparados. El usuario reporta que aplicó la migración; el error de verificación queda aplazado a petición.
+- Archivos añadidos: `src/lib/supabase/`, `src/proxy.ts`, `src/features/auth/`, rutas de Auth, `src/app/auth/callback/route.ts`, `supabase/migrations/202611230001_auth_foundation.sql`.
+- Seguridad: `profiles` solo permite leer/editar el perfil propio y solo `display_name`; el trigger crea el perfil desde Auth. El bucket es privado y limitado por formato/tamaño, sin policies de objetos hasta que las fases 5–6 permitan validar propiedad, visibilidad y asignación.
+- Dependencias: `@supabase/ssr@0.12.7`, `@supabase/supabase-js@2.119.2`, `zod@4.6.7` instaladas; el usuario confirmó que `pnpm install` terminó sin error y el lockfile incluye los paquetes.
+- Verificaciones: `pnpm lint` y `pnpm typecheck` pasan tras la instalación.
+- Pendiente de Fase 4: diagnosticar enlace de verificación cuando el usuario retome ese punto y probar Auth completa. Mientras, se avanza con roles/permisos.
+
+## REGISTRO DE FASE 5
+- Objetivo: guardar rol base y estado de cuenta en servidor, proteger perfiles con RLS y ofrecer guardas de autorización reutilizables.
+- Estado: [~] Código de migración, helpers SQL, RPC, guardas server-side y perfil de cuenta creados. Usuario confirma que aplicó migración y designó primer Admin; no se pudo verificar remotamente.
+- Archivos: `supabase/migrations/202611230002_roles_and_permissions.sql`, `src/lib/permissions/access.ts`, `src/features/users/`, páginas `/mi-cuenta` y `/admin/usuarios`, layouts de protección y navegación de sesión.
+- Roles: `client`, `agent`, `admin`; estado `active`/`suspended`. Premium no es un rol. El usuario no puede cambiar campos de rol ni estado. El primer Admin se promueve manualmente como bootstrap por el dueño del proyecto.
+- RLS/RPC: helper de rol privado y acotado; perfiles ajenos visibles solo para Admin; RPC administrativo no permite auto-modificación y registra antes/después en `audit_logs`.
+- Validación reportada: el usuario confirma que la interfaz que acabamos de probar funciona correctamente.
+- Pendiente: ejecutar pruebas negativas de rol/escalamiento, suspensión y RLS desde cuentas separadas. La interfaz observada no sustituye verificación en base de datos.
+
+## REGISTRO DE FASE 6 — INCREMENTO 1
+- Objetivo: crear persistencia segura para inmuebles, asignaciones y metadata de fotografías.
+- Estado: [x] El usuario confirma que la propiedad real, imágenes, publicación y cambios/historial de precio funcionan al 100%; se cierra la fase funcional.
+- Archivo nuevo: `supabase/migrations/202611230003_properties.sql`.
+- Tablas: `properties`, `agent_assignments`, `property_images`, `property_features`, `property_feature_values`.
+- Integridad: slug/formato, precio/moneda, estado, visibilidad, coordenadas, MIME/tamaño, FK, una asignación activa por pareja y una foto de portada por propiedad; índices para catálogo y relaciones.
+- Seguridad: RLS/grants explícitos; público ve publicaciones aprobadas públicas/ambas; agente ve sus asignaciones; escritura de esta entrega reservada a Admin. Storage privado valida objeto con metadata y publicación. El acceso Premium queda cerrado hasta Fase 8.
+- Fotografías: cada propiedad y metadata vivirán en PostgreSQL; cada binario se cargará al bucket privado `property-images` del mismo proyecto Supabase con ruta `{property_id}/{image_id}.{ext}`. Borrar metadata no elimina automáticamente el objeto; el futuro caso de uso debe coordinar y limpiar ambos lados.
+- Implementado: catálogo público lee publicaciones aprobadas de PostgreSQL y obtiene enlaces temporales de Storage. Si Supabase está configurado pero vacío, no presenta ejemplos ficticios.
+- Implementado: `/admin/propiedades` permite crear/editar/moderar/eliminar fichas, mantener características, cargar/retirar imágenes y limpiar Storage antes de borrar una propiedad.
+- Fotografías: el cliente comprueba formato, tamaño y firma básica; servidor valida sesión/rol y metadata; RLS aplica permisos al bucket y las tablas.
+- Precio: migración 0004 registra historial inmutable transaccional; el usuario confirmó que el flujo de precios funciona.
+- RLS con cuentas cliente/agente/admin diferentes sigue pendiente para la matriz global de seguridad.
+- Verificaciones: `pnpm lint` y `pnpm typecheck` pasan.
+
+## REGISTRO DE FASE 7 — INCREMENTO 1
+- Objetivo: preparar coordenadas consistentes y búsqueda por proximidad antes de integrar el mapa interactivo.
+- Estado: [~] Formulario acepta coordenadas; el usuario habilitó PostGIS y una consulta confirma que 0005 está aplicada. La búsqueda cercana requiere prueba con datos reales.
+- Archivo: `supabase/migrations/202611230005_geospatial_search.sql` añade `extensions.geography(Point,4326)`, sincronización desde latitud/longitud, índice GiST y RPC `search_public_properties_nearby`.
+- La RPC usa `SECURITY INVOKER` para respetar grants/RLS, fija límites de radio de 100 m–50 km y hasta 100 resultados; devuelve solo propiedades aprobadas públicas/ambas con coordenadas.
+- La UI del selector de punto y búsqueda pública sincronizada espera la dependencia MapLibre.
+- La fuente de teselas se configura por entorno. No se implementa precarga de teselas; se debe mostrar atribución OSM y respetar caché. La geocodificación será por petición explícita y proveedor configurable.
+- Dependencia: `pnpm add maplibre-gl@6.19.0` falló aquí por DNS al consultar `registry.npmjs.org`; se requiere instalar desde la terminal Arch.
+- Marca: `Logo.png` se copió a `public/logos/paradise.png`, referencias de navbar/footer actualizadas y SVG fuente conservado.
+
+## REGISTRO DE FASE 7 — INCREMENTO 2
+- Objetivo: integrar selección cartográfica en administración y exploración pública por radio.
+- Estado: [~] UI y consulta al RPC implementadas; 0005 está confirmada por consulta, mapas revisados por el usuario; falta probar búsqueda con datos reales.
+- MapLibre GL JS 6.19.0 añadido por el usuario; se carga desde un componente cliente y el worker se configura para Next/Turbopack según la guía oficial.
+- `MapCanvas` renderiza teselas OSM con atribución, controles de navegación, marcadores y selección/arrastre de puntos.
+- El formulario de `/admin/propiedades` permite poner/mover/quitar coordenadas en mapa y enviarlas al servidor con el resto de la ficha.
+- Se creó `/propiedades/mapa`: permite elegir punto con click, solicitar ubicación explícitamente al navegador, fijar radio, filtrar localmente por tipo/precio y sincronizar marcadores con fichas cercanas.
+- La ficha pública `/propiedad/[slug]` muestra un mapa de solo lectura si la propiedad tiene coordenadas guardadas; no expone borradores porque el catálogo público sigue sujeto a publicación aprobada y RLS.
+- El repositorio consulta `search_public_properties_nearby`, vuelve a leer fichas bajo RLS pública, conserva el orden de proximidad y genera URLs firmadas para sus fotos.
+- La búsqueda solo muestra propiedades aprobadas con coordenadas consultadas por Supabase; no publica ubicaciones ficticias.
+- Estilo adaptable; teselas OSM configurables por entorno y sin precarga.
+- Verificación: `pnpm lint` y `pnpm typecheck` pasan. `pnpm build` sigue bloqueado en el sandbox: Turbopack no puede crear procesos/enlazar su puerto interno (`Operation not permitted`); requiere repetirse en Arch.
+- Riesgo conocido: mapas requieren conexión externa a teselas OSM. La búsqueda por dirección mediante proveedor de geocodificación sigue sin configurarse; click en mapa y geolocalización son las formas actuales de seleccionar una zona.
+
+## REGISTRO DE FASE 8 — INCREMENTO 1
+- Objetivo: establecer persistencia y controles de acceso para planes, suscripciones, pagos ficticios y propiedades Premium.
+- Estado: [~] Migración preparada, aún no aplicada según la consulta del usuario (`premium_schema = false`); requiere aplicarse en Supabase y probarse.
+- Migración nueva: `supabase/migrations/202611230006_premium_subscriptions.sql` crea `subscription_plans`, `subscriptions` y `payment_simulations`, índices, restricciones, grants y RLS.
+- Entitlement `private.has_active_premium_membership()` solo considera perfiles Cliente activos y suscripción `active` vigente por fechas; Premium no se convierte en rol.
+- RPC `public.simulate_premium_checkout(plan_id, result)` permite únicamente escenarios ficticios, valida sesión/cliente/plan, serializa compras simultáneas, extiende periodos exitosos y escribe historial/auditoría en una transacción.
+- Un plan académico de MXN 299/30 días se inserta como demostración configurable; no se capturan datos bancarios.
+- Policies amplían lectura de propiedades aprobadas, imágenes, características y objetos Storage Premium a suscriptores vigentes.
+- No se puede validar sintaxis ni permisos contra el Supabase remoto en esta sesión. Revisar la migración y aplicar tras confirmar la secuencia remota.
+
+## REGISTRO DE FASE 8 — INCREMENTO 2
+- Objetivo: ofrecer una primera experiencia navegable de planes, checkout ficticio y estado de membresía.
+- Estado: [~] Código integrado; el usuario reporta 0006 aplicada. El checkout y el distintivo siguen pendientes de prueba funcional.
+- `/premium` lista planes activos de Postgres, muestra resumen/precio/duración/beneficios y ofrece botones separados para simular éxito o rechazo; avisa que no hay cargos ni se deben ingresar datos bancarios.
+- La acción de servidor requiere Cliente activo, valida UUID/resultado con Zod y llama a `simulate_premium_checkout`; el servidor no acepta un estado de suscripción directo.
+- Navbar y `/mi-cuenta` consultan la vigencia real por servidor y activan el aro Premium existente solo durante el periodo vigente.
+- Catálogo y fichas consultan visibilidades con RLS; la migration 0006 extiende la RPC geográfica para las publicaciones Premium del suscriptor activo.
+- Verificación: `pnpm lint` y `pnpm typecheck` pasan en el incremento original. El usuario reporta 0006 aplicada; esta sesión no reejecutó SQL remoto.
+
+## REGISTRO DE FASE 8 — INCREMENTO 3
+- Objetivo: historial de pagos de prueba, cancelación de vigencia y administración de planes.
+- Estado: [x] El usuario confirma que el flujo Premium funciona bien.
+- `/premium` muestra historial del titular y permite cancelar periodos activos vigentes. No pide datos bancarios ni promete reembolso.
+- `/admin/suscripciones` permite crear/editar planes (slug, precio simulado, duración, beneficios, activo) y cancelar una suscripción concreta. Las mutaciones de planes usan RLS de Admin; las cancelaciones pasan por RPC.
+- Migración nueva: `202611230007_premium_cancel.sql`. El funcionamiento confirmado de cancelación implica que la RPC está disponible; no se consultó directamente el historial de migraciones remoto.
+- La cancelación propia registra una fila de auditoría por cada suscripción y enlaza el ID correcto de esa suscripción.
+- Verificación: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan. No hay servidor de desarrollo ni navegador en esta sesión para revisar la UI. Build de Turbopack sigue bloqueado en sandbox.
+- El usuario reporta que no puede crear planes ni simular pagos. El guardado ahora exige confirmación de fila devuelta y ambas acciones traducen códigos comunes de migración/esquema, permisos y plan no disponible a mensajes visibles.
+- El usuario compartió HTTP 500: `A "use server" file can only export async functions, found object`. Causa confirmada: los módulos de acciones exportaban valores de estado inicial. Se movieron estados y tipo al módulo neutral `features/subscriptions/types/action-state.ts`; los action modules ya exportan solo funciones async.
+- Se limpió `.next` para eliminar el action loader compilado antiguo; no había proceso `next dev` activo en el entorno de trabajo.
+- Git informa `No commits yet on fase-8-premium` y los archivos del proyecto están sin seguimiento; no existe una rama/punto anterior guardado. Se conservaron los archivos y la rama.
+- El usuario confirma que crear planes y simular pagos funciona correctamente tras reiniciar el servidor. Se registra como validación manual del usuario; no se infieren resultados específicos de cancelación o RLS.
+- Validación reportada por el usuario: flujo Premium completo, incluyendo creación de planes y simulaciones; el usuario confirma que todo funciona bien.
+- Pendiente global: pruebas automatizadas y matriz negativa de RLS en Fase 14; no bloquean el cierre funcional de Fase 8.
+
+## CONTEXTO DE RELEVO PARA OTRA IA
+- Instrucciones persistentes: `AGENTS.md`. Leer primero `PROGRESO.txt`, luego `README.md` y los documentos temáticos indicados allí.
+- El usuario confirma funcionamiento de CRUD/fotos/publicación/historial de precio y ahora confirma que el mapa se ve en Admin y en el detalle público.
+- El usuario reporta que instaló MapLibre y habilitó PostGIS; consulta de Supabase confirma que la columna espacial y RPC de 0005 existen.
+- El usuario reporta 0006 aplicada y confirma que el flujo Premium completo funciona. No se inspeccionó directamente el estado remoto de 0007; la cancelación funcional del flujo está confirmada por el usuario.
+- Enlace de verificación de email: el usuario reporta que ahora funciona; no se verificó Auth remoto desde esta sesión.
+- Datos reales: ficha e imágenes metadata en PostgreSQL; binarios de fotos en Supabase Storage del mismo proyecto.
+
+ÚLTIMA ACTIVIDAD
+2026-11-24 — El usuario confirma que 0019 y 0020 funcionan y reporta que 0021 parece funcionar; no se inspeccionó Supabase. La revisión de API detectó lectura excesiva de datos privados; 0021 separa dirección/coordenadas exactas y limita grants. El usuario reporta que el enlace de verificación Auth ahora funciona.
+
+PRÓXIMA ACTIVIDAD
+Fase 14, incremento 4: el usuario indica que 0021 parece funcionar; no se verificó la base ni cada rol de manera independiente. Próximo: completar matriz con anon, Cliente, Agente asignado/no asignado y Admin, además de pruebas negativas RLS y mitigación anti-abuso para captación pública. El enlace de verificación Auth ya funciona según reporte del usuario.
+
+## REGISTRO DE FASE 9 — INCREMENTO 1
+- Objetivo: dar al Admin un resumen de actividad operativa usando solo filas persistidas existentes.
+- Añadido `/admin`, panel con enlaces desde navegación Admin, resumen numérico compacto y gráficas de tendencia mensual de creación, distribución de estados de publicación/comerciales y simulaciones Premium por semana.
+- Se añadió tabla de cambios de precio recientes desde `property_price_history`. Las simulaciones se identifican como pruebas y nunca como ingresos. En el incremento 1 no se mostraban vistas; el incremento 2 añade esa métrica, pendiente de migración remota.
+- Sin migración nueva: las consultas usan `count: exact`, sesión Supabase y RLS existente; los errores de fuente muestran “No disponible”, no cero.
+- Verificación: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan tras corregir el path.
+- Verificación tras rediseño: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan.
+- Pendiente: reiniciar y abrir `/admin` con Admin; revisar gráficas y comparar resultados con Supabase.
+
+## REGISTRO DE FASE 9 — INCREMENTO 2
+- Añadida migración `supabase/migrations/202611240008_property_view_analytics.sql` para vistas reales de fichas, deduplicación por UUID de sesión/pestaña, validación de publicación/visibilidad, límite de 30 fichas por sesión/día, retención mediante limpieza oportunista de eventos >90 días y RPC de métricas diarias solo Admin. El usuario confirma que la gráfica y el flujo funcionan.
+- Añadido `POST /api/analytics/property-view`, validación estricta de origen/JSON/UUID, componente `PropertyViewTracker` solo para propiedades no demo y gráfica de vistas diarias de 28 días en `/admin`.
+- La tabla no tiene acceso directo desde Data API y la agregación no expone sesiones ni eventos crudos. No se guarda IP, usuario, navegador, referente o búsqueda.
+- Validación en esta sesión: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan.
+- La confirmación del usuario valida el flujo general; no verificamos directamente la base remota ni ejecutamos pruebas negativas independientes.
+
+## REGISTRO DE FASE 9 — INCREMENTO 3
+- Se añade RPC Admin agregada para ranking de hasta 20 fichas con más vistas en un intervalo máximo de 90 días; no expone sesiones ni eventos individuales.
+- `/admin` consulta el top 10 de los últimos 28 días y lo muestra como barras horizontales con enlace a cada ficha.
+- Nueva migración `202611240009_property_view_ranking.sql`; el usuario confirmó que el ranking funciona en su entorno (ver incremento 4).
+
+## REGISTRO DE FASE 9 — INCREMENTO 4
+- El usuario confirma que las vistas y el ranking funcionan en su entorno, por lo que 0009 se considera aplicada según su reporte.
+- Añadido `GET /api/admin/analytics/export`: Admin activo exporta CSV UTF-8 con vistas por día y ranking de fichas de 28 días; el endpoint usa RPC agregadas, no incluye sesiones/eventos individuales, evita caché y neutraliza celdas CSV con prefijo de fórmula.
+- Añadido enlace “Descargar vistas CSV” en el encabezado de `/admin`.
+- Validación estática del incremento 4: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan.
+- Pendiente validar descarga como Admin, rechazo como Cliente/visitante y consistencia de totales con el panel.
+
+## REGISTRO DE FASE 9 — INCREMENTO 5
+- El usuario confirma que la descarga CSV funciona en su entorno.
+- Se añadió un selector de 7, 28 o 90 días para el gráfico diario y el ranking; el enlace CSV transporta el mismo periodo.
+- Los rangos se resuelven desde una allowlist común, los valores inválidos regresan al predeterminado de 28 días y el RPC conserva su tope de 90 días.
+- `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan. Pendiente que el usuario revise selector y coincidencia entre panel/CSV en los tres rangos.
+
+## REGISTRO DE FASE 9 — INCREMENTO 6
+- El usuario confirma que los periodos y la descarga CSV funcionan.
+- Añadidos gráficos de vistas por tipo de inmueble y ciudad, integrados con filtro de 7/28/90 días y exportación CSV.
+- Nueva RPC agregada `admin_property_view_breakdowns`, con validación Admin y rango máximo de 90 días; devuelve conteos por tipo y las 10 ciudades principales, sin eventos individuales.
+- Nueva migración `supabase/migrations/202611240010_property_view_breakdowns.sql`; el usuario confirma que los desgloses y el CSV funcionan.
+
+## REGISTRO DE FASE 9 — CIERRE FUNCIONAL
+- El usuario confirma que todo funciona, incluidos los desgloses por tipo/ciudad y el CSV. Fase 9 queda cerrada funcionalmente según su validación; no se inspeccionó el historial remoto de migraciones desde esta sesión.
+
+## REGISTRO DE FASE 10 — INCREMENTO 1
+- Se crea `public.agents` con migración 0011: perfil profesional ligado a cuenta con rol Agente, slug, nombre público, biografía, especialidades, zonas y publicación moderada.
+- Añadido `/admin/agentes` para que Admin gestione perfiles de cuentas Agente existentes; `/agentes` y `/agentes/[slug]` presentan solo perfiles publicados de agentes activos según RLS.
+- Los perfiles públicos no muestran correo ni teléfono personal; no hay perfiles demo inventados. La UI orienta al Admin a asignar el rol desde `/admin/usuarios` cuando aún no existen cuentas Agente.
+- Añadida validación Zod de servidor, Server Action con autorización Admin, RLS y helper de cuenta Agente activa en SQL.
+- El usuario confirma que los perfiles funcionan tras aplicar 0011 en su entorno; esta sesión no inspeccionó el historial remoto.
+- Validación de esta sesión al implementar el incremento: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan.
+
+## REGISTRO DE FASE 10 — INCREMENTO 2
+- Admin puede asignar propiedad a agente activo y retirar asignación desde `/admin/agentes`; el retiro escribe `revoked_at` y conserva el historial.
+- Añadido `/agente` con resumen calculado y lista de propiedades activas del agente, obtenidas mediante su sesión/RLS; muestra estado de publicación y comercial, y enlaza a ficha pública solo cuando corresponde.
+- Añadido enlace de navegación “Mi cartera” para Agente. La gestión y consulta usan `agent_assignments` de 0003 y requieren `SELECT` con RLS.
+- Se crea migración `202611240012_agent_assignment_read.sql` porque 0003 tenía policy SELECT pero omitió el grant de SELECT; además, la policy no bloqueaba la lectura directa de cuentas suspendidas. 0012 reemplaza la policy y exige cuenta Agente activa.
+- El usuario confirma que las asignaciones y la cartera funcionan tras aplicar 0012; no se inspeccionó directamente el historial remoto.
+- Verificación estática: `pnpm lint`, `pnpm typecheck`, parseo PostCSS y `git diff --check` pasan.
+
+## REGISTRO DE FASE 10 — INCREMENTO 3
+- Añadido formulario de consulta en fichas reales disponibles; se excluyen propiedades demo y no disponibles. La Server Action valida campos y consentimiento; RPC valida de nuevo propiedad/aprobación/disponibilidad, cliente autenticado activo, consentimiento y límite de tres consultas por correo/propiedad por hora. No se registra IP.
+- Las consultas se asignan al primer agente activo con asignación vigente; si no hay, quedan en bandeja Admin.
+- Añadidas tablas `leads`, `lead_interactions` y `lead_stage_history` con RLS; acceso de CRM solo para Admin activo y agente asignado activo. Clientes/visitantes no pueden leer filas CRM. Las notas se guardan como interacciones internas y los cambios de etapa generan historial mediante trigger.
+- Añadidos `/admin/leads` y `/agente/leads` con Kanban de etapas, acciones de cambio y notas.
+- Migración nueva `supabase/migrations/202611240013_crm_leads.sql`; el usuario confirma CRM funcional, se considera validada según su reporte. No se inspeccionó el historial remoto.
+- Verificación al implementar: `pnpm lint`, `pnpm typecheck`, parseo CSS y `git diff --check` pasaron. No se ejecutaron pruebas de integración ni consulta a Supabase.
+
+## REGISTRO DE FASE 11 — INCREMENTO 1
+- Favoritos por cuenta: tabla `favorites` con PK compuesta, RLS para Cliente activo propietario y restricciones de lectura/alta/baja. Solo se puede insertar una propiedad que el actor pueda leer por las políticas existentes.
+- La acción de servidor exige Cliente mediante `requireProfileRole`, valida campos con Zod, hace alta/baja idempotente y refresca `/favoritos`. El repositorio resuelve los IDs bajo RLS.
+- Añadido `/favoritos` y controles en portada, catálogo y ficha. Los datos demo no se convierten en favoritos persistentes.
+- Comparación: `localStorage` en navegador, hasta cuatro UUIDs; tabla comparativa vuelve a consultar propiedades públicas vigentes. Incluye quitar/vaciar y ofrece limpiar IDs guardados si ninguna propiedad seleccionada sigue visible; evita escribir datos en servidor.
+- Migración `supabase/migrations/202611240014_customer_favorites.sql`; el usuario confirma que favoritos/comparación funcionan, por lo que se considera aplicada/validada según su reporte (sin consulta remota en esta sesión).
+- Archivos nuevos en `src/features/favorites`, `src/features/comparison`, `/favoritos`, `/comparar` y migración 0014; se ajustaron tarjetas, layout/proveedor, navegación y `src/styles/components.css`.
+- Validación de esta sesión: `pnpm lint` y `pnpm typecheck` pasan después del ajuste de comparación; parseo PostCSS de `components.css` pasa; `git diff --check` no reporta errores. No se ejecutaron tests ni se consultó Supabase remoto.
+
+## REGISTRO DE FASE 11 — INCREMENTO 2
+- Añadida `favorite_lists` con nombre único por usuario y `favorite_list_properties` con PK compuesta, cascadas e índices. RLS limita las listas al Cliente activo propietario; para agregar una propiedad requiere que sea visible y ya esté guardada como favorito propio.
+- `/favoritos/listas` permite crear, renombrar y borrar listas. El detalle `/favoritos/listas/[id]` permite añadir desde favoritos y retirar propiedades; cada consulta vuelve a resolver las fichas bajo las reglas públicas.
+- La navegación del Cliente enlaza a “Mis listas”; `/favoritos` muestra el acceso y el total.
+- Migración nueva `supabase/migrations/202611240015_favorite_lists.sql`; el usuario confirma que listas funcionan, por lo que se considera aplicada/validada según su reporte (sin consulta remota).
+- Archivos nuevos en rutas de listas, acciones, esquemas, repositorio y componentes; modificaciones a navegación, estilos y páginas de favoritos.
+- Verificación de esta sesión: `pnpm lint` y `pnpm typecheck` pasan tras el incremento. No se ejecutaron pruebas ni se consultó Supabase remoto.
+
+## REGISTRO DE FASE 11 — INCREMENTO 3
+- Añadida migración `202611240016_customer_activity.sql` con `user_activity`, RLS de lectura del propio Cliente activo y RPC `record_customer_activity` que valida tipo de actividad, rol/estado y visibilidad de propiedad.
+- Se registran `property_viewed` (máximo una por propiedad/día UTC), `favorite_added`, `favorite_removed` e `inquiry_sent`; no se guarda IP, texto de consulta, correo, búsqueda ni metadatos libres. El RPC limita el historial del titular a 500 filas.
+- `/mi-actividad` presenta una cronología privada, enlaza solo propiedades aún visibles y etiqueta las fichas ya no disponibles.
+- La ficha pública registra vista solo al Cliente activo; las acciones exitosas de favoritos y consulta CRM agregan eventos. La falta de migración no bloquea esas acciones: se registra error técnico y el flujo principal continúa.
+- El usuario confirma que el historial funciona; 0016 se considera aplicada/validada según su reporte. No se consultó el proyecto remoto.
+- Verificación: `pnpm lint`, `pnpm typecheck`, parseo PostCSS y `git diff --check` pasan. No se ejecutaron pruebas de producto.
+
+## CIERRE FUNCIONAL DE FASE 11
+- El usuario confirma que herramientas de cliente e historial de actividad funcionan. Las migraciones 0014–0016 se consideran validadas según su reporte; esta sesión no inspeccionó el estado remoto.
+
+## REGISTRO DE FASE 12 — INCREMENTO 1
+- Añadida migración `202611240017_in_app_notifications.sql` para notificaciones privadas por estado de suscripción Premium y cambios de etapa de consultas CRM de Clientes autenticados.
+- Triggers insertan los eventos dentro de las transacciones originales; no guardan mensajes arbitrarios. Unicidad por evento de historial o pareja suscripción/tipo evita duplicados.
+- `/notificaciones` lista los avisos propios; permite marcar uno o todos como leídos. La navegación del Cliente muestra el contador de no leídas.
+- RLS permite lectura propia y solo actualización de `read_at`; no hay INSERT directo. Admin/agente/visitante no ven notificaciones de Clientes. No se envían correos/SMS.
+- El usuario confirma que las notificaciones funcionan; 0017 queda validada según su reporte. No se consultó Supabase remoto ni se ejecutaron pruebas de producto en esta sesión.
+
+## REGISTRO DE FASE 13 — INCREMENTO 1
+- Añadido SEO técnico: `metadataBase` desde `NEXT_PUBLIC_SITE_URL`, metadatos en español, canonical en páginas públicas, sitemap con páginas/propiedades/agentes públicos, `robots.txt` y `noindex` en áreas autenticadas/administrativas.
+- Corregida la ubicación física de `/propiedades/mapa`, que estaba bajo un directorio con paréntesis literales y por ello no era un segmento de grupo de rutas de Next.js.
+- Añadida migración `202611240018_site_settings.sql`: fila singleton para nombre, frase, descripción SEO y contacto público, con lectura pública, escritura solo Admin activo y actor desde la sesión.
+- Añadidos repositorio, validación Zod, Server Action y formulario `/admin/configuracion`; pie y metadatos raíz consultan datos guardados. Correo y teléfono parten vacíos para evitar publicar datos comerciales inventados.
+- El usuario confirma que la configuración funciona; 0018 queda validada según su reporte, sin inspección del historial remoto. La configuración de dominio canónico depende del entorno de despliegue.
+- Verificación estática de implementación: `pnpm lint` y `pnpm typecheck` pasan. No se ejecutaron pruebas independientes ni se consultó Supabase.
+
+## REGISTRO DE FASE 14 — INCREMENTO 1
+- La revisión de `agent_assignments` encontró que la policy `FOR ALL` de Admin permitía cambiar `assigned_by`/campos de asignación y la concesión incluía `DELETE`, aunque la interfaz preserva el historial mediante `revoked_at`.
+- La migración 0019 retira privilegios globales y concede solo `SELECT`, `INSERT` de propiedad/agente/actor y `UPDATE(revoked_at)`. RLS exige Admin activo, `assigned_by = auth.uid()`, agente vigente, inserción activa, y revocación solo de filas activas. No concede DELETE.
+- El usuario confirma que asignar y revocar funciona; 0019 se considera validada según su reporte. No se inspeccionó el historial remoto ni se ejecutaron pruebas SQL independientes.
+
+## REGISTRO DE FASE 14 — INCREMENTO 2
+- La revisión estática de `POST /api/analytics/property-view` encontró que la validación de origen comparaba contra `request.url`; ahora compara contra el origen canónico de `NEXT_PUBLIC_SITE_URL` mediante `getSiteOrigin()`.
+- La validación de `Content-Type` acepta solo el media type exacto `application/json`, permitiendo parámetros estándar como `charset`.
+- La telemetría pública sigue sin conservar IP ni identidad; el RPC existente limita vistas por ID de sesión, pero ese identificador puede ser elegido por quien llama. Este endpoint no es barrera anti-abuso ni sustituye límites externos.
+- `next.config.ts` añade `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` y `Permissions-Policy` a todas las rutas.
+- No se ejecutaron pruebas de producto ni SQL. La matriz negativa multirrol y mitigación de abuso en CRM siguen pendientes.
+
+## REGISTRO DE FASE 14 — INCREMENTO 3
+- La inspección detectó que `agent_assignments` preservaba actor creador con 0019, pero altas/revocaciones aún no generaban auditoría de base de datos pese al criterio documentado del proyecto.
+- Añadida migración 0020 con trigger `SECURITY DEFINER`, `search_path` vacío y sin ejecución directa para roles cliente. Registra altas y revocaciones en `audit_logs` dentro de la misma transacción, incluyendo actor y referencias de agente/propiedad; no almacena PII.
+- El usuario confirma que 0020 y auditoría de asignaciones funcionan; no se inspeccionó el historial remoto ni se ejecutaron pruebas SQL independientes.
+
+## REGISTRO DE FASE 14 — INCREMENTO 4
+- La revisión estática halló que el grant `SELECT` de tabla hacía legibles por Data API `address`, `postal_code`, `created_by`, `approved_by`, `location` geográfica, `property_images.uploaded_by` y `property_price_history.changed_by`, aunque la interfaz no los mostraba.
+- La migración 0021 mueve datos privados a `property_private_details`, limita esa lectura a Admin/agente asignado, redondea coordenadas para el catálogo, revoca SELECT de tabla y concede columnas explícitas. La RPC geoespacial devuelve solo IDs elegibles; la UI pública carga solo columnas permitidas. El Admin conserva edición de campos exactos.
+- `pnpm lint` y `pnpm typecheck` pasan. No se ejecutaron pruebas SQL ni de producto; 0021 pendiente de aplicar y validar con roles separados.
+- Ajuste de grants en 0021: `property_private_details` concede solo propiedad, dirección, código postal y coordenadas; ni siquiera Admin/agente asignado leen IDs de actores o timestamps internos desde Data API.
+- Documentación alineada en `README.md`, `AGENTS.md`, `CHANGELOG.md`, `docs/ARCHITECTURE.md`, `docs/DATABASE.md`, `docs/SECURITY.md`, `docs/TESTING.md` y `supabase/README.md`. Próximo paso: aplicar y probar 0021 con roles separados.
+
+## FASE 14 — INCREMENTO 5: NAVEGACIÓN RESPONSIVE Y LATENCIA PERCIBIDA
+- El usuario compartió captura donde el header quedaba congestionado por enlaces públicos y de Admin en la misma fila; pidió que Mi cuenta, Premium y opciones por rol vivieran en el icono de perfil, y mejorar la navegación móvil y la espera al abrir rutas.
+- La barra mantiene cuatro destinos públicos centrados. Cuenta, Premium y accesos de Cliente/Agente/Admin viven en un menú de perfil; badge de notificaciones y estado Premium se consultan al abrirlo, no bloquean cada render del header.
+- El menú móvil/perfil se puede cerrar con Escape, click exterior o al cambiar de ruta. Se ajustaron áreas táctiles, prefetch de enlaces y feedback de navegación pendiente.
+- El usuario reporta que el enlace de verificación de correo ahora funciona y que 0021 parece funcionar; no se inspeccionó Supabase/Auth remoto.
+- `pnpm lint`, `pnpm typecheck`, parseo PostCSS de estilos y `git diff --check` pasan. No se pudo acceder al navegador local para revisión visual o interactiva; falta revisión manual en escritorio y móvil.
+- Hosting recomendado para demo fuera de Vercel: Render Free con Next.js Node y Supabase existente. Limitación relevante: duerme tras 15 minutos inactivo y tarda alrededor de un minuto en despertar; aún no se configuró despliegue.
+
+## FASE 14 — INCREMENTO 6: MAPA MÓVIL, CONTROLES Y CONTRASTE
+- El usuario reportó que el mapa, el botón de tema y la hamburguesa no responden en móvil; indicó que no sabe si ocurre solo en iPhone. También pidió una paleta más legible y neutra.
+- Causa encontrada en código: `MapCanvas` activaba `cooperativeGestures`, que bloquea el arrastre normal y requiere dos dedos en móvil. Se desactivó; el mapa permite pan de un dedo y zoom con pellizco. Se amplió la superficie de marcadores y controles MapLibre.
+- Hamburguesa, tema y perfil ahora apuntan a 48 CSS px, tienen `touch-action: manipulation`; la hamburguesa muestra su estado abierto y los botones tienen estado de pulsación.
+- `tokens.css` usa fondos claros/oscuros diferenciados, texto negro/blanco y grises; `--color-on-accent` asegura texto contrastado en badges y selección.
+- Contraste calculado con fórmula WCAG: texto principal 17.24:1 claro y 17.04:1 oscuro; secundario 6.11:1 y 9.52:1; bordes de control 3.35:1 y 3.09:1.
+- Fuentes consultadas: WCAG 2.2 AA exige 4.5:1 texto normal y 3:1 texto grande; Apple recomienda área de botón de 44×44 pt; WCAG 2.2 Target Size Minimum establece 24×24 CSS px (con excepciones). MapLibre confirma que `cooperativeGestures` requiere dos dedos en móvil cuando está activo.
+- Archivos: `src/components/maps/map-canvas.tsx`, `src/styles/components.css`, `src/styles/tokens.css`, `src/app/globals.css`, `README.md`, `AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/TESTING.md`, `CHANGELOG.md`, `PROGRESO.txt`.
+- `pnpm lint`, `pnpm typecheck` y parseo PostCSS de los tres CSS pasan. `git diff --check` devolvió 0, pero los archivos de esta carpeta aparecen sin seguimiento y no se tomó como validación efectiva. No hay prueba visual ni acceso a iPhone/Android. No se verificó si el problema del botón/nav del usuario era específico de Safari.
+- Próximo paso: pasar lint/typecheck, inspeccionar diff y pedir al usuario una comprobación breve en su móvil. Si sigue sin responder, capturar modelo/iOS y revisar consola/hidratación.
+
+## FASE 14 — INCREMENTO 7: DIAGNÓSTICO DE HIDRATACIÓN E ICONO
+- El usuario aportó captura móvil desde `http://192.168.1.65`: menú, tema y perfil no responden; MapLibre permanece en “Cargando mapa”. Los cuatro síntomas apuntan a JavaScript cliente/hidratación no ejecutándose; no equivalen a un problema aislado del CSS o del tap target.
+- La sesión no tiene servidor local activo ni acceso al navegador remoto del teléfono, así que no se pudo leer consola ni comprobar carga de `/_next/static/*`. Revisar host/puerto, peticiones de chunks y errores JavaScript antes de atribuirlo a iOS.
+- El usuario añadió `PARADISE.png` (435×458, transparente). Se copió sin modificar a `public/icons/paradise.png`, configurado como icono del sitio y de Apple, además de imagen Open Graph/Twitter para vistas previas.
+- `pnpm lint` y `pnpm typecheck` pasan; `file` confirma que el asset servido es PNG RGBA 435×458.
+- El repo vacío `paradiseurbanproperties/Paradise` existe, es público, tiene rama por defecto `main` y la sesión cuenta con permiso push. No tenía remoto configurado localmente. `.gitignore` excluye `.env.local`, `node_modules`, `.next` y `.vercel`.
+- Se intentó `pnpm build` dentro y fuera del sandbox. En ambos casos Turbopack aborta al intentar enlazar un puerto interno con `Operation not permitted`; es un límite del entorno observado antes, no un error de compilación de módulo. La build de producción queda sin verificar.
+- Archivos: `public/icons/paradise.png`, `src/app/layout.tsx`, `PROGRESO.txt`, `CHANGELOG.md`, `README.md`, `AGENTS.md`, `docs/TESTING.md`.
+- Pendiente validar entrega HTTP real del icono/meta tags y diagnosticar carga de bundles/hidratación en la URL LAN. No afirmar aún arreglo de interacciones móviles.
+
+PRUEBAS
+- No se ejecutaron pruebas: Fase 0 fue análisis/documentación y Fase 1 prepara el entorno, no módulos de producto.
+- Fase 1: `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck` y `pnpm build` reportados exitosos desde la terminal normal de Arch.
+- Fase 2: build y verificaciones estáticas pasaron; el usuario confirmó tema oscuro y vista móvil.
+- Fase 3: lint, typecheck, parseo CSS y smoke checks pasan; usuario confirma rutas y logo. Build del sandbox bloqueado por permisos de puerto, sin afirmar build exitoso en esta sesión.
+- Fase 4: `pnpm lint`/`pnpm typecheck` pasaron; usuario reporta configuración Supabase y migración aplicada. Error de verificación aplazado. Build bloqueado por el puerto interno de Turbopack en sandbox.
+- Fase 5: `pnpm lint` y `pnpm typecheck` pasan. Usuario reporta migración/bootstrap completos; sin conexión remota para verificarlos. Pruebas manuales de UI/RLS y build local pendientes.
+- Fase 6: usuario confirma que propiedad, imágenes, publicación y cambios de precio funcionan al 100%; fase cerrada funcionalmente. Pruebas de permisos bajo cuentas separadas siguen pendientes.
+- Fase 7, incremento 1: instalación de MapLibre falló en sandbox por DNS; el usuario reporta que instaló la dependencia y habilitó PostGIS en Supabase.
+- Fase 8: el usuario confirma que Premium funciona integralmente, incluida la cancelación. No hay prueba E2E independiente en esta sesión.
+- Build de producción de la entrega anterior no se verificó aquí: Turbopack fue bloqueado por permisos de puerto/proceso en el sandbox.
+- No hay todavía suite formal Vitest/Playwright. Los smoke checks manuales de catálogo sí se ejecutaron; las rutas visuales de Fase 3 aún requieren revisión local.

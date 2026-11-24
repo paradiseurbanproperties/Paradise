@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" fill="none">
+  <rect width="1200" height="840" fill="#E9E6E7"/>
+  <path d="M290 620V388l310-214 310 214v232H290Z" fill="#F7F5F4" stroke="#AB978C" stroke-width="8"/>
+  <path d="M510 620V452c0-52 40-94 90-94s90 42 90 94v168" stroke="#7B7F8A" stroke-width="8"/>
+  <circle cx="864" cy="268" r="42" fill="#AB978C"/>
+  <text x="600" y="738" fill="#5E5653" font-family="Georgia,serif" font-size="34" text-anchor="middle">Paradise · Propiedades</text>
+</svg>
