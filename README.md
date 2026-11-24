@@ -2,7 +2,7 @@
 
 Plataforma inmobiliaria modular en planeación para un ejercicio académico. El objetivo es administrar propiedades y publicaciones, clientes, agentes, CRM, visitas, suscripciones Premium simuladas, analítica y configuración desde una experiencia pública y paneles con permisos.
 
-> **Estado:** Fase 14 en curso. El usuario confirma 0018–0020 funcionales y reporta que 0021 parece funcionar; la matriz RLS por rol aún no se verificó. El enlace de confirmación Auth ya funciona según reporte. La captura móvil más reciente muestra los controles sin interacción y el mapa en carga, probable fallo de hidratación por investigar. `PARADISE.png` se configuró para icono de pestaña y vista previa al compartir.
+> **Estado:** Fase 14 en curso. El usuario confirma 0018–0020 funcionales y reporta que 0021 parece funcionar; la matriz RLS por rol aún no se verificó. El enlace de confirmación Auth ya funciona según reporte. Vercel sirve `https://paradise-kappa-gray.vercel.app/` con HTTP 200 tras fijar el framework Next.js. Las interacciones móviles siguen pendientes de revisión en dispositivo. `PARADISE.png` se configuró para icono de pestaña y vista previa al compartir.
 
 ## Objetivos y problema
 

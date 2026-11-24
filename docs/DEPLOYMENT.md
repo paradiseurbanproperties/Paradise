@@ -24,8 +24,9 @@ Vercel detecta Next.js y ejecuta la build del proyecto por cada push según su c
 - En Vercel usar `Production Branch: main` y `Root Directory` en la raíz del repositorio (campo vacío o `./`). Dejar `Output Directory` sin sobrescribir; no usar `/main`, `public` ni `.next` como salida de una app Next.js.
 - Revisar que `Framework Preset` sea `Next.js`, que el deployment marcado como Production corresponda al commit `main` y abrir su dominio `.vercel.app` directamente en `/`.
 - La URL `https://paradise-kappa-gray.vercel.app/` respondió HTTP/2 404, `server: Vercel`, `x-vercel-error: NOT_FOUND` (PoP SFO). GitHub marca deployment completado para el commit anterior y el build local incluye `/`.
-- Causa compatible con evidencia: Vercel puede completar el build con preset “Other” pero no generar el manifiesto de rutas Next. Se añadió `vercel.json` para forzar el preset `nextjs`; el push siguiente debe crear un deployment nuevo.
-- Si persiste tras el redeploy, confirmar `Root Directory` en la raíz, `Output Directory` predeterminado, Framework Next.js y que el dominio esté asignado a ese proyecto/deployment; Vercel recomienda revisar el manifiesto/routing settings y logs.
+- Causa compatible con evidencia: Vercel puede completar el build con preset “Other” pero no generar el manifiesto de rutas Next. Se añadió `vercel.json` para forzar el preset `nextjs`.
+- Tras el push de `vercel.json`, el deployment terminó y la misma URL respondió HTTP/2 200 con `x-matched-path: /` y `x-powered-by: Next.js`. El 404 quedó resuelto al fijar el framework Next.js.
+- Próxima verificación funcional: abrir la web y comprobar navegación/interacciones desde iOS y Android. Si reaparece un 404 en otra URL, confirmar `Root Directory` en la raíz, `Output Directory` predeterminado y asignación del dominio al proyecto/deployment; Vercel recomienda revisar el routing y logs.
 - Referencia: [diagnóstico oficial de 404 en Vercel](https://vercel.com/kb/guide/why-is-my-deployed-project-giving-404) y [Root Directory/build settings](https://vercel.com/docs/builds/configure-a-build).
 
 ## Componentes previstos

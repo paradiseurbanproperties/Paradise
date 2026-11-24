@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 14 — Seguridad y rendimiento
 - Avance estimado: 87% (Fase 13 y flujo de verificación Auth confirmados por el usuario; 0019–0020 confirmadas por reporte; el usuario indica que 0021 parece funcionar, matriz multirrol aún pendiente)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]
-- Próxima actividad: después del redeploy con `vercel.json` (`framework: nextjs`), probar `https://paradise-kappa-gray.vercel.app/`. Si sigue en 404, confirmar Root Directory en raíz, Output Directory predeterminado y dominio asignado al proyecto/deployment correcto. Después validar móvil en Preview, configurar variables/redirects Supabase y continuar matriz RLS.
+- Próxima actividad: validar en iOS/Android los controles y mapa en `https://paradise-kappa-gray.vercel.app/`; la URL ya responde HTTP 200 tras fijar `framework: nextjs`. Si persiste el fallo táctil, revisar consola/peticiones del navegador móvil. Después configurar/verificar variables y redirects Supabase y continuar matriz RLS.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -418,6 +418,7 @@ Fase 14, incremento 4: el usuario indica que 0021 parece funcionar; no se verifi
 - Turbopack aborta al intentar enlazar un puerto interno con `Operation not permitted`; la build Webpack primero encontró que el sandbox bloqueaba el subproceso de TypeScript. Fuera del sandbox, `pnpm exec next build --webpack` completó compilación, TypeScript, datos, 31 páginas prerenderizadas y trazas de rutas. Se fija el script `pnpm build` en `next build --webpack` para el despliegue reproducible.
 - Vercel publica un status `success` (“Deployment has completed”) para el último commit `a18bc63`, pero el usuario reporta que al visitar su despliegue aparece que la página no existe. El build de Next genera `/`; no se puede localizar la causa sin la URL accesible y el código/texto exacto del 404. Se documentó la configuración esperada y la lista de comprobación.
 - La URL reportada `https://paradise-kappa-gray.vercel.app/` respondió a una solicitud directa con `HTTP/2 404`, `x-vercel-error: NOT_FOUND`, `server: Vercel`, PoP SFO. El status GitHub para el commit actual previo al fix es success. Se añadió `vercel.json` con el framework `nextjs`, ya que preset `Other` es una causa documentada de 404 global con build listo. Esperar el redeploy del nuevo commit y revalidar.
+- El deployment del commit `7c61e2b` terminó con status success y la misma URL pasó a HTTP/2 200, `x-matched-path: /`, `x-powered-by: Next.js`. Fijar el preset `nextjs` resolvió el 404; falta revisar interacciones móviles en dispositivos.
 - Archivos: `public/icons/paradise.png`, `src/app/layout.tsx`, `PROGRESO.txt`, `CHANGELOG.md`, `README.md`, `AGENTS.md`, `docs/TESTING.md`.
 - Pendiente validar entrega HTTP real del icono/meta tags y diagnosticar carga de bundles/hidratación en la URL LAN. No afirmar aún arreglo de interacciones móviles.
 

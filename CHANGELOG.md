@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.15] — 2026-11-24
+
+### Verificado en Vercel
+- El deployment posterior a `vercel.json` completó correctamente.
+- `https://paradise-kappa-gray.vercel.app/` ahora responde HTTP 200, `x-matched-path: /`, `x-powered-by: Next.js`; quedó resuelto el 404 NOT_FOUND.
+- Pendiente: revisar interacciones táctiles del sitio en iOS y Android.
+
 ## [0.17.14] — 2026-11-24
 
 ### Vercel
