@@ -18,6 +18,14 @@ En Supabase Auth, añadir el dominio de producción y las URLs Preview necesaria
 
 Vercel detecta Next.js y ejecuta la build del proyecto por cada push según su configuración estándar. Fuente: [Next.js en Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs), [builds](https://vercel.com/docs/builds) y [variables de entorno](https://vercel.com/docs/environment-variables/framework-environment-variables).
 
+### Diagnóstico de 404
+
+- La raíz del repositorio contiene `package.json` y la ruta `/` está en `src/app/(public)/page.tsx`; el build local confirma que `/` forma parte de las rutas generadas.
+- En Vercel usar `Production Branch: main` y `Root Directory: ./` (raíz del repositorio). Dejar `Output Directory` sin sobrescribir; no usar `/main`, `public` ni `.next` como salida de una app Next.js.
+- Revisar que `Framework Preset` sea `Next.js`, que el deployment marcado como Production corresponda al commit `main` y abrir su dominio `.vercel.app` directamente en `/`.
+- Vercel reportó estado exitoso para el último commit, pero el usuario sigue recibiendo 404. La URL exacta y el texto/código de la pantalla aún no se proporcionaron; distinguir error `NOT_FOUND` de deployment protection, URL preview caducada o dominio asignado a otro deployment.
+- Referencia: [diagnóstico oficial de 404 en Vercel](https://vercel.com/kb/guide/why-is-my-deployed-project-giving-404) y [Root Directory/build settings](https://vercel.com/docs/builds/configure-a-build).
+
 ## Componentes previstos
 
 - Aplicación Next.js en un runtime compatible con la versión elegida.

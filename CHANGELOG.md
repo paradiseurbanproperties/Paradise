@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.13] — 2026-11-24
+
+### Despliegue
+- GitHub confirma que Vercel completó el deployment asociado al commit `a18bc63`.
+- Confirmado en código y build que existe la ruta pública `/`; documentados `Production Branch: main`, `Root Directory: ./` y `Output Directory` predeterminado para Next.js.
+- Sigue pendiente ver la URL exacta/código del 404 reportado para distinguir configuración del proyecto, dominio/preview o protección del deployment.
+
 ## [0.17.12] — 2026-11-24
 
 ### Entrega

@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 14 — Seguridad y rendimiento
 - Avance estimado: 87% (Fase 13 y flujo de verificación Auth confirmados por el usuario; 0019–0020 confirmadas por reporte; el usuario indica que 0021 parece funcionar, matriz multirrol aún pendiente)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]
-- Próxima actividad: subir el primer commit a `paradiseurbanproperties/Paradise` en `main`; después conectar Vercel, configurar variables/redirects Supabase y validar una Preview desde móvil. Diagnosticar consola/network si las interacciones móviles siguen inertes. Después completar matriz RLS con identidades separadas (incluida 0021), abuso de formularios públicos y mapa con datos reales.
+- Próxima actividad: resolver el 404 del deployment Vercel con la URL/código exactos. GitHub ya marca como exitoso el deployment del commit `a18bc63`; la ruta `/` existe y el build local la genera. Confirmar en Vercel `Production Branch=main`, `Root Directory=./`, preset Next.js, Output Directory predeterminado y dominio `.vercel.app` correcto. Después validar móvil en Preview, configurar variables/redirects Supabase y continuar matriz RLS.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -416,6 +416,7 @@ Fase 14, incremento 4: el usuario indica que 0021 parece funcionar; no se verifi
 - `pnpm lint` y `pnpm typecheck` pasan; `file` confirma que el asset servido es PNG RGBA 435×458.
 - El repo vacío `paradiseurbanproperties/Paradise` existe, es público, tiene rama por defecto `main` y la sesión cuenta con permiso push. No tenía remoto configurado localmente. `.gitignore` excluye `.env.local`, `node_modules`, `.next` y `.vercel`.
 - Turbopack aborta al intentar enlazar un puerto interno con `Operation not permitted`; la build Webpack primero encontró que el sandbox bloqueaba el subproceso de TypeScript. Fuera del sandbox, `pnpm exec next build --webpack` completó compilación, TypeScript, datos, 31 páginas prerenderizadas y trazas de rutas. Se fija el script `pnpm build` en `next build --webpack` para el despliegue reproducible.
+- Vercel publica un status `success` (“Deployment has completed”) para el último commit `a18bc63`, pero el usuario reporta que al visitar su despliegue aparece que la página no existe. El build de Next genera `/`; no se puede localizar la causa sin la URL accesible y el código/texto exacto del 404. Se documentó la configuración esperada y la lista de comprobación.
 - Archivos: `public/icons/paradise.png`, `src/app/layout.tsx`, `PROGRESO.txt`, `CHANGELOG.md`, `README.md`, `AGENTS.md`, `docs/TESTING.md`.
 - Pendiente validar entrega HTTP real del icono/meta tags y diagnosticar carga de bundles/hidratación en la URL LAN. No afirmar aún arreglo de interacciones móviles.
 
