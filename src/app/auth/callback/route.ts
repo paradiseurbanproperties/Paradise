@@ -4,27 +4,44 @@ import { getSupabasePublicConfig } from "@/lib/supabase/config";
 
 const allowedNextPaths = new Set(["/", "/verificar-email", "/auth/cambiar-password"]);
 
-function verificationError(request: NextRequest) {
-  return NextResponse.redirect(new URL("/login?auth-error=verification", request.url));
-}
-
 export async function GET(request: NextRequest) {
-  const code = request.nextUrl.searchParams.get("code");
-  const next = request.nextUrl.searchParams.get("next") ?? "/";
-  const destination = allowedNextPaths.has(next) ? next : "/";
+  const params = request.nextUrl.searchParams;
+  const code = params.get("code");
+  const tokenHash = params.get("token_hash");
+  const type = params.get("type");
+  const next = params.get("next") ?? "/";
+  let destination = allowedNextPaths.has(next) ? next : "/";
+  const recovery = type === "recovery" || destination === "/auth/cambiar-password";
 
-  if (request.nextUrl.searchParams.has("error")) return verificationError(request);
-  if (!getSupabasePublicConfig() || !code) return verificationError(request);
-
-  try {
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) return verificationError(request);
-  } catch {
-    return verificationError(request);
+  function finish(path: string) {
+    const response = NextResponse.redirect(new URL(path, request.url));
+    response.headers.set("Cache-Control", "private, no-store");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    return response;
+  }
+  function failed(error?: { code?: string; status?: number }) {
+    if (error) console.error("[auth:callback] Verification failed", { code: error.code, status: error.status });
+    return finish(recovery ? "/recuperar-password?expired=1" : "/login?auth-error=verification");
   }
 
-  const redirectUrl = new URL(destination, request.url);
-  if (destination === "/verificar-email") redirectUrl.searchParams.set("verified", "1");
-  return NextResponse.redirect(redirectUrl);
+  if (params.has("error") || !getSupabasePublicConfig()) return failed();
+  try {
+    const supabase = await createSupabaseServerClient();
+    if (tokenHash && (type === "recovery" || type === "email" || type === "signup")) {
+      const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+      if (error) return failed(error);
+      destination = type === "recovery" ? "/auth/cambiar-password" : "/verificar-email";
+    } else if (code) {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) return failed(error);
+      // Supabase persists the recovery intent with the PKCE verifier cookie.
+      if ("redirectType" in data && data.redirectType === "recovery") destination = "/auth/cambiar-password";
+    } else {
+      return failed();
+    }
+  } catch {
+    return failed();
+  }
+
+  return finish(destination === "/verificar-email" ? "/verificar-email?verified=1" : destination);
 }

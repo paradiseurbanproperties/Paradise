@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createAuthRedirectUrl, getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getPasswordErrorMessage } from "@/features/auth/services/password-error";
 import { getSignUpErrorMessage } from "@/features/auth/services/sign-up-error";
 import {
   formDataRecord,
@@ -77,7 +78,10 @@ export async function requestPasswordRecoveryAction(
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: createAuthRedirectUrl("/auth/callback?next=%2Fauth%2Fcambiar-password"),
   });
-  if (error) return { status: "error", message: "No pudimos iniciar el proceso. Inténtalo de nuevo más tarde." };
+  if (error) {
+    console.error("[auth:recovery] Request failed", { code: error.code, status: error.status });
+    return { status: "error", message: getPasswordErrorMessage(error, "request") };
+  }
 
   return {
     status: "success",
@@ -100,7 +104,12 @@ export async function updatePasswordAction(
   }
 
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
-  if (error) return { status: "error", message: "No se pudo actualizar la contraseña. Solicita un enlace nuevo." };
+  if (error) {
+    console.error("[auth:password] Update failed", { code: error.code, status: error.status });
+    return { status: "error", message: getPasswordErrorMessage(error, "update") };
+  }
+  // The next screen asks for login; clear this browser's recovery session first.
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/login?password-updated=1");
 }
 

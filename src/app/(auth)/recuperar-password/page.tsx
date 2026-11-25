@@ -4,7 +4,12 @@ import { requestPasswordRecoveryAction } from "@/features/auth/actions/auth-acti
 
 export const metadata = { title: "Recuperar contraseña" };
 
-export default function RecoverPasswordPage() {
+export default async function RecoverPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ expired?: string }>;
+}) {
+  const params = await searchParams;
   return (
     <AuthPage
       alternate={{ href: "/login", label: "¿Recordaste tu contraseña?", linkText: "Volver al acceso" }}
@@ -12,6 +17,12 @@ export default function RecoverPasswordPage() {
       eyebrow="Recuperar acceso"
       title="Volvamos a entrar."
     >
+      {params.expired === "1" ? (
+        <p className="auth-form__feedback auth-form__feedback--error" role="alert">
+          No pudimos validar el enlace. Puede haber vencido o ya haberse utilizado.
+          Solicita otro correo y abre el enlace más reciente en el navegador donde lo pediste.
+        </p>
+      ) : null}
       <AuthForm action={requestPasswordRecoveryAction} submitLabel="Enviar instrucciones">
         <label className="auth-field">
           <span>Correo electrónico</span>

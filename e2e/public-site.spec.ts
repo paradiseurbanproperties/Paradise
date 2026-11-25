@@ -103,3 +103,16 @@ test("la página de mapa conserva controles accesibles", async ({ page }) => {
   await expect(page.getByLabel("Radio de búsqueda")).toBeVisible();
   await expectNoAccessibilityViolations(page);
 });
+
+test("recuperación explica enlaces inválidos y permite solicitar otro correo", async ({ page }) => {
+  await page.goto("/auth/confirm?type=recovery&error=access_denied", { waitUntil: "networkidle" });
+  await expect(page).toHaveURL(/\/recuperar-password\?expired=1$/);
+  await expect(page.getByRole("alert").filter({ hasText: "No pudimos validar el enlace" })).toBeVisible();
+  await expect(page.getByLabel("Correo electrónico")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Enviar instrucciones" })).toBeEnabled();
+  await expectNoAccessibilityViolations(page);
+
+  await page.goto("/auth/callback?next=https://attacker.example", { waitUntil: "networkidle" });
+  await expect(page).toHaveURL(/\/login\?auth-error=verification$/);
+  await expect(page.getByRole("alert").filter({ hasText: "No pudimos verificar el correo" })).toBeVisible();
+});

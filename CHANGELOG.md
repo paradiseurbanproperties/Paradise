@@ -2,6 +2,15 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.35] — 2026-11-24
+
+### Recuperación y confirmación de Auth
+- Callback compatible con PKCE y token_hash; recuperación reconoce la intención guardada por Supabase aunque falte `next`. Nueva ruta `/auth/confirm` para plantillas SSR.
+- Enlaces de recuperación inválidos muestran instrucciones para reintentar. Mensajes específicos para límites de correo, contraseña repetida/débil y sesión vencida; logs sin tokens ni datos personales.
+- Al actualizar la contraseña se cierra la sesión local antes de pedir iniciar sesión de nuevo. Callback sin caché ni envío de referente.
+- Plantillas de correo listas en `supabase/templates`; requieren copiarse al dashboard. No se modificó configuración remota ni se verificó un inbox real.
+- 24 pruebas unitarias pasan, incluidas regresiones de callback y mensajes de contraseña. Validaciones restantes y despliegue en PROGRESO.
+
 ## [0.17.34] — 2026-11-24
 
 ### Rendimiento de la portada

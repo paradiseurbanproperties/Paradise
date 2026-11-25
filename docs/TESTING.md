@@ -203,3 +203,9 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - Smoke checks de defaults sin límites, filtros, orden por precio, paginación y resultado vacío: pasan.
 - `pnpm build`: no completó dentro del sandbox porque Turbopack intenta enlazar un puerto local y el sistema responde `Operation not permitted`; debe repetirse en la terminal local de Arch.
 - Revisión visual de las rutas nuevas: pendiente hasta disponer del build/dev server local.
+
+## Corrección de recuperación Auth — 2026-11-24
+
+Pruebas unitarias del callback con Supabase simulado: PKCE de recuperación sin `next`, tokens de recuperación/confirmación, tipos inválidos, enlaces vencidos, credenciales ausentes y rechazo de redirecciones externas. Mensajes de contraseña repetida, expiración y límites de envío. Estas pruebas no confirman SMTP, cookies en un navegador real ni configuración remota. Validación local: 24 unitarias, lint, tipos y build pasan. Cinco E2E existentes pasaron y el nuevo escenario de recuperación pasó en ejecución focalizada después de corregir un selector ambiguo; incluye axe y redirección real del callback sin credenciales.
+
+Pendiente con un inbox real: solicitar recuperación, abrir el correo más reciente, guardar una contraseña diferente y comprobar login nuevo; repetir expiración/uso único y registro/confirmación. Para otro navegador, aplicar las plantillas token_hash de `supabase/templates` antes de solicitar el correo.

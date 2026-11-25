@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 15 — QA y entrega
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]; Fase 15 [~]
-- Próxima actividad: repetir Lighthouse en desktop/catálogo y revisar teclado/navegador y roles con cuentas de prueba. Una muestra Lighthouse móvil ya está documentada. No hacer nuevos push sin autorización explícita. El rate limit WAF se omite por decisión del usuario.
+- Próxima actividad: validar recuperación/registro con inbox real y configurar URL pública/plantillas de Supabase; después retomar QA de Fase 15. Push de esta corrección Auth autorizado expresamente por el usuario. El rate limit WAF se omite por decisión del usuario.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -548,3 +548,10 @@ PRUEBAS
 - Fase 8: el usuario confirma que Premium funciona integralmente, incluida la cancelación. No hay prueba E2E independiente en esta sesión.
 - Build de producción de la entrega anterior no se verificó aquí: Turbopack fue bloqueado por permisos de puerto/proceso en el sandbox.
 - No hay todavía suite Playwright; Vitest ahora cubre reglas unitarias iniciales. Los smoke checks manuales de catálogo sí se ejecutaron; las rutas visuales de Fase 3 aún requieren revisión local.
+
+## FASE 15 — CORRECCIÓN DE RECUPERACIÓN AUTH (2026-11-24)
+- Incidencia del usuario: no puede recuperar contraseña; el punto exacto del fallo remoto no está confirmado. La captura anterior mostraba un Site URL que redirige al SSO de Vercel; el otro dominio público respondió 200.
+- Defectos corregidos en código: callback limitado a PKCE, pérdida del destino recovery cuando falta next, error genérico de verificación para recuperación y expiración invisible en el formulario. Añadidos tokens SSR y alias /auth/confirm, mensajes de errores y cierre de sesión local tras cambiar contraseña.
+- Archivos: callback/confirm, acciones y formulario de recuperación, servicio password-error, pruebas unitarias, supabase/templates y documentación temática.
+- Plantillas de confirmación/recuperación preparadas; no aplicadas al dashboard. No hay credenciales administrativas conectadas para modificar Supabase/Vercel. No se creó una cuenta ni se envió correo real. El arreglo de código no equivale a confirmar el flujo de producción.
+- Validación: 24 unitarias pasan (Supabase simulado en callback); lint pasó. Typecheck detectó que redirectType es propiedad de runtime de la versión instalada pero no figura en el tipo público: se añadió comprobación de propiedad antes de leerla. Typecheck y build Webpack pasaron (build fuera del sandbox tras fallo del subproceso TypeScript). Cinco E2E existentes pasaron; el nuevo E2E de recuperación pasó tras corregir un selector ambiguo con el anunciador de Next. Total: seis escenarios validados; aviso DEP0205 no fatal. Pendiente push/estado remoto.

@@ -93,7 +93,7 @@ Fase 11, incremento 3: `features/activity` registra eventos minimizados de un Cl
 
 Fase 12, incremento 1: `notifications` entrega avisos in-app al Cliente sobre activación/cancelación Premium y cambios de etapa CRM. Triggers guardan eventos dentro de las transacciones originales; `/notificaciones` permite marcar leídos y la navegación muestra el contador. RLS permite leer filas propias y cambiar únicamente `read_at`. La migración 0017 está pendiente.
 
-Auth SSR utiliza `@supabase/ssr`: cliente de navegador, cliente servidor con cookies y `src/proxy.ts` para renovar tokens. Las acciones de Auth validan entradas con Zod y el callback intercambia el código PKCE por sesión. La autorización de Fase 5 se centraliza en `src/lib/permissions/access.ts`. Se consulta el rol desde servidor bajo RLS; las guardas requieren cuenta activa y ocultan rutas no autorizadas. La base valida cambios administrativos y no confía en metadata editable del cliente.
+Auth SSR utiliza `@supabase/ssr`: cliente de navegador, cliente servidor con cookies y `src/proxy.ts` para renovar tokens. Las acciones de Auth validan entradas con Zod y el callback intercambia el código PKCE por sesión o verifica `token_hash` de las plantillas SSR. `/auth/confirm` comparte ese manejador; el tipo recovery conduce al formulario de contraseña incluso si falta `next`. La autorización de Fase 5 se centraliza en `src/lib/permissions/access.ts`. Se consulta el rol desde servidor bajo RLS; las guardas requieren cuenta activa y ocultan rutas no autorizadas. La base valida cambios administrativos y no confía en metadata editable del cliente.
 
 ## Riesgos técnicos identificados
 
