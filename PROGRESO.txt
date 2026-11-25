@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 14 — Seguridad y rendimiento
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]
-- Próxima actividad: activar la regla WAF de rate limit en el proyecto Vercel y observar su tráfico. La ruta pública de mapa con centro CDMX/radio 5 km devolvió HTTP 200 y renderizó un resultado; el usuario reporta que el mapa funciona. La interacción visual no se automatizó en esta sesión.
+- Próxima actividad: activar la regla WAF de rate limit en el proyecto Vercel y observar su tráfico. Se alineó la validación Origin de las APIs con el mismo dominio Vercel que Auth usa como fallback, para evitar rechazar tráfico legítimo si falta `NEXT_PUBLIC_SITE_URL`.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -117,6 +117,12 @@ FUNCIONES PENDIENTES
 - GET público a la URL de búsqueda por radio de producción (`lat=19.4326`, `lon=-99.1332`, `radius=5000`) respondió HTTP 200; el HTML renderizado mostró una propiedad.
 - El usuario confirma que el mapa funciona. No hay navegador accesible en esta sesión, así que no se observó el movimiento del mapa ni el toque/cambio de centro.
 - La regla WAF sigue pendiente: Vercel CLI no está instalada, el checkout no está enlazado y el host del navegador no está disponible. No hubo cambios de aplicación ni push.
+
+## FASE 14 — INCREMENTO 16: ORIGEN CONFIABLE EN VERCEL
+- Revisión estática encontró que Origin de CRM/analítica usaba `getSiteOrigin()` con fallback `localhost`, distinto al fallback Vercel que Auth ya usa. Si faltara `NEXT_PUBLIC_SITE_URL` en producción, formularios/analítica podían responder 403.
+- `getSiteOrigin()` ahora reutiliza `getPublicSiteUrl()`: prioriza configuración explícita, usa dominio Vercel de producción/deployment y mantiene HTTP de loopback/LAN solo en desarrollo.
+- Verificación: `pnpm lint`, `pnpm build` (Webpack), `pnpm typecheck` y `git diff --check` pasan. El build conservó `DEP0205`; un primer intento encadenado dio un error transitorio de lectura de `tsc --showConfig`, pero el build independiente pasó.
+- No se ejecutaron pruebas de producto ni se enviaron solicitudes de origen. Sin migración ni cambio SQL. Push pendiente de revisión final.
 
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.

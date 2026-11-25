@@ -10,7 +10,7 @@ Variables que deben configurarse en Vercel para Production y Preview según corr
 
 - `NEXT_PUBLIC_SUPABASE_URL`: URL del proyecto Supabase.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: clave publicable (nunca service role).
-- `NEXT_PUBLIC_SITE_URL`: origen canónico HTTPS que alimenta metadatos, sitemap y canonical. Para Production, asignar el dominio Vercel definitivo. Los callbacks de Auth usan esta URL y, si falta, el dominio de producción o deployment que Vercel expone automáticamente.
+- `NEXT_PUBLIC_SITE_URL`: origen canónico HTTPS que alimenta metadatos, sitemap y canonical. Para Production, asignar el dominio Vercel definitivo. Auth y las APIs públicas usan esta URL y, si falta, el dominio de producción o deployment que Vercel expone automáticamente.
 - Opcional: `NEXT_PUBLIC_MAP_STYLE_URL` o `NEXT_PUBLIC_MAP_TILE_URL`; si faltan, el mapa usa teselas raster OSM. Configurar límites/condiciones de un proveedor antes de tráfico significativo.
 - `GEOCODING_PROVIDER` y `GEOCODING_API_KEY` solo si se habilita geocodificación; la clave debe ser server-side y no llevar prefijo `NEXT_PUBLIC_`.
 

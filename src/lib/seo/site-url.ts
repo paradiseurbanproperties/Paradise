@@ -1,18 +1,7 @@
-const FALLBACK_SITE_ORIGIN = "http://localhost:3000";
+import { getPublicSiteUrl } from "@/lib/supabase/config";
 
 export function getSiteOrigin(): URL {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!configured) return new URL(FALLBACK_SITE_ORIGIN);
-
-  try {
-    const url = new URL(configured);
-    if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password) {
-      return new URL(FALLBACK_SITE_ORIGIN);
-    }
-    return new URL(url.origin);
-  } catch {
-    return new URL(FALLBACK_SITE_ORIGIN);
-  }
+  return new URL(getPublicSiteUrl());
 }
 
 export function getCanonicalUrl(path: string): URL {

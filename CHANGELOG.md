@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.25] — 2026-11-24
+
+### Origen de solicitudes públicas
+- `getSiteOrigin()` reutiliza el origen de Auth: `NEXT_PUBLIC_SITE_URL` o el dominio Vercel de producción/deployment. Evita que CRM/analítica comparen el `Origin` con `localhost` en Production.
+- En desarrollo se siguen aceptando orígenes HTTP de loopback/LAN para hosts locales.
+- Sin SQL/migración. `pnpm lint`, `pnpm build` (Webpack), `pnpm typecheck` y `git diff --check` pasan; build conserva `DEP0205`. No se ejecutaron pruebas de producto ni smoke HTTP en este incremento.
+
 ## [0.17.24] — 2026-11-24
 
 ### Búsqueda geográfica en producción

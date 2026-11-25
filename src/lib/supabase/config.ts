@@ -40,8 +40,9 @@ export function getPublicSiteUrl(): string {
     try {
       const hasScheme = /^[a-z][a-z\d+.-]*:\/\//i.test(configuredUrl);
       const url = new URL(hasScheme ? configuredUrl : `https://${configuredUrl}`);
-      const isLocalHttp = url.protocol === "http:" && (url.hostname === "localhost" || url.hostname === "127.0.0.1");
-      if (url.protocol === "https:" || (isLocalHttp && !isVercel)) {
+      const isLoopbackHttp = url.protocol === "http:" && (url.hostname === "localhost" || url.hostname === "127.0.0.1");
+      const isDevelopmentHttp = url.protocol === "http:" && !isVercel && process.env.NODE_ENV === "development";
+      if (url.protocol === "https:" || (isLoopbackHttp && !isVercel) || isDevelopmentHttp) {
         return url.origin;
       }
     } catch {

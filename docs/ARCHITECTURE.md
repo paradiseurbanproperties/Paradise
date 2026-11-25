@@ -129,7 +129,7 @@ Auth SSR utiliza `@supabase/ssr`: cliente de navegador, cliente servidor con coo
 
 - `src/app/layout.tsx` genera metadatos raíz desde `site_settings`, con valores locales de respaldo cuando Supabase no está disponible.
 - `src/app/sitemap.ts` compone rutas públicas y propiedades/agentes actualmente visibles bajo RLS. `src/app/robots.ts` expone sitemap y bloquea rastreo de rutas privadas; los layouts de autenticación y paneles incluyen `noindex`.
-- `NEXT_PUBLIC_SITE_URL` define `metadataBase`, canonical, host y sitemap. Debe contener el origen canónico del despliegue.
+- `NEXT_PUBLIC_SITE_URL` define `metadataBase`, canonical, host y sitemap. Si no está configurada, el servidor usa el dominio Vercel de producción/deployment como fallback común para Auth y validación de `Origin`.
 - `/admin/configuracion` edita una fila singleton mediante Server Action, Zod y sesión Supabase. La tabla `site_settings` tiene lectura pública y escritura reservada a Admin activo con RLS. Solo se publican nombre, frase, descripción y contacto expresamente guardados.
 - El upsert de `site_settings` omite la clave `singleton` del payload para respetar el grant de columnas; PostgreSQL la establece a `true` por default. Los redirects Auth usan `NEXT_PUBLIC_SITE_URL` o los dominios de Vercel; Auth requiere que el callback esté permitido en Supabase.
 - La ruta `/propiedades/mapa` vive en el route group `(public)` correcto; no usar comillas literales en nombres de carpetas App Router.
