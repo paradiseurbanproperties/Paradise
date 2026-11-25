@@ -48,7 +48,7 @@ export async function signUpAction(
     password: parsed.data.password,
     options: {
       data: { display_name: parsed.data.displayName },
-      emailRedirectTo: createAuthRedirectUrl("/auth/callback?next=%2Fverificar-email"),
+      emailRedirectTo: createAuthRedirectUrl("/auth/callback"),
     },
   });
 
@@ -76,7 +76,7 @@ export async function requestPasswordRecoveryAction(
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: createAuthRedirectUrl("/auth/callback?next=%2Fauth%2Fcambiar-password"),
+    redirectTo: createAuthRedirectUrl("/auth/callback"),
   });
   if (error) {
     console.error("[auth:recovery] Request failed", { code: error.code, status: error.status });

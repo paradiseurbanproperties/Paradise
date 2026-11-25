@@ -15,6 +15,10 @@ beforeEach(() => {
 });
 
 describe("Auth callback", () => {
+  it("confirms signup PKCE without a next query parameter", async () => {
+    const response = await GET(request("code=test"));
+    expect(response.headers.get("location")).toBe("https://paradise.example/verificar-email?verified=1");
+  });
   it("recovers the password destination from PKCE when next is missing", async () => {
     auth.exchangeCodeForSession.mockResolvedValue({ data: { redirectType: "recovery" }, error: null });
     const response = await GET(request("code=test"));

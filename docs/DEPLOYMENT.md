@@ -76,3 +76,5 @@ Para permitir abrir el correo en otro navegador, copiar `supabase/templates/reco
 La comprobación HTTP del 24 de noviembre encontró `paradise-paradise-0f94.vercel.app` redirigiendo al SSO de Vercel, mientras `paradise-kappa-gray.vercel.app` respondió 200. No usar un dominio protegido como destino público de Auth. No se dispone de acceso administrativo a Supabase/Vercel para modificar URLs, SMTP o plantillas desde esta sesión.
 
 Los errores de recuperación y actualización registran únicamente código/estado. Si no llegan correos, revisar Auth logs y SMTP: un cambio de callback no soluciona un proveedor de correo rechazado o limitado. No se ha verificado entrega real a un inbox.
+
+Registro y recuperación solicitan exactamente `/auth/callback` sin `next` para coincidir con la entrada exacta de Redirect URLs. Supabase conserva la intención recovery en el verificador PKCE; el callback usa esa información para dirigir al formulario. Referencia de comparación de URLs: https://github.com/supabase/auth/blob/master/internal/utilities/request.go.

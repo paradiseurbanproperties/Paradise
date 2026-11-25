@@ -5,11 +5,12 @@ Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a
 ## [0.17.35] — 2026-11-24
 
 ### Recuperación y confirmación de Auth
+- Registro y recuperación envían la URL exacta `/auth/callback`, sin query `next`, para coincidir con la allowlist cuando Site URL usa otro dominio.
 - Callback compatible con PKCE y token_hash; recuperación reconoce la intención guardada por Supabase aunque falte `next`. Nueva ruta `/auth/confirm` para plantillas SSR.
 - Enlaces de recuperación inválidos muestran instrucciones para reintentar. Mensajes específicos para límites de correo, contraseña repetida/débil y sesión vencida; logs sin tokens ni datos personales.
 - Al actualizar la contraseña se cierra la sesión local antes de pedir iniciar sesión de nuevo. Callback sin caché ni envío de referente.
 - Plantillas de correo listas en `supabase/templates`; requieren copiarse al dashboard. No se modificó configuración remota ni se verificó un inbox real.
-- 24 pruebas unitarias pasan, incluidas regresiones de callback y mensajes de contraseña. Validaciones restantes y despliegue en PROGRESO.
+- 26 pruebas unitarias pasan, incluidas regresiones de callback y mensajes de contraseña. Validaciones restantes y despliegue en PROGRESO.
 
 ## [0.17.34] — 2026-11-24
 

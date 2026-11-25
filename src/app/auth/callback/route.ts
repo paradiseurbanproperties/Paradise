@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const code = params.get("code");
   const tokenHash = params.get("token_hash");
   const type = params.get("type");
-  const next = params.get("next") ?? "/";
+  const next = params.get("next") ?? "/verificar-email";
   let destination = allowedNextPaths.has(next) ? next : "/";
   const recovery = type === "recovery" || destination === "/auth/cambiar-password";
 
