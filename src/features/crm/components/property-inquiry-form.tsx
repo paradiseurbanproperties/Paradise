@@ -17,6 +17,7 @@ export function PropertyInquiryForm({ propertyId, propertyTitle }: { propertyId:
 
     try {
       const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
+      payload.senderEmail = String(payload.senderEmail ?? "").trim();
       const response = await fetch("/api/crm/property-inquiry", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -43,7 +44,7 @@ export function PropertyInquiryForm({ propertyId, propertyTitle }: { propertyId:
       <form className="property-inquiry-form" onSubmit={handleSubmit}>
         <input name="propertyId" type="hidden" value={propertyId} />
         <label className="auth-field"><span>Tu nombre</span><input autoComplete="name" maxLength={120} name="senderName" required /></label>
-        <label className="auth-field"><span>Correo electrónico</span><input autoComplete="email" maxLength={254} name="senderEmail" required type="email" /></label>
+        <label className="auth-field"><span>Correo electrónico</span><input autoCapitalize="none" autoComplete="email" autoCorrect="off" inputMode="email" maxLength={254} name="senderEmail" required type="email" /></label>
         <label className="auth-field"><span>¿Qué te gustaría saber?</span><textarea maxLength={2000} minLength={5} name="message" required rows={4} /></label>
         <label className="property-inquiry-consent">
           <input name="privacyConsent" required type="checkbox" />

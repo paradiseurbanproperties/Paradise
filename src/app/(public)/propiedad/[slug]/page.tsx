@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import * as motion from "motion/react-client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -61,7 +62,12 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
         <div className="property-detail">
           <Link className="back-link" href="/propiedades">← Volver al catálogo</Link>
 
-          <header className="property-detail__heading">
+          <motion.header
+            animate={{ opacity: 1, y: 0 }}
+            className="property-detail__heading"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div>
               <p className="eyebrow">{property.type}{property.demo ? " · Ficha de demostración" : property.visibility === "premium" ? " · Exclusiva Premium" : " · Paradise"}</p>
               <h1 className="page-title">{property.title}</h1>
@@ -73,20 +79,25 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
               <span>{property.demo ? "Precio de muestra" : "Precio"}</span>
               <strong>{formatPropertyPrice(property.price, property.currency)}</strong>
             </div>
-          </header>
+          </motion.header>
 
-          <div className="property-gallery">
-            <figure className="property-gallery__main">
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            className="property-gallery"
+            initial={{ opacity: 0, y: 24 }}
+            transition={{ delay: 0.12, duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <motion.figure className="property-gallery__main" initial={{ opacity: 0, scale: 1.035 }} transition={{ duration: 0.8 }} viewport={{ once: true }} whileInView={{ opacity: 1, scale: 1 }}>
               <Image alt={cover.alt} fill priority sizes="(max-width: 800px) 100vw, 66vw" src={cover.src} unoptimized={!property.demo} />
-            </figure>
-            <figure>
+            </motion.figure>
+            <motion.figure initial={{ opacity: 0, y: 16 }} transition={{ delay: 0.1, duration: 0.55 }} viewport={{ once: true }} whileInView={{ opacity: 1, y: 0 }}>
               <Image alt={secondImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={secondImage.src} unoptimized={!property.demo} />
-            </figure>
-            <figure>
+            </motion.figure>
+            <motion.figure initial={{ opacity: 0, y: 16 }} transition={{ delay: 0.18, duration: 0.55 }} viewport={{ once: true }} whileInView={{ opacity: 1, y: 0 }}>
               <Image alt={thirdImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={thirdImage.src} unoptimized={!property.demo} />
-            </figure>
+            </motion.figure>
             <span className="property-gallery__label">{property.demo ? "Fotografía ilustrativa" : "Fotografía de la propiedad"}</span>
-          </div>
+          </motion.div>
 
           <div className="property-detail__content">
             <div className="property-detail__main-column">
@@ -96,20 +107,20 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
                   <span>Esta propiedad, su ubicación y precio son ficticios. No está a la venta.</span>
                 </div>
               ) : null}
-              <section className="detail-section" aria-labelledby="property-description-title">
+              <motion.section className="detail-section" aria-labelledby="property-description-title" initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.56 }} viewport={{ amount: 0.2, once: true }} whileInView={{ opacity: 1, y: 0 }}>
                 <p className="eyebrow">Sobre el espacio</p>
                 <h2 id="property-description-title">Un espacio con personalidad</h2>
                 <p>{property.description}</p>
-              </section>
-              <section className="detail-section" aria-labelledby="property-features-title">
+              </motion.section>
+              <motion.section className="detail-section" aria-labelledby="property-features-title" initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.56 }} viewport={{ amount: 0.2, once: true }} whileInView={{ opacity: 1, y: 0 }}>
                 <p className="eyebrow">Detalles</p>
                 <h2 id="property-features-title">Características</h2>
                 <ul className="feature-list">
                   {property.features.map((feature) => <li key={feature}>{feature}</li>)}
                 </ul>
-              </section>
+              </motion.section>
               {typeof property.location.latitude === "number" && typeof property.location.longitude === "number" ? (
-                <section className="detail-section property-detail__map-section" aria-labelledby="property-location-title">
+                <motion.section className="detail-section property-detail__map-section" aria-labelledby="property-location-title" initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.56 }} viewport={{ amount: 0.15, once: true }} whileInView={{ opacity: 1, y: 0 }}>
                   <p className="eyebrow">Ubicación</p>
                   <h2 id="property-location-title">Explora la zona</h2>
                   <p>{property.location.neighborhood}, {property.location.city}, {property.location.state}</p>
@@ -126,7 +137,7 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
                     }]}
                     zoom={14}
                   />
-                </section>
+                </motion.section>
               ) : null}
               {priceHistory.length ? (
                 <section className="detail-section" aria-labelledby="property-price-history-title">
@@ -165,7 +176,14 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
             </aside>
           </div>
 
-          <section aria-labelledby="related-properties-title" className="related-properties">
+          <motion.section
+            aria-labelledby="related-properties-title"
+            className="related-properties"
+            initial={{ opacity: 0, y: 24 }}
+            transition={{ duration: 0.65 }}
+            viewport={{ amount: 0.1, once: true }}
+            whileInView={{ opacity: 1, y: 0 }}
+          >
             <div className="section-heading">
               <div>
                 <p className="eyebrow">Descubre más</p>
@@ -174,9 +192,13 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
               <Link className="text-link" href="/propiedades">Ver catálogo completo ↗</Link>
             </div>
             <div className="property-grid property-grid--related">
-              {otherProperties.map((item) => <PropertyCard canFavorite={canFavorite} isFavorite={favoriteIds.has(item.id)} key={item.id} property={item} showFavoriteControl={showFavoriteControl} />)}
+              {otherProperties.map((item, index) => (
+                <motion.div initial={{ opacity: 0, y: 20 }} key={item.id} transition={{ delay: index * 0.08, duration: 0.55 }} viewport={{ once: true }} whileHover={{ y: -5, transition: { type: "spring", stiffness: 320, damping: 24 } }} whileInView={{ opacity: 1, y: 0 }}>
+                  <PropertyCard canFavorite={canFavorite} isFavorite={favoriteIds.has(item.id)} property={item} showFavoriteControl={showFavoriteControl} />
+                </motion.div>
+              ))}
             </div>
-          </section>
+          </motion.section>
         </div>
       </main>
       <SiteFooter />

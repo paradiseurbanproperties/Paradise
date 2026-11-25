@@ -213,3 +213,25 @@ Pendiente con un inbox real: solicitar recuperación, abrir el correo más recie
 ## Avisos SMTP de consultas
 
 Tres pruebas con transporte simulado comprueban ausencia de envío sin contraseña de aplicación, Gmail como destinatario fijo con Reply-To del visitante, y fallo SMTP sin datos personales en logs. `pnpm test` (29), lint y build pasan localmente; el build tuvo que ejecutarse fuera del sandbox por el fallo conocido de TypeScript `--showConfig`. Falta envío real y validación de 0023/CRM contra Supabase.
+
+## Consulta CRM desde móvil
+
+La RPC requiere sesión anónima o un Cliente activo; una sesión Admin/Agente/suspendida se rechaza. El usuario confirmó que el móvil tenía una sesión Admin y que funciona con cuenta Cliente, por lo que no se necesita un cambio de backend. El formulario recorta el correo de autofill y usa atributos de email compatibles con iOS.
+
+## Revisión del rediseño responsive
+
+Para cada ruta pública y de cuenta, revisar a 360–390 px, 768 px y 1280 px: que no haya desplazamiento horizontal, el menú/perfil/tema se puedan tocar, los campos queden a 16 px en pantallas táctiles, los CTAs no se salgan de pantalla y las tablas puedan desplazarse dentro de su contenedor. Comprobar el tema claro/oscuro, foco por teclado y `prefers-reduced-motion`. El usuario revisó capturas y pidió compactar pie, cabecera móvil y filtros; se aplicaron esos ajustes. Lint, typecheck, parseo PostCSS y `git diff --check` pasan. El log de Next registró `Compiled in 1789ms`; no se ejecutaron pruebas de producto. No se hizo un nuevo screenshot tras el ajuste, porque CUA sigue sin acceder al host del navegador.
+
+## Motion y entradas animadas
+
+La aplicación usa Motion for React con `MotionConfig reducedMotion="user"`. Revisar a 360–390 px y 1280 px: entrada hero, reveals de secciones al hacer scroll, hover de tarjetas en puntero, menú de perfil y cambio de tema; con `prefers-reduced-motion: reduce`, los desplazamientos/escala deben reducirse. El log de Next confirmó compilación; lint y typecheck pasan. Falta revisión visual manual del resultado animado en ambos tamaños.
+
+## Revisión del refinamiento visual — 2026-11-25
+
+Se corrigió el botón de perfil para mostrar un único contorno (el aro dorado solo se conserva para Premium). La portada añadió jade, bosque, arcilla y arena sobre las superficies neutras existentes. `pnpm lint`, `pnpm typecheck`, `git diff --check` y `pnpm build` pasan; build mantiene el aviso no fatal `DEP0205`. No se ejecutaron pruebas de producto. Revisar en tema claro/oscuro a 360–390 px y 1280 px: el panel verde debe mantener legibilidad, la tarjeta de cierre no debe recortar contenido, y el perfil debe conservar foco visible y un área táctil cómoda. La inspección visual manual sigue pendiente; sin push.
+
+## Turbopack/HMR y acceso por LAN — 2026-11-25
+
+El log local registró errores internos repetidos `CellId ... no longer exists` en HMR de Turbopack; el archivo `.next/dev/lock` apuntaba a un PID que ya no existía. `dev` ahora usa Webpack y `--hostname 0.0.0.0`; el usuario reinició y confirma que el blur desapareció al acceder por IP. No ejecutar el build en paralelo con dev: comparten `.next`. CUA no tiene navegador disponible, así que queda pendiente la revisión visual independiente. El usuario autorizó push junto con la petición de estilizar todos los `select`.
+
+Los `select` sencillos ahora reciben flecha de marca, estados de hover/foco, tema oscuro y tamaño táctil. Confirmar selección en Safari iOS, Chrome Android y escritorio; el menú de opciones sigue siendo nativo.

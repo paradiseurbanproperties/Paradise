@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useScroll } from "motion/react";
 import type { ProfileRole } from "@/constants/access";
 import { signOutAction } from "@/features/auth/actions/auth-actions";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -80,6 +81,7 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
   const openMenu = openMenuState?.pathname === pathname ? openMenuState.menu : null;
   const menuOpen = openMenu === "navigation";
   const profileOpen = openMenu === "profile";
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -141,6 +143,7 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
 
   return (
     <header className="site-header" ref={headerRef}>
+      <motion.div aria-hidden="true" className="site-scroll-progress" style={{ scaleX: scrollYProgress }} />
       <a className="skip-link" href="#main-content">
         Saltar al contenido
       </a>
@@ -163,18 +166,19 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
         </Link>
 
         <nav aria-label="Navegación principal" className="site-nav">
-          <button
+          <motion.button
             aria-controls="site-main-navigation"
             aria-expanded={menuOpen}
             aria-label={menuOpen ? "Cerrar navegación" : "Abrir navegación"}
             className="site-nav__menu-button"
             onClick={() => toggleMenu("navigation")}
             type="button"
+            whileTap={{ scale: 0.92 }}
           >
             <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
               {menuOpen ? <path d="m6 6 12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
             </svg>
-          </button>
+          </motion.button>
           <div
             className={`site-nav__links${menuOpen ? " site-nav__links--open" : ""}`}
             id="site-main-navigation"
@@ -198,7 +202,7 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
         <div className="site-header__actions">
           <ThemeToggle />
           <div className="site-profile">
-            <button
+            <motion.button
               aria-controls="site-profile-menu"
               aria-expanded={profileOpen}
               aria-label={profileLabel}
@@ -206,6 +210,7 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
               onClick={() => toggleMenu("profile")}
               title={session?.displayName || "Mi cuenta"}
               type="button"
+              whileTap={{ scale: 0.92 }}
             >
               {session ? (
                 <PremiumAvatar
@@ -222,9 +227,19 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
                 </svg>
               )}
               <span className="site-profile__chevron" aria-hidden="true">⌄</span>
-            </button>
+            </motion.button>
 
-              <div className="site-profile-menu" hidden={!profileOpen} id="site-profile-menu">
+            <AnimatePresence initial={false}>
+              {profileOpen ? (
+              <motion.div
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="site-profile-menu"
+                exit={{ opacity: 0, scale: 0.98, y: -7 }}
+                id="site-profile-menu"
+                initial={{ opacity: 0, scale: 0.98, y: -7 }}
+                key="site-profile-menu"
+                transition={{ duration: 0.17, ease: [0.2, 0.7, 0.2, 1] }}
+              >
                 {session ? (
                   <>
                     <div className="site-profile-menu__identity">
@@ -274,7 +289,9 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
                     <ProfileMenuLink current={isCurrent("/premium")} href="/premium" label="Conocer Premium" onClick={closeMenus} />
                   </div>
                 )}
-              </div>
+              </motion.div>
+              ) : null}
+            </AnimatePresence>
           </div>
         </div>
       </div>

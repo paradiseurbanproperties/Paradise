@@ -2,6 +2,27 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.20.3] — 2026-11-25
+
+### Controles select personalizados
+- Se personalizaron los `select` del sitio con flecha de marca, superficies suaves, estados hover/focus, tratamiento para modo oscuro y altura táctil en móvil. El selector y su menú nativo se conservan.
+- El usuario confirma que el reinicio con Webpack eliminó la vista borrosa en la IP local. Lint, tipos y parseo CSS se validan antes del push.
+
+## [0.20.2] — 2026-11-25 (local)
+
+### Estabilidad del servidor local
+- El log de desarrollo mostró errores internos repetidos de HMR de Turbopack y quedó un lock con PID que ya no existía. El script `dev` cambia a Webpack y enlaza explícitamente `0.0.0.0` para permitir el acceso por IP de la LAN.
+- El servidor ya iniciado no adopta cambios del script: requiere reinicio. No pude validar la vista LAN desde CUA porque el host del navegador está desconectado; el puerto 3000 aparece ocupado desde el entorno de comandos y no se debe interrumpir a ciegas.
+- No ejecutar `next build` mientras el servidor de desarrollo está activo: ambos usan `.next`. No se hizo push ni build concurrente en este incremento.
+
+## [0.20.1] — 2026-11-25 (local)
+
+### Más carácter visual en la portada
+- Perfil de la barra convertido en un único botón circular; se quitó el chevron y se eliminó el borde anidado que producía aros concéntricos. El avatar Premium conserva su aro de estado.
+- Paleta de portada ampliada con verde bosque/jade, arcilla y arena. Las herramientas ahora forman una sección oscura con tarjetas translúcidas; búsqueda, tarjetas y cierre tienen acentos diferenciados.
+- Se mantuvieron los textos, controles y datos reales existentes. Sin cambios de backend ni push.
+- `pnpm lint`, `pnpm typecheck`, `git diff --check` y `pnpm build` pasan; build presenta la advertencia conocida no fatal `DEP0205`. No se ejecutaron pruebas de producto. Revisión visual manual en móvil/escritorio pendiente. Sin push.
+
 ## [0.18.0] — 2026-11-25
 
 ### Aviso por correo de nuevas consultas
@@ -9,6 +30,35 @@ Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a
 - Se retiró el incremento local previo de respuestas web y cola compleja. La migración 0022 reportada como aplicada queda versionada; 0023 desactiva su trigger/RPC y conserva la tabla como archivo.
 - Validación local: 29 unitarias, lint y build pasan. El usuario confirma el envío por SMTP funcionando localmente; Vercel requiere este despliegue para incluir el código.
 - Sin pago ni consola Google Cloud. Push a `main` autorizado por el usuario el 2026-11-25.
+
+## [0.19.0] — 2026-11-25 (local)
+
+### Renovación visual responsive
+- Nueva paleta de alto contraste en neutros cálidos, controles táctiles y tipografía móvil de 16 px para evitar zoom automático en iOS.
+- Portada reorganizada alrededor de búsqueda, catálogo, comparación y contacto; animaciones breves que respetan `prefers-reduced-motion`.
+- El campo de correo de consultas evita autocapitalización/corrección y recorta el valor antes de enviarlo.
+- Pie más útil con enlaces y contactos en texto; se retiró el logo repetido junto al correo y teléfono.
+- Lint y typecheck pasan. Revisión visual de navegador pendiente porque el servicio de navegador está desconectado; el servidor de desarrollo existente en 3000 no es accesible desde el sandbox. Sin push.
+
+## [0.19.1] — 2026-11-25 (local)
+
+### Resolución del error de import CSS
+- Se quitó el import separado `refresh.css` y se integraron sus reglas al archivo `components.css`, que ya estaba importado por la app. Turbopack registró `Compiled in 1941ms` después del cambio.
+- Parseo de CSS, lint, typecheck y `git diff --check` pasan. Sin push.
+
+## [0.19.2] — 2026-11-25 (local)
+
+### Ajustes tras revisión visual del usuario
+- Catálogo: título y filtros más compactos; los controles ya no quedan anidados dentro de campos grises.
+- Pie: altura reducida y enlaces/contactos en línea para escritorio.
+- Móvil: tema solo con icono; perfil redondo sin borde exterior doble ni chevron apretado.
+- Next registra compilación correcta (`Compiled in 1789ms`); lint, typecheck, parseo CSS y `git diff --check` pasan. Sin push.
+
+## [0.20.0] — 2026-11-25 (local)
+
+### Motion e interacciones
+- Se añadió Motion for React 14.14.0. Portada, catálogo, fichas, agentes y Premium tienen entradas escalonadas y reveals al desplazarse; las tarjetas responden con spring hover, el menú de perfil entra/sale, el icono de tema transiciona y el encabezado muestra progreso de lectura.
+- `MotionConfig reducedMotion="user"` sigue la preferencia del sistema. Next compiló en desarrollo; lint y typecheck pasan. Revisión visual animada en móvil/escritorio pendiente. Sin push.
 
 ## [0.17.35] — 2026-11-24
 

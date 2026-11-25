@@ -2,6 +2,10 @@
 
 **Estado:** Fases 0–3 y 6, 8–13 validadas funcionalmente según reportes del usuario. En Fase 14, el usuario confirma RLS aprobado; la sesión no inspeccionó de forma independiente cada identidad. Una llamada RPC anónima de proximidad y la lectura del catálogo respondieron HTTP 200 con un resultado; falta validar el flujo completo desde la interfaz. La navegación principal concentra rutas públicas y deja opciones de cuenta/rol en el menú de perfil. La comparación se mantiene local en el navegador. Premium vive en `features/subscriptions` y no es un rol.
 
+## Identidad visual pública
+
+Los tokens globales están en `src/styles/tokens.css`. La portada combina neutros de alto contraste con acentos verde jade, arcilla y arena; el bloque de herramientas usa un fondo bosque persistente en ambos temas y superficies translúcidas. Los controles mantienen estados de foco visibles. Los datos de inventario y conteos siguen viniendo del repositorio; no se agregan métricas de muestra como si fueran reales.
+
 ## Límites y responsabilidades
 
 - `app/`: rutas, layouts y composición por audiencia; no contiene consultas complejas ni reglas de negocio.
@@ -13,6 +17,7 @@
 - `lib/permissions/`: resolución de sesión, roles y reglas de acceso en servidor.
 - `lib/validations/`, `security/`, `logging/`, `cache/`, `utilities/`: capacidades transversales pequeñas.
 - `components/`: UI común sin reglas específicas del dominio.
+- `components/motion/` y Motion for React: `MotionConfig` global respeta `prefers-reduced-motion`; las rutas App Router usan `motion/react-client` para SSR y revelados de scroll, mientras los controles interactivos usan `motion/react`. Priorizar `opacity`/`transform`, animar una sola vez al entrar y evitar transiciones de ruta que retarden la navegación.
 - `styles/`: tokens de marca, tema claro/oscuro y estilos base.
 - Los temas consumen tokens semánticos neutros. El objetivo es WCAG 2.2 AA: contraste de texto de al menos 4.5:1 (3:1 para texto grande) y contraste de 3:1 para componentes/bordes esenciales. La paleta actual alcanza texto principal 17.24:1/17.04:1 y texto secundario 6.11:1/9.52:1 en fondos claro/oscuro; bordes de controles 3.35:1/3.09:1.
 - `supabase/migrations/`: cambios versionados de esquema, funciones y políticas; `seed.sql` solo con datos ficticios.

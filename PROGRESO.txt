@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 15 — QA y entrega
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]; Fase 15 [~]
-- Próxima actividad: validar recuperación/registro con inbox real y configurar URL pública/plantillas de Supabase; después retomar QA de Fase 15. Push de esta corrección Auth autorizado expresamente por el usuario. El rate limit WAF se omite por decisión del usuario.
+- Próxima actividad: continuar el rediseño frontend en Fase 15, revisar las vistas principales en navegador real con escritorio y móvil y ajustar según esa comprobación. El usuario confirma que consultas CRM funcionan desde móvil como Cliente y desde PC. No hacer push sin autorización expresa para el avance actual. El rate limit WAF se omite por decisión del usuario.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -566,3 +566,46 @@ PRUEBAS
 - Archivos: src/features/crm/services/inquiry-email.ts, ruta POST de consulta, .env.example, package.json/lockfile, migraciones 0022/0023 y docs/DEPLOYMENT.md. La dependencia nodemailer y tipos se instalaron; el primer intento en sandbox quedó sin respuesta y se instaló fuera del aislamiento.
 - Validación local: 29 unitarias (3 SMTP con transporte simulado), lint y build Webpack pasan; typecheck incluido en build. Build dentro del sandbox falló al lanzar TypeScript `--showConfig`, fuera del sandbox pasó. El usuario confirma ahora que el flujo SMTP funciona localmente y reporta 0023 aplicada; no se comprobó directamente el historial remoto.
 - El usuario autoriza push a GitHub el 2026-11-25. Próximo: comprobar CI y Vercel para el commit enviado y el correo de prueba en Production.
+
+## INCIDENCIA CRM MÓVIL (2026-11-25)
+- El usuario reporta que formularios funcionan en PC (lead y email llegan), pero desde móvil reciben el mensaje de error genérico.
+- El usuario confirmó que el teléfono tenía una sesión Admin y que como Cliente la consulta funciona. La regla existente de CRM para cuentas Cliente/visitante explica el comportamiento; no se requieren cambios de backend.
+- El formulario conserva ajustes de interfaz para normalizar el correo y ofrecer teclado móvil apropiado. Sin cambios de API, esquema ni pruebas de CRM.
+
+## REDISEÑO FRONTEND — INCREMENTO 1 (2026-11-25)
+- Alcance solicitado: trabajar solo interfaz; preservar backend. Se confirmó que las consultas móviles funcionan con sesión Cliente.
+- Cambios locales: paleta neutral más legible, navegación y espaciado responsive, controles táctiles de al menos 44 px, tamaño de 16 px en campos para pantallas táctiles, estados hover/focus y animación breve con respeto a movimiento reducido.
+- Portada ahora explica acciones existentes (buscar, comparar y consultar); pie actualizado con enlaces/contactos en texto y sin el logo duplicado junto al correo/teléfono.
+- Archivos principales: `src/styles/tokens.css`, `src/styles/refresh.css`, `src/app/globals.css`, portada pública, pie y `docs/TESTING.md`.
+- Validación: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan. No se ejecutaron pruebas de producto. Revisión visual no disponible: CUA informó que su host de navegador está indisponible; el servidor Next preexistente en el puerto 3000 no es accesible desde el sandbox.
+- Sin cambios de API, acciones, datos o migraciones. Sin push.
+
+## CORRECCIÓN DE IMPORT CSS (2026-11-25)
+- El servidor mostró `Can't resolve '../styles/refresh.css'` desde `src/app/globals.css`. El archivo existía, pero Turbopack mantenía el fallo de resolución inicial.
+- Se integraron las reglas nuevas en `src/styles/components.css`, ya importado, y se quitó el import adicional. El log de Next registró `Compiled in 1941ms` tras el cambio.
+- `pnpm lint`, `pnpm typecheck`, parseo PostCSS de `components.css` y `git diff --check` pasan. Sin push.
+
+## REDISEÑO FRONTEND — AJUSTES DE REVISIÓN (2026-11-25)
+- El usuario revisó capturas y pidió compactar el pie, corregir el aspecto del encabezado móvil y el panel del catálogo.
+- Footer pasa a franja compacta con navegación/contacto en línea; botones tema/perfil móviles quedan iconográficos y sin aros redundantes; filtros muestran controles de una sola capa y el título/espaciado del catálogo se reducen.
+- Next registró `Compiled in 1789ms`; lint, typecheck, parseo PostCSS y `git diff --check` pasan. Sin push.
+
+## REDISEÑO FRONTEND — MOTION (2026-11-25)
+- Se instaló Motion for React `14.14.0`. La raíz usa `MotionConfig reducedMotion="user"`; páginas App Router usan `motion/react-client` y controles cliente usan `motion/react`.
+- Portada, catálogo, fichas, directorio de agentes y Premium incorporan secuencias de entrada, reveals al entrar en viewport y elevación spring en tarjetas. Menú de perfil tiene entrada/salida; tema anima cambio de icono; encabezado muestra progreso de scroll.
+- `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan. El log de Next registró `Compiled in 718ms`; no se ejecutaron pruebas de producto ni revisión visual posterior. Sin push.
+- Referencias revisadas: documentación oficial Motion (Next App Router, Motion component, scroll y reduced motion), galería Motion y documentación oficial GSAP ScrollTrigger. Decisión: Motion encaja con interacciones React actuales sin escenas pinneadas o control de scroll.
+
+## REDISEÑO FRONTEND — IDENTIDAD VISUAL Y PERFIL (2026-11-25)
+- El usuario pidió quitar los aros redundantes del perfil y que el sitio deje de sentirse básico.
+- Perfil: el contorno del botón y el avatar ya no se apilan; se conserva un solo círculo y el aro Premium solo para cuentas Premium. Chevron oculto; foco de teclado visible.
+- Portada: verde bosque/jade, arcilla y arena como acentos; bloque de herramientas oscuro con tarjetas translúcidas; acento en búsqueda, precio de propiedades y CTA editorial. Sin incorporar estadísticas inventadas ni modificar datos.
+- Archivos: `src/styles/tokens.css`, `src/styles/components.css`, `docs/ARCHITECTURE.md`, `docs/TESTING.md`, `CHANGELOG.md`.
+- Validación de esta sesión: `pnpm lint`, `pnpm typecheck`, `git diff --check` y `pnpm build` pasan. Build conserva aviso no fatal `DEP0205`. No se ejecutaron pruebas de producto ni revisión visual manual; queda contrastar escritorio/móvil, ambos temas y prefers-reduced-motion en navegador. Sin push.
+
+## ESTABILIDAD DEV — HMR Y ACCESO LAN (2026-11-25)
+- El usuario reportó panic de Turbopack y una vista borrosa al acceder por `192.168.1.65:3000`. El log `.next/dev/logs/next-development.log` confirma errores internos HMR `CellId ... no longer exists`; `.next/dev/lock` guardaba PID 3919, inexistente al inspeccionarlo. Probable error overlay/HMR tras la colisión del entorno de build y dev; queda confirmación visual.
+- `package.json` cambia `dev` a `next dev --webpack --hostname 0.0.0.0` para evitar Turbopack en desarrollo y aceptar conexiones LAN. Hay que reiniciar el servidor existente para que el script surta efecto.
+- El intento de arrancar otro Next detectó el puerto 3000 ocupado y abrió 3001. No se detuvo el servidor existente. El CUA/browser host está desconectado y `curl` del sandbox no puede conectar a los puertos locales; no se pudo verificar la interfaz por IP. No ejecutar `build` en paralelo con dev porque ambos modifican `.next`.
+- El usuario confirma que al reiniciar desapareció el blur. En este avance, todos los `select` simples reciben flecha personalizada, hover/foco, colores del tema y altura táctil; el menú nativo queda para compatibilidad móvil.
+- Lint/typecheck/CSS y diff quedan por validar; el usuario autorizó push para este avance. Evitar build concurrente con el dev server.

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { THEME_STORAGE_KEY } from "@/constants/theme";
 import { ComparisonProvider } from "@/features/comparison/components/comparison-provider";
+import { SiteMotionProvider } from "@/components/motion/site-motion-provider";
 import { getPublicSiteSettings } from "@/features/site-settings/repositories/site-settings-repository";
 import { getSiteOrigin } from "@/lib/seo/site-url";
 import "./globals.css";
@@ -65,14 +66,18 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="es-MX" suppressHydrationWarning>
+    <html data-scroll-behavior="smooth" lang="es-MX" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
           id="paradise-theme-bootstrap"
         />
       </head>
-      <body><ComparisonProvider>{children}</ComparisonProvider></body>
+      <body>
+        <SiteMotionProvider>
+          <ComparisonProvider>{children}</ComparisonProvider>
+        </SiteMotionProvider>
+      </body>
     </html>
   );
 }

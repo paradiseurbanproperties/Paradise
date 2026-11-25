@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import * as motion from "motion/react-client";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { PropertyCard } from "@/features/properties/components/property-card";
@@ -44,7 +45,12 @@ export default async function PropertiesPage({
       <SiteHeader />
       <main className="site-main catalog-main" id="main-content">
         <div className="catalog-page">
-          <header className="catalog-heading">
+          <motion.header
+            animate={{ opacity: 1, y: 0 }}
+            className="catalog-heading"
+            initial={{ opacity: 0, y: 22 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          >
             <p className="eyebrow">Catálogo · Paradise</p>
             <h1 className="page-title">Encuentra un lugar para llamar tuyo.</h1>
             <p className="page-description">
@@ -52,12 +58,23 @@ export default async function PropertiesPage({
                 ? "Explora una selección de ejemplo y prueba los filtros del catálogo. Los inmuebles, ubicaciones y precios son ficticios."
                 : "Explora las propiedades disponibles y encuentra el espacio adecuado para ti."}
             </p>
-          </header>
+          </motion.header>
 
-          <PropertyFiltersForm filters={filters} />
-          <div className="catalog-map-link-row">
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 18 }}
+            transition={{ delay: 0.15, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <PropertyFiltersForm filters={filters} />
+          </motion.div>
+          <motion.div
+            animate={{ opacity: 1 }}
+            className="catalog-map-link-row"
+            initial={{ opacity: 0 }}
+            transition={{ delay: 0.32, duration: 0.45 }}
+          >
             <Link className="text-link" href="/propiedades/mapa">Explorar propiedades en el mapa ↗</Link>
-          </div>
+          </motion.div>
 
           <div className="catalog-results-heading">
             <div>
@@ -78,7 +95,16 @@ export default async function PropertiesPage({
           {result.items.length > 0 ? (
             <div className="property-grid">
               {result.items.map((property, index) => (
-                <PropertyCard canFavorite={canFavorite} isFavorite={favoriteIds.has(property.id)} key={property.id} property={property} priority={index < 2} showFavoriteControl={showFavoriteControl} />
+                <motion.div
+                  initial={{ opacity: 0, y: 25 }}
+                  key={property.id}
+                  transition={{ delay: Math.min(index * 0.055, 0.38), duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
+                  viewport={{ amount: 0.12, once: true }}
+                  whileHover={{ y: -5, transition: { type: "spring", stiffness: 320, damping: 24 } }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                >
+                  <PropertyCard canFavorite={canFavorite} isFavorite={favoriteIds.has(property.id)} property={property} priority={index < 2} showFavoriteControl={showFavoriteControl} />
+                </motion.div>
               ))}
             </div>
           ) : (
