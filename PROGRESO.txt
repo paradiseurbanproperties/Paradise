@@ -171,8 +171,13 @@ FUNCIONES PENDIENTES
 - La corrida de CI para `52bf1ac` confirmó que `aria-label` manual todavía reemplazaba el texto de las etiquetas internas y fallaba `label-content-name-mismatch` en tarjetas con “Ejemplo académico” y “En trato”.
 - Se eliminó el `aria-label` en el enlace que envuelve la foto y distintivos; el nombre nativo ahora conserva el texto alternativo de imagen y los badges visibles.
 - `pnpm test` pasa 15/15, `pnpm test:e2e` 5/5, lint, typecheck, build (32 rutas) y `git diff --check` pasan localmente.
-- Commit `15ac12b` ya está en `main`; CI de GitHub terminó correctamente y Vercel marcó deploy exitoso. `/registro` responde HTTP 200.
+- Commit `15ac12b` ya está en `main`; Vercel marcó deploy exitoso y `/registro` responde HTTP 200. CI falló solo en el scan móvil porque axe midió colores durante la transición de tema.
 - La configuración de Supabase confirma signup email habilitado con verificación. No se probó el alta con un correo real; revisar el mensaje nuevo y el código/estado de Auth en Vercel si vuelve a fallar. No nuevos push sin autorización.
+
+## FASE 15 — INCREMENTO 7: ESTABILIZAR SCAN MÓVIL DE TEMA
+- El log CI mostró contraste temporal (fondo #78797b) en paginador y footer al ejecutar axe inmediatamente después del cambio de tema móvil; valores finales de tema oscuro son accesibles y el resto de pruebas pasó.
+- Se añadió espera de 500 ms tras el cambio de tema en el test móvil, igual que en el test de portada. No cambia el comportamiento del producto.
+- `pnpm test:e2e` local pasa 5/5. El siguiente push debe volver a ejecutar CI; el deployment actual permanece en `15ac12b` y `/registro` respondió 200 en la verificación previa.
 
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.

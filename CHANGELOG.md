@@ -2,12 +2,18 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.33] — 2026-11-24
+
+### Estabilizar axe al cambiar tema en móvil
+- CI de `15ac12b` encontró contraste temporal en paginador/footer durante la transición móvil de tema (fondos interpolados, no colores finales).
+- Se añadió espera a que termine la transición antes del scan axe móvil. `pnpm test:e2e` pasa 5/5 localmente con el ajuste; falta ejecutar el mismo workflow remoto en el próximo push.
+
 ## [0.17.32] — 2026-11-24
 
 ### Enlaces de tarjetas y accesibilidad
 - Se retiró el `aria-label` redundante de la imagen enlazada en cada tarjeta. El nombre accesible ahora se deriva del `alt` real de la foto y del contenido visible, como badges, sin reemplazar ese contenido.
 - La segunda corrida CI confirmó que construir un `aria-label` manual a partir de badges no cubría el caso de texto visible concatenado; usar el nombre nativo del enlace corrige el origen.
-- Build y 5 E2E/axe pasan localmente. La corrida CI de `15ac12b` terminó correctamente y el estado Vercel quedó exitoso; `/registro` responde HTTP 200.
+- Build y 5 E2E/axe pasan localmente. Vercel marcó exitoso el deployment de `15ac12b`; GitHub CI falló únicamente en el scan móvil mientras animaba el tema, corregido en `0.17.33`.
 
 ## [0.17.31] — 2026-11-24
 

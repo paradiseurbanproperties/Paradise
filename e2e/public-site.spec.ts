@@ -84,6 +84,8 @@ test("navegación móvil abre, navega y el tema se guarda", async ({ page }) => 
   await themeButton.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect.poll(() => page.evaluate(() => window.localStorage.getItem("paradise-theme"))).toBe("dark");
+  // Evita analizar colores intermedios mientras termina la transición de la paleta.
+  await page.waitForTimeout(500);
   await expectNoAccessibilityViolations(page);
 
   await page.reload({ waitUntil: "networkidle" });
