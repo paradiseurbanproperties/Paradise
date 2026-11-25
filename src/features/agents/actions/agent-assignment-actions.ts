@@ -36,6 +36,8 @@ export async function assignPropertyToAgentAction(
 
   revalidatePath("/admin/agentes");
   revalidatePath("/agente");
+  revalidatePath("/agente/visitas");
+  revalidatePath("/admin/visitas");
   return { status: "success", message: "Propiedad asignada." };
 }
 
@@ -58,5 +60,7 @@ export async function revokePropertyAssignmentAction(
   if (error || !data) return { status: "error", message: "No se pudo retirar la asignación activa." };
   revalidatePath("/admin/agentes");
   revalidatePath("/agente");
+  revalidatePath("/agente/visitas");
+  revalidatePath("/admin/visitas");
   return { status: "success", message: "Asignación retirada. El registro histórico se conserva." };
 }

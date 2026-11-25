@@ -11,7 +11,7 @@ Al iniciar las fases de backend se deberá:
 5. Probar políticas bajo cada rol y conservar un inventario de propiedades consistente con las funciones habilitadas en la aplicación.
 6. Mantener la clave `service_role` exclusivamente en el servidor.
 
-Fase de visitas: `migrations/202611250024_property_visits.sql` agrega solicitudes, historial, RLS y RPC transaccionales; el usuario reporta que ya la aplicó, sin verificación independiente. `migrations/202611250025_property_inventory_standardization.sql` limpia los slugs/textos del inventario y mantiene sus relaciones para habilitar el mismo flujo en las doce propiedades. 0025 está en el repositorio, pero no se ha aplicado en Supabase.
+Fase de visitas: `migrations/202611250024_property_visits.sql` agrega solicitudes, historial, RLS y RPC transaccionales; el usuario reporta que ya la aplicó, sin verificación independiente. `migrations/202611250025_property_inventory_standardization.sql` limpia los slugs/textos del inventario y mantiene sus relaciones para habilitar el mismo flujo en las doce propiedades. `migrations/202611250026_agent_visit_assignment_access.sql` actualiza el acceso de agente para seguir la asignación vigente aunque la visita se solicitara antes de asignar la propiedad. Aplicar 0025 y 0026 en ese orden; su estado remoto aún no se verificó.
 
 Fase 4: configurar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` en `.env.local`, y permitir `http://localhost:3000/auth/callback` en Supabase Auth. El usuario reportó aplicar `202611230001_auth_foundation.sql`.
 

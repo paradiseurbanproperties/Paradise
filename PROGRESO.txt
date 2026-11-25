@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 15 — QA y entrega
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]; Fase 15 [~]
-- Próxima actividad: comprobar el resultado del workflow/deploy tras el push autorizado; aplicar `202611250025_property_inventory_standardization.sql` en Supabase después de 0024 y probar con Cliente/Agente/Admin.
+- Próxima actividad: aplicar `202611250025_property_inventory_standardization.sql` y `202611250026_agent_visit_assignment_access.sql` en Supabase, en ese orden después de 0024; comprobar con Cliente/Agente/Admin que una visita creada antes de asignar la propiedad aparece y se puede gestionar desde la agenda del agente.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -631,6 +631,13 @@ PRUEBAS
 - Añadido `visit_requests`/`visit_request_history` con RLS y RPC de solicitud, cancelación y gestión; horario fijo de una hora, perfil de contacto autenticado, validación de fechas y advisory lock para evitar cruces en una propiedad o agenda de agente. El agente requiere asignación activa tanto para leer como para gestionar; revocarla retira el acceso.
 - Interfaz: solicitud en ficha de propiedad para Cliente activo; `/mis-visitas`; agendas de equipo `/agente/visitas` y `/admin/visitas`; menú de perfil y controles de confirmación/rechazo/reprogramación/cancelación/resultado.
 - Estado: el usuario autorizó el push de este avance. Reporta haber aplicado 0024 en Supabase; no se inspeccionó el historial remoto. Falta validar con base/cuentas aisladas y comprobar UI en navegador.
+
+## CORRECCIÓN DE VISITAS PARA AGENTES (2026-11-25)
+- Incidencia reportada: Admin ve solicitudes de visita, pero el agente asignado no.
+- Causa en el código: la policy RLS y la RPC de gestión exigían que el `assigned_agent_id` guardado al solicitar la visita fuera el agente actual. Si la propiedad se asignaba después, la visita quedaba oculta/inmutable para ese agente.
+- Corrección: migración 0026 define lectura de la visita y su historial por asignación activa vigente; la RPC usa el mismo alcance y conserva la validación de estados, fechas y cruces. Si el agente gestiona la visita, queda registrado como agente asignado. Las acciones de asignación invalidan las dos agendas.
+- Archivos: migración `202611250026_agent_visit_assignment_access.sql`, acción de asignación, `docs/SECURITY.md`, `docs/DATABASE.md`, `docs/TESTING.md`, `supabase/README.md` y `CHANGELOG.md`.
+- Validación: `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan. No se ejecutó build ni pruebas de producto, y no se consultó ni modificó Supabase remoto. 0025 y 0026 deben aplicarse allí en orden. Próximo: push autorizado por el usuario y verificar CI; después probar con una sesión Agente y una visita anterior a la asignación.
 
 ## INVENTARIO ESTÁNDAR PARA LAS DOCE PROPIEDADES — IMPLEMENTACIÓN LOCAL (2026-11-25)
 - Se quitó la clasificación por slug/descripción que escondía Guardar, actividad, conteo de vistas, consulta CRM y solicitud de visita. El código usa los mismos componentes, repositorios y permisos que cualquier propiedad; para visitas remotas, 0025 primero debe normalizar los slugs existentes.

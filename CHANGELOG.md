@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.20.8] — 2026-11-25
+
+### Agenda de visitas de agentes
+- La lectura y gestión de visitas ahora sigue la asignación activa actual a la propiedad; no quedan ocultas si fueron solicitadas antes de asignarla. Revocar la asignación elimina el acceso y una gestión del agente registra al actor responsable.
+- La revalidación incluye las agendas de agente y administración al asignar o revocar propiedades.
+- Nueva migración 0026; aplicar después de 0025 en Supabase. `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan; no se ejecutó build ni pruebas de producto. Falta probar con sesión de Agente y una visita anterior a la asignación.
+
 ## [0.20.7] — 2026-11-25
 
 ### Inventario y funciones de propiedades

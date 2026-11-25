@@ -60,7 +60,7 @@ La ubicación física de Storage se versionará por propiedad, por ejemplo `{pro
 
 ## Visitas y agenda
 
-- La migración `202611250024_property_visits.sql` crea `visit_requests` y `visit_request_history`. La solicitud requiere Cliente autenticado y guarda nombre/correo del perfil, propiedad, horario propuesto de una hora, mensaje opcional, agente asignado activo (si lo hay), estado y timestamps.
+- La migración `202611250024_property_visits.sql` crea `visit_requests` y `visit_request_history`. La solicitud requiere Cliente autenticado y guarda nombre/correo del perfil, propiedad, horario propuesto de una hora, mensaje opcional, agente asignado activo (si lo hay), estado y timestamps. La migración `202611250026_agent_visit_assignment_access.sql` hace que agentes activos lean y gestionen visitas según su asignación vigente a la propiedad, aunque esta se haya creado después de la solicitud; revocar la asignación retira el acceso.
 - El cliente propone una fecha en su zona local; el navegador la normaliza a UTC. El agente asignado o Admin confirma, rechaza, reprograma, cancela o registra resultado. El cliente consulta su agenda e historial y puede cancelar antes del inicio.
 - Las escrituras pasan por `request_property_visit`, `change_property_visit` y `cancel_own_property_visit`; el usuario no puede actualizar directamente estados o actores. El trigger registra estado y horario anterior/nuevo.
 - Las políticas RLS dejan leer al Cliente propietario, al Agente activo asignado y a Admin activo. Una advisory lock serializa escritura/confirmación y la RPC rechaza cruces horarios para la misma propiedad o agente.
