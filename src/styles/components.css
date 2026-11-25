@@ -2984,7 +2984,6 @@
   transform: scale(1.035);
 }
 
-.property-card__demo,
 .property-card__status {
   position: absolute;
   z-index: 1;
@@ -2997,10 +2996,6 @@
   font-size: 0.68rem;
   font-weight: 650;
   backdrop-filter: blur(12px);
-}
-
-.property-card__demo {
-  left: 0.8rem;
 }
 
 .property-card__premium {

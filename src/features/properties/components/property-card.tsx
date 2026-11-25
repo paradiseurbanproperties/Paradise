@@ -33,7 +33,6 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
           sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw"
           src={cover.src}
         />
-        {property.demo ? <span className="property-card__demo">Ficha ilustrativa</span> : null}
         {property.visibility === "premium" ? <span className="property-card__premium">✦ Exclusiva Premium</span> : null}
         {property.status === "in_deal" ? (
           <span className="property-card__status">En trato</span>
