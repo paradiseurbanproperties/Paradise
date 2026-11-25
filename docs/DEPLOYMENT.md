@@ -1,6 +1,6 @@
 # Despliegue y operación
 
-**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. Esta sesión no verificó el estado del deployment tras los cambios locales. Se añadió un workflow de CI en `.github/workflows/quality.yml`; está en el checkout local y aún no se ha ejecutado en GitHub. Backups, monitorización y dominio propio no constan configurados/verificados.
+**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. El deploy del commit `15ac12b` fue marcado exitoso por Vercel; `/registro` responde HTTP 200. GitHub Actions pasó lint, tipos, unitarias, build y E2E para ese commit. Backups, monitorización y dominio propio no constan configurados/verificados.
 
 ## Vercel — destino solicitado
 

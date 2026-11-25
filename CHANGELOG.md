@@ -7,7 +7,7 @@ Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a
 ### Enlaces de tarjetas y accesibilidad
 - Se retiró el `aria-label` redundante de la imagen enlazada en cada tarjeta. El nombre accesible ahora se deriva del `alt` real de la foto y del contenido visible, como badges, sin reemplazar ese contenido.
 - La segunda corrida CI confirmó que construir un `aria-label` manual a partir de badges no cubría el caso de texto visible concatenado; usar el nombre nativo del enlace corrige el origen.
-- Build y 5 E2E/axe pasan localmente. El siguiente push inicia la tercera corrida CI y actualiza Vercel.
+- Build y 5 E2E/axe pasan localmente. La corrida CI de `15ac12b` terminó correctamente y el estado Vercel quedó exitoso; `/registro` responde HTTP 200.
 
 ## [0.17.31] — 2026-11-24
 
