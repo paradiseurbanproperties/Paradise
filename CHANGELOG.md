@@ -2,6 +2,21 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.24] — 2026-11-24
+
+### Búsqueda geográfica en producción
+- La ruta pública del mapa para CDMX con radio de 5 km respondió HTTP 200 y el HTML renderizado incluyó un resultado.
+- El usuario confirma el mapa funcional; no se observó la interacción del mapa/búsqueda en navegador en esta sesión.
+- La regla de rate limit WAF sigue pendiente en la configuración de Vercel; no hay CLI instalada/proyecto enlazado ni navegador disponible. Sin cambios de aplicación ni push.
+
+## [0.17.23] — 2026-11-24
+
+### Confirmación del usuario y siguiente paso de seguridad
+- El usuario reporta que el guardado de contacto, redirects de correo y precios ya parecen funcionar en el deployment; queda como validación reportada, no reproducida en esta sesión.
+- La siguiente verificación de Fase 7 es usar la búsqueda por radio en la interfaz con el resultado real de la RPC.
+- El límite WAF preparado requiere una regla del proyecto por Dashboard, API o CLI; la configuración `routes` de `vercel.json` solo documenta acciones de challenge/deny. La CLI Vercel no está instalada ni el checkout enlazado en este entorno.
+- No hubo cambios de aplicación ni push en este incremento.
+
 ## [0.17.22] — 2026-11-24
 
 ### Configuración, Auth y precios

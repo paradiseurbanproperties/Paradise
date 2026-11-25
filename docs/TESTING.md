@@ -76,12 +76,12 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 
 ## Fase 7 — Coordenadas y mapa
 
-- Dependencias: el usuario reporta habilitar PostGIS e instalar MapLibre; confirmó en SQL Editor la firma de la RPC de 0005. Una llamada RPC anónima y la lectura de catálogo posterior respondieron HTTP 200 con una ficha cada una; queda validar la búsqueda por radio desde la interfaz.
+- Dependencias: el usuario reporta habilitar PostGIS e instalar MapLibre; confirmó en SQL Editor la firma de la RPC de 0005. La RPC, lectura de catálogo y página pública de mapa respondieron HTTP 200; el SSR de la búsqueda de 5 km mostró una ficha. El usuario confirma que el mapa funciona.
 - Unitarias: rangos de latitud/longitud, radio 100 m–50 km, límite 1–100, coordenadas incompletas y filtros de visibilidad.
 - Integración: trigger actualiza geography desde lat/lng; índice GiST presente; RPC ordena por distancia, limita resultados y respeta publicación/RLS.
 - E2E: Admin guarda punto desde mapa y al cliente el mapa sincroniza marcadores, resultados y filtros; interacción teclado/táctil y atribución visible.
 - Proveedor OSM: no precargar teselas; respetar caché, referer y atribución. La geocodificación debe ser iniciada por el usuario y limitada; no autocompletar contra Nominatim público.
-- Estado: MapLibre, selector Admin, mapa público y repositorio/RPC integrados. `pnpm lint` y `pnpm typecheck` pasaron en el incremento previo. El usuario confirma que los mapas se muestran; sondeo anónimo de RPC y lectura del catálogo: HTTP 200 y una fila cada uno. Falta validación manual de la búsqueda por radio en la interfaz.
+- Estado: MapLibre, selector Admin, mapa público y repositorio/RPC integrados. El usuario confirma que los mapas se muestran. Sondeo RPC, lectura del catálogo y página de mapa por radio: HTTP 200; el HTML mostró una ficha. No se observó interacción de mapa en navegador en esta sesión.
 
 ## Fase 8 — Premium simulado
 

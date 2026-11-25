@@ -2,7 +2,7 @@
 
 Plataforma inmobiliaria modular en planeación para un ejercicio académico. El objetivo es administrar propiedades y publicaciones, clientes, agentes, CRM, visitas, suscripciones Premium simuladas, analítica y configuración desde una experiencia pública y paneles con permisos.
 
-> **Estado:** Fase 14 en curso. El usuario confirma RLS aprobado; no se inspeccionó la matriz remota de forma independiente. Los enlaces Auth ahora resuelven al dominio de producción de Vercel si falta `NEXT_PUBLIC_SITE_URL`; Supabase aún debe permitir `/auth/callback` en URL Configuration. Guardado de contacto Admin y precios fuera de incrementos de $1,000 corregidos localmente, sin confirmación manual post-deployment. Vercel sirve `https://paradise-kappa-gray.vercel.app/` con HTTP 200, y el usuario confirma que móvil funciona al 100%. La RPC PostGIS anónima y la lectura del catálogo respondieron HTTP 200 con un resultado cada una; falta validar la búsqueda por radio en la interfaz. `public/icons/paradise.png` es la marca unificada para pestaña, vista previa, navbar y footer.
+> **Estado:** Fase 14 en curso. El usuario confirma RLS aprobado; no se inspeccionó la matriz remota de forma independiente. El usuario reporta que contacto Admin, redirects de correo y precios funcionan tras el ajuste. Vercel sirve `https://paradise-kappa-gray.vercel.app/` con HTTP 200, y el usuario confirma que móvil funciona al 100%. La RPC PostGIS, lectura del catálogo y ruta pública de mapa respondieron HTTP 200; el HTML de la búsqueda de 5 km renderizó una propiedad. El rate limit WAF sigue pendiente en la configuración del proyecto. `public/icons/paradise.png` es la marca unificada para pestaña, vista previa, navbar y footer.
 
 ## Objetivos y problema
 

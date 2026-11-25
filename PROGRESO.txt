@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 14 — Seguridad y rendimiento
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]
-- Próxima actividad: verificar en Vercel la configuración de URLs de Auth de Supabase y probar guardar contacto Admin, links de correo y precios no redondos; luego revisar búsqueda por radio y rate limit WAF. El usuario autorizó el push del avance tras estas correcciones. La RPC PostGIS anónima y lectura de catálogo devolvieron HTTP 200.
+- Próxima actividad: activar la regla WAF de rate limit en el proyecto Vercel y observar su tráfico. La ruta pública de mapa con centro CDMX/radio 5 km devolvió HTTP 200 y renderizó un resultado; el usuario reporta que el mapa funciona. La interacción visual no se automatizó en esta sesión.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -65,13 +65,13 @@ FASES DEL DESARROLLO
 [~] Fase 4 — Supabase y autenticación (usuario reporta configuración y que el enlace de verificación funciona; falta matriz completa de pruebas Auth/RLS)
 [x] Fase 5 — Roles y perfiles (migración/bootstrap reportados, interfaz y RLS aprobados por el usuario)
 [x] Fase 6 — Propiedades y administración (usuario confirma flujo completo funcional al 100%; RLS aprobado por el usuario)
-[~] Fase 7 — Mapas y búsqueda geográfica (usuario confirma mapa Admin y detalle público; RPC y lectura pública del catálogo responden, falta revisar el flujo de búsqueda por radio en la interfaz)
+[~] Fase 7 — Mapas y búsqueda geográfica (usuario confirma mapa funcional; RPC y ruta pública renderizan una ficha real; falta observar la interacción visual de búsqueda por radio)
 [x] Fase 8 — Premium (usuario confirma funcionamiento integral)
 [x] Fase 9 — Analítica y dashboard (el usuario confirma que gráficas, filtro, desgloses y CSV funcionan; 0010 se considera validada por su reporte)
 [x] Fase 10 — Agentes y CRM (el usuario confirma el flujo; 0011–0013 se consideran funcionales por su reporte)
 [x] Fase 11 — Herramientas del cliente (el usuario confirma favoritos, comparación, listas y actividad; 0014–0016 se consideran funcionales por su reporte)
 [x] Fase 12 — Historiales y notificaciones (usuario confirma funcionamiento; 0017 se considera validada por su reporte, sin inspección remota directa)
-[~] Fase 13 — Configuración y SEO (nombre/SEO reportados funcionales; contacto público se corrigió localmente y falta confirmar el guardado en deployment)
+[x] Fase 13 — Configuración y SEO (usuario reporta que contacto público también guarda después del ajuste)
 [~] Fase 14 — Seguridad y rendimiento (usuario confirma RLS aprobado; WAF pendiente; búsqueda PostGIS respondió en sondeo anónimo)
 [ ] Fase 15 — QA y entrega
 
@@ -99,7 +99,7 @@ FUNCIONES TERMINADAS
 FUNCIONES PENDIENTES
 - Fase 14: el usuario confirma RLS aprobado. No se hizo inspección independiente de la matriz ni del estado remoto en esta sesión; conservar su aprobación como reporte del usuario.
 - Fase 14: `POST /api/crm/property-inquiry` valida origen, JSON, body máx. 4 KiB, campos y honeypot; CRM conserva su límite de 3 por correo/propiedad/hora con advisory lock. `POST /api/analytics/property-view` limita el body a 512 bytes durante la lectura. Se documentó una regla WAF única (30 req/60 s/IP, ambos endpoints); falta publicarla y observar el comportamiento. La protección por IP no impide abuso distribuido ni excedencias regionales.
-- Fase 7: el primer sondeo devolvió `PGRST125`, pero la llamada POST a `/rest/v1/rpc/search_public_properties_nearby` con la firma confirmada respondió HTTP 200 y retornó una ficha; la lectura posterior de columnas permitidas también respondió HTTP 200 con una ficha. La causa del error inicial no quedó confirmada. Falta revisar la búsqueda por radio en la interfaz y el proveedor/uso de teselas en producción.
+- Fase 7: el primer sondeo devolvió `PGRST125`, pero la llamada POST a `/rest/v1/rpc/search_public_properties_nearby` con la firma confirmada respondió HTTP 200; la lectura posterior del catálogo también respondió HTTP 200. La ruta pública `/propiedades/mapa?lat=19.4326&lon=-99.1332&radius=5000` respondió HTTP 200 y SSR mostró un resultado. No se revisó la interacción cliente en navegador; el usuario confirma que el mapa funciona.
 - Fase 4: completar prueba de registro, verificación, login, recuperación y cambio de contraseña contra el dominio Vercel/Supabase; el usuario reporta que el enlace funciona, sin verificación de esta sesión.
 - Fase 15: pruebas de producto automatizadas/E2E, accesibilidad y rendimiento; completar visitas/agenda y áreas administrativas que siguen fuera del alcance implementado.
 - Operación: revisar variables y redirects de Supabase, dominio propio si se desea, límites/proveedor de geocodificación, backups y monitorización antes de tratarlo como producción comercial.
@@ -110,8 +110,13 @@ FUNCIONES PENDIENTES
 - Auth: `getPublicSiteUrl` prioriza `NEXT_PUBLIC_SITE_URL`, usa `VERCEL_PROJECT_PRODUCTION_URL` en producción y recurre a la URL del deployment; localhost queda solo como fallback local. La URL exacta `/auth/callback` debe estar permitida en Supabase Auth y el template personalizado debe usar `{{ .RedirectTo }}`.
 - Propiedades: el campo de precio ya acepta centavos con `step=0.01`; la validación superior se alinea al máximo de `numeric(14,2)` en Postgres.
 - Verificación local: `pnpm lint`, `pnpm build` (Webpack), `pnpm typecheck` y `git diff --check` pasan; build emite advertencia no fatal `DEP0205`. No se ejecutaron pruebas de producto.
-- Falta prueba manual post-deployment: guardar correo/teléfono desde Admin, confirmar email, recuperar contraseña y guardar precio no múltiplo de 1,000. Supabase debe permitir el callback en URL Configuration.
-- El usuario autorizó y solicitó el push de este avance. La próxima verificación manual tras el deployment cubre contacto Admin, enlaces Auth y precios.
+- El usuario confirma que contacto, enlaces Auth y precios parecen funcionar después del push; sin verificación independiente en esta sesión.
+- El usuario autorizó y solicitó el push de ese avance. No volver a hacer push hasta que autorice otro avance.
+
+## FASE 14 — INCREMENTO 15: VALIDACIÓN DE RUTA DE MAPA
+- GET público a la URL de búsqueda por radio de producción (`lat=19.4326`, `lon=-99.1332`, `radius=5000`) respondió HTTP 200; el HTML renderizado mostró una propiedad.
+- El usuario confirma que el mapa funciona. No hay navegador accesible en esta sesión, así que no se observó el movimiento del mapa ni el toque/cambio de centro.
+- La regla WAF sigue pendiente: Vercel CLI no está instalada, el checkout no está enlazado y el host del navegador no está disponible. No hubo cambios de aplicación ni push.
 
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.
