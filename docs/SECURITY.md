@@ -107,3 +107,7 @@ No hay proyecto Supabase, políticas activas, pruebas de penetración, rate limi
 - Cambios de rol/estado generan auditoría inmutable. `audit_logs` solo concede SELECT a Admin y la escritura ocurre dentro del RPC.
 - `src/lib/permissions/access.ts` resuelve claims y perfil desde servidor; rutas privadas deben usar `requireActiveProfile` o `requireProfileRole`. El proxy refresca sesión, pero no sustituye esa autorización.
 - El usuario reporta aplicar `202611230002_roles_and_permissions.sql` y designar el primer Admin. Pendiente probar cliente/agente/admin, rol inmutable, suspensión, rechazo de auto-modificación y lectura de auditoría.
+
+## Avisos SMTP de CRM
+
+El envío usa una contraseña de aplicación Gmail en `CRM_GMAIL_APP_PASSWORD`, variable solo de servidor. El destinatario está fijo al correo del proyecto; el correo validado del visitante solo se usa como Reply-To. Los datos proceden del formulario ya validado en servidor. SMTP no se ejecuta cuando la RPC rechaza la consulta. La migración 0023 desactiva las funciones de respuesta/cola de 0022. Aún no se ha comprobado entrega real ni estado remoto de la migración.

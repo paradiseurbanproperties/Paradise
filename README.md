@@ -125,3 +125,5 @@ La estrategia incluye pruebas unitarias, integración de repositorios/RLS y E2E.
 ## Estado y alcance
 
 El desarrollo se realizará en las 16 fases descritas en `PROGRESO.txt`. La Fase 6 está cerrada funcionalmente; la Fase 7 tiene la interfaz y consulta geoespacial implementadas, pendientes de validación en Supabase. Con Supabase configurado, el catálogo consulta los inmuebles persistidos y no presenta ejemplos si no hay propiedades aprobadas.
+
+La copia por correo de nuevas solicitudes CRM usa Gmail SMTP y una contraseña de aplicación configurada solo en el servidor. La consulta permanece en CRM. Configuración y estado real en [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).

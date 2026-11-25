@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyProjectOfInquiry } from "@/features/crm/services/inquiry-email";
 import { revalidatePath } from "next/cache";
 import { submitPropertyInquirySchema } from "@/features/crm/schemas/lead";
 import { recordCustomerActivity } from "@/features/activity/services/customer-activity";
@@ -57,6 +58,13 @@ export async function POST(request: Request) {
       return reply(503, "No se pudo enviar la consulta. Comprueba los datos e inténtalo de nuevo.");
     }
 
+    // El lead ya quedó guardado. Un fallo de SMTP no debe duplicarlo ni perderlo.
+    await notifyProjectOfInquiry({
+      senderName: parsed.data.senderName,
+      senderEmail: parsed.data.senderEmail,
+      message: parsed.data.message,
+      propertyId: parsed.data.propertyId,
+    });
     await recordCustomerActivity("inquiry_sent", parsed.data.propertyId);
     revalidatePath("/mi-actividad");
     return reply(201, "Gracias. Tu consulta fue enviada al equipo de Paradise.");

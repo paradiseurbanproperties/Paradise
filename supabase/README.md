@@ -50,3 +50,7 @@ where profile.id = auth_user.id
 ```
 
 Verifica que el editor informe una fila actualizada. Este paso de bootstrap se ejecuta una sola vez por el propietario del proyecto; los cambios posteriores deben pasar por la función autorizada y auditada. Mantener `.env.local` fuera de Git y nunca compartir claves secretas.
+
+### Aviso de correo CRM
+
+El usuario reportó 0022 aplicada, aunque no se verificó el historial remoto. No repetirla. Aplicar una sola vez `migrations/202611250023_simplify_crm_email.sql` para retirar su trigger/RPC antiguos; conserva la tabla y sus registros. El aviso nuevo usa Gmail SMTP tras guardar el lead; configuración en [docs/DEPLOYMENT.md](../docs/DEPLOYMENT.md).

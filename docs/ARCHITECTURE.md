@@ -134,3 +134,7 @@ Auth SSR utiliza `@supabase/ssr`: cliente de navegador, cliente servidor con coo
 - El upsert de `site_settings` omite la clave `singleton` del payload para respetar el grant de columnas; PostgreSQL la establece a `true` por default. Los redirects Auth usan `NEXT_PUBLIC_SITE_URL` o los dominios de Vercel; Auth requiere que el callback esté permitido en Supabase.
 - La ruta `/propiedades/mapa` vive en el route group `(public)` correcto; no usar comillas literales en nombres de carpetas App Router.
 - Fase 14 separa `property_private_details` del catálogo público. Dirección, código postal, coordenadas exactas y actores de gestión se leen solo por Admin/agente asignado; la Data API ofrece coordenadas redondeadas y columnas explícitamente concedidas.
+
+## Aviso de consultas por correo
+
+La ruta `POST /api/crm/property-inquiry` conserva el RPC que registra el lead. Solo tras recibir éxito intenta Gmail SMTP desde servidor; el navegador no recibe la contraseña de aplicación. El aviso no cambia la asignación ni los permisos CRM. La migración 0023 desactiva la cola de 0022 reportada como aplicada.

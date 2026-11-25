@@ -2,6 +2,14 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.18.0] — 2026-11-25
+
+### Aviso por correo de nuevas consultas
+- Se conserva el envío de solicitudes al CRM. Tras guardarlas, Gmail SMTP envía una copia al correo del proyecto usando una contraseña de aplicación de servidor; Reply-To apunta al visitante.
+- Se retiró el incremento local previo de respuestas web y cola compleja. La migración 0022 reportada como aplicada queda versionada; 0023 desactiva su trigger/RPC y conserva la tabla como archivo.
+- Validación local: 29 unitarias, lint y build pasan. El usuario confirma el envío por SMTP funcionando localmente; Vercel requiere este despliegue para incluir el código.
+- Sin pago ni consola Google Cloud. Push a `main` autorizado por el usuario el 2026-11-25.
+
 ## [0.17.35] — 2026-11-24
 
 ### Recuperación y confirmación de Auth

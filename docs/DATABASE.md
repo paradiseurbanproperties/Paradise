@@ -137,3 +137,7 @@ Un trigger o RPC transaccional registrará `property_price_history` al cambiar `
 La migración `202611230005_geospatial_search.sql` agrega `properties.location` como `extensions.geography(Point,4326)`, la sincroniza desde las columnas latitud/longitud y crea índice GiST. También prepara RPC `search_public_properties_nearby` con `SECURITY INVOKER`, RLS, estados/visibilidad públicas y límites de radio/resultados.
 
 El usuario reporta haber habilitado PostGIS desde Database → Extensions en Supabase, en el esquema `extensions`. Confirmó en SQL Editor la firma de la RPC de 0005. Una llamada anónima a `/rest/v1/rpc/search_public_properties_nearby` y la lectura posterior de la fila con selección pública respondieron HTTP 200. La ruta de mapa en producción con centro CDMX y radio 5 km también respondió HTTP 200 y renderizó una propiedad. El usuario confirma que el mapa funciona; la interacción de toque/gestos no se observó de forma independiente. El `PGRST125` de un sondeo anterior no se reprodujo con la ruta canónica; la causa inicial no quedó identificada. La búsqueda por área poligonal vendrá después; esta primera consulta usa radio geodésico. No se deben exponer direcciones exactas cuando la publicación requiera privacidad.
+
+## Correo de consultas
+
+El usuario reporta 0022 aplicada; no se ha verificado el estado remoto. La migración 0023 retira el trigger y las funciones de cola que ya no se usan. La tabla de cola permanece como archivo de posibles registros previos y no recibe nuevas filas. Los leads y sus relaciones no cambian.

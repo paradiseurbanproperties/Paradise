@@ -78,3 +78,14 @@ La comprobación HTTP del 24 de noviembre encontró `paradise-paradise-0f94.verc
 Los errores de recuperación y actualización registran únicamente código/estado. Si no llegan correos, revisar Auth logs y SMTP: un cambio de callback no soluciona un proveedor de correo rechazado o limitado. No se ha verificado entrega real a un inbox.
 
 Registro y recuperación solicitan exactamente `/auth/callback` sin `next` para coincidir con la entrada exacta de Redirect URLs. Supabase conserva la intención recovery en el verificador PKCE; el callback usa esa información para dirigir al formulario. Referencia de comparación de URLs: https://github.com/supabase/auth/blob/master/internal/utilities/request.go.
+
+## Avisos gratuitos de consultas por Gmail
+
+La consulta sigue guardándose en CRM por `submit_property_inquiry`. Después el servidor envía un aviso a `paradiseurbanproperties@gmail.com` por Gmail SMTP; el correo del visitante figura en Reply-To. No hay Google Cloud, OAuth ni servicio de correo de pago.
+
+1. En la cuenta `paradiseurbanproperties@gmail.com`, activa [verificación en dos pasos](https://support.google.com/mail/answer/185833?hl=es) y crea una contraseña de aplicación para Paradise. Si Google no ofrece la opción a esa cuenta, habrá que usar otra cuenta de correo o un proveedor gratuito compatible.
+2. En Vercel → Project → Settings → Environment Variables, añade `CRM_GMAIL_APP_PASSWORD` con la contraseña de aplicación, solo para Production. No uses la contraseña normal de Gmail, no la compartas en el chat y no la pongas en variables `NEXT_PUBLIC_*`.
+3. Vuelve a desplegar para cargar la variable. Envía una consulta desde una ficha real; comprueba que aparezca en `/admin/leads` o `/agente/leads` y que llegue el aviso a Gmail. También revisa Spam/Promociones. No se ha realizado esta comprobación con credenciales reales.
+4. Aplica `supabase/migrations/202611250023_simplify_crm_email.sql` una vez. Ya se reportó 0022 aplicada: 0023 desactiva su antigua cola sin tocar leads ni borrar el historial de la tabla. No repitas 0022.
+
+Vercel [permite SMTP saliente salvo el puerto 25](https://vercel.com/kb/guide/serverless-functions-and-smtp); se usa TLS en el 465 y se espera la respuesta antes de devolver el HTTP. Un fallo de Gmail no borra el lead ya guardado y se registra solo el código de error. No hay reintento automático ni garantía de entrega: Gmail también aplica [límites de envío](https://support.google.com/mail/answer/22839?hl=es).
