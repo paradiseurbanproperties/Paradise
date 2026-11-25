@@ -1,6 +1,6 @@
 # Despliegue y operación
 
-**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. El deploy del commit `15ac12b` fue marcado exitoso por Vercel; `/registro` responde HTTP 200. GitHub Actions para ese commit pasó lint, tipos, unitarias y build, pero falló en E2E por una lectura axe durante la transición visual del tema móvil; el test se corrigió localmente y requiere nueva corrida remota. Backups, monitorización y dominio propio no constan configurados/verificados.
+**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. El deploy del commit `5a958f2` fue marcado exitoso por Vercel; `/registro` responde HTTP 200. GitHub Actions pasó lint, tipos, unitarias, build y E2E para ese commit. Backups, monitorización y dominio propio no constan configurados/verificados.
 
 ## Vercel — destino solicitado
 

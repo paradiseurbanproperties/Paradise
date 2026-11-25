@@ -6,7 +6,7 @@ Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a
 
 ### Estabilizar axe al cambiar tema en móvil
 - CI de `15ac12b` encontró contraste temporal en paginador/footer durante la transición móvil de tema (fondos interpolados, no colores finales).
-- Se añadió espera a que termine la transición antes del scan axe móvil. `pnpm test:e2e` pasa 5/5 localmente con el ajuste; falta ejecutar el mismo workflow remoto en el próximo push.
+- Se añadió espera a que termine la transición antes del scan axe móvil. `pnpm test:e2e` pasa 5/5 localmente y GitHub Actions terminó correctamente para `5a958f2`; Vercel marcó el deployment como exitoso.
 
 ## [0.17.32] — 2026-11-24
 

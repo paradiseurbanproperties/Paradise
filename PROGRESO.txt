@@ -177,7 +177,7 @@ FUNCIONES PENDIENTES
 ## FASE 15 — INCREMENTO 7: ESTABILIZAR SCAN MÓVIL DE TEMA
 - El log CI mostró contraste temporal (fondo #78797b) en paginador y footer al ejecutar axe inmediatamente después del cambio de tema móvil; valores finales de tema oscuro son accesibles y el resto de pruebas pasó.
 - Se añadió espera de 500 ms tras el cambio de tema en el test móvil, igual que en el test de portada. No cambia el comportamiento del producto.
-- `pnpm test:e2e` local pasa 5/5. El siguiente push debe volver a ejecutar CI; el deployment actual permanece en `15ac12b` y `/registro` respondió 200 en la verificación previa.
+- `pnpm test:e2e` local pasa 5/5; GitHub Actions pasó todos los steps para `5a958f2`, y Vercel marcó el deployment exitoso. `/registro` responde HTTP 200.
 
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.
