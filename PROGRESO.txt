@@ -161,6 +161,12 @@ FUNCIONES PENDIENTES
 - Limitación: la creación real necesita un inbox de prueba y no se ejecutó para evitar dejar una cuenta huérfana. Si falla el siguiente intento en producción, el código/status estará en logs de Vercel para distinguir política, SMTP, rate limit o fallo de trigger/DB.
 - El usuario autorizó push para que la corrección llegue a Vercel. Ejecutar el conjunto completo, confirmar CI/deploy y probar solo lectura de rutas; no hacer una alta externa sin correo de prueba.
 
+## FASE 15 — INCREMENTO 5: CORRECCIÓN DE CI Y ETIQUETAS ACCESIBLES
+- CI del commit `3d25e3f` pasó lint, tipos, 15 unitarias, build e instalación Chromium, pero detectó `label-content-name-mismatch` en enlaces de imagen de tarjetas de propiedad porque sus etiquetas visibles no estaban dentro del `aria-label`.
+- Se corrigió el nombre accesible para incluir distintivos visibles de ejemplo académico, Premium y estado “En trato”. Build y 5 E2E pasan localmente, incluidos scans axe de portada y navegación móvil.
+- El deployment de Vercel para `3d25e3f` terminó como exitoso; `/registro` respondió HTTP 200. El nuevo commit debe volver a correr CI.
+- Se mantiene pendiente una prueba real de alta con correo de prueba. El endpoint confirma signup habilitado y email con verificación obligatoria; no se creó ninguna cuenta artificial.
+
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.
 - El build Turbopack falla en este sandbox al enlazar un puerto interno; `pnpm build` usa Webpack y completó fuera del sandbox. Persiste la advertencia no fatal `DEP0205` de Node 26.

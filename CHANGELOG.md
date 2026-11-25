@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.31] — 2026-11-24
+
+### Corrección de accesibilidad encontrada por CI
+- La primera corrida remota de CI encontró `label-content-name-mismatch` en enlaces de imagen de tarjetas: el `aria-label` omitía etiquetas visibles como “Ejemplo académico” y “En trato”.
+- El nombre accesible ahora incluye las etiquetas que aparecen dentro de cada enlace. Los 5 E2E y todos los scans axe pasan localmente tras el ajuste.
+- Vercel del commit `3d25e3f` desplegó correctamente; `/registro` responde HTTP 200. El push de esta corrección inicia una segunda corrida CI.
+
 ## [0.17.30] — 2026-11-24
 
 ### Diagnóstico de registro
