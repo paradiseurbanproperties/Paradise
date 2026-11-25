@@ -1,6 +1,6 @@
 # Despliegue y operación
 
-**Estado:** guía de decisiones futuras; no existe despliegue configurado. No hay backups, monitorización, CI, dominios ni servicios operativos verificados.
+**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. Esta sesión no verificó el estado del deployment tras los cambios locales. Backups, monitorización, CI y dominio propio no constan configurados/verificados.
 
 ## Vercel — destino solicitado
 
@@ -10,13 +10,21 @@ Variables que deben configurarse en Vercel para Production y Preview según corr
 
 - `NEXT_PUBLIC_SUPABASE_URL`: URL del proyecto Supabase.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: clave publicable (nunca service role).
-- `NEXT_PUBLIC_SITE_URL`: origen canónico HTTPS que alimenta metadatos, sitemap, canonical y redirects. Para Production, asignar el dominio Vercel definitivo; para Preview, usar el origen de preview si se desea que canonical/redirect sean específicos de esa vista.
+- `NEXT_PUBLIC_SITE_URL`: origen canónico HTTPS que alimenta metadatos, sitemap y canonical. Para Production, asignar el dominio Vercel definitivo. Los callbacks de Auth usan esta URL y, si falta, el dominio de producción o deployment que Vercel expone automáticamente.
 - Opcional: `NEXT_PUBLIC_MAP_STYLE_URL` o `NEXT_PUBLIC_MAP_TILE_URL`; si faltan, el mapa usa teselas raster OSM. Configurar límites/condiciones de un proveedor antes de tráfico significativo.
 - `GEOCODING_PROVIDER` y `GEOCODING_API_KEY` solo si se habilita geocodificación; la clave debe ser server-side y no llevar prefijo `NEXT_PUBLIC_`.
 
-En Supabase Auth, añadir el dominio de producción y las URLs Preview necesarias a Redirect URLs para `/auth/callback`; confirmar el dominio público del proyecto en Site URL/Auth y validar email/recovery links. No copiar `.env.local` a GitHub ni a Vercel como archivo; cargar las variables por Settings → Environment Variables. `.env.example` contiene solo marcadores.
+En Supabase Auth → URL Configuration, establecer **Site URL** al dominio canónico, por ejemplo `https://paradise-kappa-gray.vercel.app`, y agregar `https://paradise-kappa-gray.vercel.app/auth/callback` a **Redirect URLs** (además de `http://localhost:3000/auth/callback` en desarrollo). Si se usan Preview URLs, permitir solo los patrones de preview requeridos. Supabase ignora `redirectTo` si su URL no coincide con la lista permitida; usar `{{ .RedirectTo }}` en templates personalizados de confirmación y recuperación. No copiar `.env.local` a GitHub ni a Vercel como archivo; cargar las variables por Settings → Environment Variables. `.env.example` contiene solo marcadores.
 
 Vercel detecta Next.js y ejecuta la build del proyecto por cada push según su configuración estándar. Fuente: [Next.js en Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs), [builds](https://vercel.com/docs/builds) y [variables de entorno](https://vercel.com/docs/environment-variables/framework-environment-variables).
+
+### Rate limit para endpoints públicos
+
+El formulario de consulta usa `POST /api/crm/property-inquiry`; analítica usa `POST /api/analytics/property-view`. Ambos validan `Origin`, JSON y tamaño del body. CRM añade además honeypot y un límite SQL de tres envíos por correo/propiedad/hora.
+
+Después del despliegue, crear en Vercel → proyecto → Firewall una regla WAF de Rate Limit con método `POST` y dos grupos de ruta (unidos por OR): cada endpoint anterior. Como valor inicial, usar ventana fija de 60 segundos, 30 solicitudes por IP y respuesta 429. En el primer despliegue se puede dejar `Log`, revisar el tráfico y después publicar el límite. Esto combina las dos rutas en una sola regla y evita persistir IP en la base de Paradise.
+
+Según [la documentación WAF de Vercel](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting), el rate limiting está disponible en todos los planes, Hobby incluye una regla, usa ventana fija y tiene una cuota de 1 millón de solicitudes permitidas; la tabla de precios muestra $0.50 por millón de solicitudes permitidas. Los contadores son regionales, de modo que tráfico repartido en regiones puede exceder el límite por región. Vercel procesa la IP como clave del firewall, pero la aplicación no la guarda. Esta regla no está habilitada hasta publicarla en el panel.
 
 ### Diagnóstico de 404
 

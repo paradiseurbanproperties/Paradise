@@ -1,6 +1,6 @@
 # Arquitectura propuesta
 
-**Estado:** Fases 0–3 y 6, 8–13 validadas funcionalmente según reportes del usuario. En Fase 14, 0019–0020 constan funcionales y el usuario indica que 0021 parece funcionar; matriz RLS independiente pendiente. La navegación principal concentra rutas públicas y deja opciones de cuenta/rol en el menú de perfil. La comparación se mantiene local en el navegador. El catálogo público consulta publicaciones de PostgreSQL cuando Supabase está configurado. Premium vive en `features/subscriptions` y no es un rol.
+**Estado:** Fases 0–3 y 6, 8–13 validadas funcionalmente según reportes del usuario. En Fase 14, el usuario confirma RLS aprobado; la sesión no inspeccionó de forma independiente cada identidad. Una llamada RPC anónima de proximidad y la lectura del catálogo respondieron HTTP 200 con un resultado; falta validar el flujo completo desde la interfaz. La navegación principal concentra rutas públicas y deja opciones de cuenta/rol en el menú de perfil. La comparación se mantiene local en el navegador. Premium vive en `features/subscriptions` y no es un rol.
 
 ## Límites y responsabilidades
 
@@ -83,7 +83,7 @@ Identidad/roles y RLS son prerrequisito para módulos con datos privados; propie
 
 Fase 9 consulta agregados de tablas operativas bajo sesión Admin/RLS. El tracking de vistas se implementa mediante UUID efímero por pestaña, deduplicación diaria por propiedad, retención de 90 días y RPC agregadas Admin; no almacena IP ni identidad. El panel desglosa vistas por inmueble, tipo y ciudad. La exportación CSV reutiliza estas agregaciones en un Route Handler privado, sin exponer eventos crudos. El rango se filtra por una allowlist común de 7, 28 o 90 días.
 
-Fase 10: `features/agents` administra perfiles, asignaciones y cartera. `features/crm` valida consultas, etapas y notas. Las fichas disponibles envían consultas mediante RPC; `/admin/leads` y `/agente/leads` muestran un tablero por etapa y permiten añadir notas internas. El usuario confirma que CRM funciona; 0013 se considera funcional por su reporte, sin inspección del historial remoto.
+Fase 10: `features/agents` administra perfiles, asignaciones y cartera. `features/crm` valida consultas, etapas y notas. El formulario público envía JSON al Route Handler `POST /api/crm/property-inquiry`, que valida origen, tamaño y honeypot antes de invocar la RPC SQL. `/admin/leads` y `/agente/leads` muestran un tablero por etapa y permiten añadir notas internas. El usuario confirma que CRM funciona; 0013 se considera funcional por su reporte, sin inspección del historial remoto.
 
 Fase 11, incremento 1: `features/favorites` persiste favoritos por usuario y `features/comparison` conserva hasta cuatro IDs en `localStorage`, sin registrar datos de comparación en servidor. El usuario confirma que funcionan; 0014 se considera validada por su reporte.
 
@@ -131,5 +131,6 @@ Auth SSR utiliza `@supabase/ssr`: cliente de navegador, cliente servidor con coo
 - `src/app/sitemap.ts` compone rutas públicas y propiedades/agentes actualmente visibles bajo RLS. `src/app/robots.ts` expone sitemap y bloquea rastreo de rutas privadas; los layouts de autenticación y paneles incluyen `noindex`.
 - `NEXT_PUBLIC_SITE_URL` define `metadataBase`, canonical, host y sitemap. Debe contener el origen canónico del despliegue.
 - `/admin/configuracion` edita una fila singleton mediante Server Action, Zod y sesión Supabase. La tabla `site_settings` tiene lectura pública y escritura reservada a Admin activo con RLS. Solo se publican nombre, frase, descripción y contacto expresamente guardados.
+- El upsert de `site_settings` omite la clave `singleton` del payload para respetar el grant de columnas; PostgreSQL la establece a `true` por default. Los redirects Auth usan `NEXT_PUBLIC_SITE_URL` o los dominios de Vercel; Auth requiere que el callback esté permitido en Supabase.
 - La ruta `/propiedades/mapa` vive en el route group `(public)` correcto; no usar comillas literales en nombres de carpetas App Router.
 - Fase 14 separa `property_private_details` del catálogo público. Dirección, código postal, coordenadas exactas y actores de gestión se leen solo por Admin/agente asignado; la Data API ofrece coordenadas redondeadas y columnas explícitamente concedidas.

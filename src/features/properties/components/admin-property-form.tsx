@@ -91,7 +91,7 @@ export function AdminPropertyForm({ initial = blankProperty }: { initial?: Admin
         </label>
         <label>
           Precio (MXN)
-          <input defaultValue={initial.price || ""} min="1" name="price" required step="1000" type="number" />
+          <input defaultValue={initial.price || ""} max="999999999999.99" min="0.01" name="price" required step="0.01" type="number" />
         </label>
         <label className="admin-property-form__wide">
           Descripción

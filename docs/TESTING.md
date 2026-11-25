@@ -26,9 +26,9 @@
 - Flujo simulado exitoso/rechazado y vencimiento Premium bajo reloj controlado.
 - Agente: asignación, visita y CRM; admin: aprobación, usuarios, ajustes y auditoría.
 - Responsividad, teclado y estados de error/vacío en flujos críticos.
-- Revisión manual en iPhone/Safari y Android/Chrome: hamburguesa abre/cierra, links navegan, tema cambia y persiste al recargar, menú de perfil abre, mapa arrastra con un dedo, pellizco acerca y los botones +/- responden. No declarar móviles validados por una revisión CSS estática.
+- Revisión manual en iPhone/Safari y Android/Chrome: hamburguesa abre/cierra, links navegan, tema cambia y persiste al recargar, menú de perfil abre, mapa arrastra con un dedo, pellizco acerca y los botones +/- responden. El usuario confirma que los cuatro controles principales funcionan al 100% en Vercel desde móvil; no se ha confirmado por separado Android.
 - Si varios controles cliente dejan de responder a la vez y MapLibre queda en carga, inspeccionar en el dispositivo la consola y Network: errores de hidratación, status/MIME de `/_next/static/*`, WebSocket/HMR en desarrollo, worker de MapLibre y requests de teselas. Registrar host/puerto usados; no atribuirlo solo al sistema operativo sin evidencia.
-- Verificar `/icons/paradise.png` con respuesta 200, favicon en pestaña, Apple touch icon y metadatos Open Graph/Twitter en vista previa. Las plataformas de vista previa pueden cachear la imagen anterior.
+- Verificar `/icons/paradise.png` con respuesta 200 y que el mismo recurso aparezca en favicon, Apple touch, vista previa Open Graph/Twitter, navbar y footer. Las plataformas de vista previa y pestañas pueden cachear el icono anterior.
 - Verificar contraste calculado al cambiar tokens de tema: WCAG 2.2 AA exige 4.5:1 para texto normal, 3:1 para texto grande y tamaño de objetivo de al menos 24×24 CSS px con excepciones; Paradise aspira a 44–48 CSS px para controles táctiles.
 
 Referencias de accesibilidad/interacción:
@@ -70,18 +70,18 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - RLS positiva/negativa: visitante solo ve propiedades aprobadas públicas/ambas; cliente no puede insertar, editar, borrar o ver borradores; agente solo ve propiedades asignadas; Admin gestiona propiedades; un usuario nunca puede asignar un agente que no tenga rol activo de agente.
 - Storage privado: visitante obtiene acceso únicamente a imágenes de ficha pública aprobada; Admin puede subir/leer/editar/borrar dentro del bucket y no en otros buckets; rechazar rutas de otro bucket o sin prefijo de propiedad.
 - Metadata: rechazar MIME no permitido, archivos mayores de 10 MiB, ruta incompatible con propiedad, segunda portada y referencias FK inválidas.
-- Estado actual: el usuario confirma que el flujo de propiedad, fotos, publicación e historial funciona al 100%. La matriz RLS multirrol sigue pendiente.
+- Estado actual: el usuario confirma que el flujo de propiedad, fotos, publicación e historial funciona al 100% y que RLS está aprobado. La sesión no repitió pruebas directas por identidad; mantener los casos como regresión ante futuros cambios.
 - El usuario probó el flujo de precio respaldado por 0004; falta probar atomicidad en rollback e inmutabilidad/RLS con cliente y Admin.
 - En esta sesión, `pnpm lint` y `pnpm typecheck` pasan; `pnpm build` falló por el sandbox al enlazar el puerto interno de Turbopack (`Operation not permitted`). El usuario puede repetirlo en su terminal Arch habitual.
 
 ## Fase 7 — Coordenadas y mapa
 
-- Dependencias: el usuario reporta habilitar PostGIS e instalar MapLibre; la migración 0005 consta aplicada según consulta del usuario; probar RPC con datos reales.
+- Dependencias: el usuario reporta habilitar PostGIS e instalar MapLibre; confirmó en SQL Editor la firma de la RPC de 0005. Una llamada RPC anónima y la lectura de catálogo posterior respondieron HTTP 200 con una ficha cada una; queda validar la búsqueda por radio desde la interfaz.
 - Unitarias: rangos de latitud/longitud, radio 100 m–50 km, límite 1–100, coordenadas incompletas y filtros de visibilidad.
 - Integración: trigger actualiza geography desde lat/lng; índice GiST presente; RPC ordena por distancia, limita resultados y respeta publicación/RLS.
 - E2E: Admin guarda punto desde mapa y al cliente el mapa sincroniza marcadores, resultados y filtros; interacción teclado/táctil y atribución visible.
 - Proveedor OSM: no precargar teselas; respetar caché, referer y atribución. La geocodificación debe ser iniciada por el usuario y limitada; no autocompletar contra Nominatim público.
-- Estado: MapLibre, selector Admin, mapa público y repositorio/RPC integrados. `pnpm lint` y `pnpm typecheck` pasan. Usuario reporta instalar MapLibre y habilitar PostGIS; migración 0005 confirmada por consulta; prueba con datos reales pendiente. La revisión visual del usuario confirmó los mapas. Build sigue bloqueado por permisos de puerto/proceso de Turbopack en este sandbox.
+- Estado: MapLibre, selector Admin, mapa público y repositorio/RPC integrados. `pnpm lint` y `pnpm typecheck` pasaron en el incremento previo. El usuario confirma que los mapas se muestran; sondeo anónimo de RPC y lectura del catálogo: HTTP 200 y una fila cada uno. Falta validación manual de la búsqueda por radio en la interfaz.
 
 ## Fase 8 — Premium simulado
 
@@ -117,6 +117,8 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - El usuario confirma que los perfiles 0011 funcionan tras aplicarla. Admin puede crear/editar perfil de cuenta con rol Agente; slug duplicado se rechaza; los límites de listas y biografía se validan; visitante lee solo perfil publicado de agente activo; cuenta suspendida y perfil despublicado no aparecen; Cliente/Agente no guardan datos profesionales; Admin puede despublicar incluso perfil de cuenta suspendida.
 - El usuario confirma que el dashboard de cartera y las asignaciones funcionan tras aplicar 0012. La matriz independiente pendiente de Fase 14 comprobará roles, cuenta suspendida, asignación revocada, borrador y visibilidad pública.
 - CRM 0013: una consulta válida crea un lead y lo asigna al agente activo de la propiedad; sin agente activo queda visible solo a Admin; propiedad demo, vendida, no aprobada, privada sin entitlement o consentimiento falso no crea lead; el cuarto envío reciente del mismo correo/propiedad se limita; visitante/Cliente no leen leads; agente asignado sí; otro agente y cuenta suspendida no; cambios de etapa generan historial; notas solo aparecen a equipo autorizado; Admin y Agente no escriben notas como otro actor.
+- API CRM: rechazar origin ausente/foráneo, content type distinto de JSON, JSON inválido y body mayor a 4 KiB; en desarrollo local aceptar solo origen con el mismo host; honeypot lleno responde éxito sin insertar lead; el rate limit por correo/propiedad del RPC sigue activo. Tras habilitar Vercel WAF, confirmar 429 al superar su límite por IP.
+- API analytics: confirmar que el body mayor a 512 bytes se corta durante lectura, no tras cargarlo completo; comprobar origin/content type/JSON/UUID inválidos y respuesta 503 controlada ante fallo de RPC.
 - Revisar estados sin migración, sin agentes, sin biografía/listas y en móvil. No presentar un perfil ficticio si no hay cuentas reales.
 
 ## Fase 11 — Herramientas del cliente, incremento 1
@@ -158,23 +160,25 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - Validar correo válido/vacío, límites de longitud, persistencia, salida escapada, y que footer/metadata reflejan valores guardados. Confirmar contacto vacío cuando no existe información aprobada.
 - Revisar `/sitemap.xml` para que solo incluya rutas y fichas públicas visibles, `/robots.txt` para sitemap y exclusiones, canonicals en portada/catálogo/detalle/directorio/agente y `noindex` en login/cuenta/paneles.
 - Configurar `NEXT_PUBLIC_SITE_URL` con el dominio real antes de comprobar sitemap/robots/canonical en despliegue; con fallback local, esos URLs no representan el sitio publicado.
+- En Vercel Production, si falta `NEXT_PUBLIC_SITE_URL`, los links Auth usan `VERCEL_PROJECT_PRODUCTION_URL` (o `VERCEL_URL` como fallback). Confirmar que Supabase Auth tiene el Site URL canónico y la URL exacta `/auth/callback` en Redirect URLs; probar confirmar email y recuperar contraseña desde Production. Probar que el código PKCE termina en `/verificar-email` o `/auth/cambiar-password`, no en la raíz ni en el dashboard de Vercel.
 
 ## Fase 14 — Revisión de permisos, incremento 1
 
-- El usuario confirma que la configuración/SEO de Fase 13 funciona y 0018 se considera validada por su reporte; no se consultó Supabase directamente.
+- El usuario reporta que nombre/SEO funcionan, pero correo/teléfono no se guardaban. Se corrigió el upsert para omitir la llave singleton sin grant UPDATE; validar después del deployment sin repetir 0018.
 - Revisión estática encontró en `agent_assignments` permiso de borrado y actualización de `assigned_by` bajo la policy `FOR ALL` de Admin. 0019 limita las columnas de escritura y quita DELETE; el usuario confirma el flujo, sin verificación SQL independiente.
 - Tras aplicar 0019: como Admin activo, crear asignación y revocarla; confirmar que Cliente, Agente y Admin suspendido no pueden asignar/revocar; confirmar que `assigned_by` debe coincidir con `auth.uid()`, y que insertar revocada, cambiar actor/relaciones, reactivar o DELETE fallan aun vía Data API directa.
-- Repetir matrices RLS pendientes para perfil/rol, propiedades/Storage, Premium, CRM, favoritos/listas/actividad y notificaciones. No marcar seguridad global cerrada sin ejecutar pruebas con identidades distintas.
+- El usuario confirma la matriz RLS aprobada para perfiles, propiedades/Storage, Premium, CRM y módulos de cliente. No se reprodujeron pruebas directas en esta sesión; automatizar estos casos antes de cambios de políticas.
 - Incremento 2: el endpoint de analítica compara `Origin` contra `NEXT_PUBLIC_SITE_URL` y valida el media type JSON. Ejecutar smoke checks para origen canónico, origen foráneo, encabezado ausente y content type inválido; aún no se ejecutaron.
-- Verificar las cabeceras base en páginas públicas, privadas y rutas API: `nosniff`, `DENY`, `strict-origin-when-cross-origin` y permisos restringidos. Comprobar en la revisión de despliegue si se puede adoptar CSP/HSTS.
+- Verificar las cabeceras base en páginas públicas, privadas y rutas API: `nosniff`, `DENY`, `strict-origin-when-cross-origin` y permisos restringidos. HSTS está configurado para Vercel, pero aún no se verificó en un deployment.
+- En el incremento de endurecimiento, verificar `Strict-Transport-Security: max-age=31536000` solo en Vercel y ausencia de `X-Powered-By`; no debe forzar HSTS en hosts locales HTTP. CSP requiere validar Next scripts/estilos, imágenes Unsplash, Supabase y mapas antes de activarse.
 - Incremento 3: el usuario confirma que 0020 y su flujo funcionan; no se inspeccionó Supabase ni se ejecutó prueba SQL independiente.
-- Incremento 4: aplicar 0021. Con anon y Cliente, comprobar que propiedades, imágenes e historial solo devuelven columnas permitidas; los campos privados y los IDs de actor deben dar error de permiso al seleccionarlos directamente. Confirmar que `property_private_details` no se lee como anon/Cliente; Admin y agente activo asignado leen solo dirección, código postal y coordenadas exactas, sin columnas de actor/timestamps. Agente no asignado y suspendido deben quedar bloqueados. Verificar alta/edición Admin, mapa, búsqueda por radio e imágenes con columnas reducidas.
+- Incremento 4: el usuario reporta que 0021 parece funcionar. Con anon y Cliente, comprobar que propiedades, imágenes e historial solo devuelven columnas permitidas; los campos privados y los IDs de actor deben dar error de permiso al seleccionarlos directamente. Confirmar que `property_private_details` no se lee como anon/Cliente; Admin y agente activo asignado leen solo dirección, código postal y coordenadas exactas, sin columnas de actor/timestamps. Agente no asignado y suspendido deben quedar bloqueados. Verificar alta/edición Admin, mapa, búsqueda por radio e imágenes con columnas reducidas.
 - El usuario informa que 0021 parece funcionar. La matriz anterior aún requiere evidencia por identidad y pruebas directas de columnas/permisos.
 
 ## Fase 14 — Navegación responsive, incremento 5
 
-- Revisión manual pendiente en escritorio, tablet y móvil: barra centrada, cuatro enlaces principales, desplegable móvil, menú de perfil con opciones por rol, cierre con Escape/click exterior y al navegar, tema y cierre de sesión.
-- Confirmar que tocar una ruta en móvil inicia navegación y cierra el panel al cambiar de ruta; mostrar indicador inmediato y cargar contenido final. La sesión actual no pudo acceder al navegador local, así que solo se verificaron lint y tipos.
+- El usuario confirma que los controles y mapa funcionan al 100% en Vercel desde móvil. Revisión por separado de Android y escritorio no documentada.
+- La inspección anterior verificó lint y tipos; no tuvo acceso al navegador del dispositivo para contrastar la experiencia.
 
 ## Verificaciones ejecutadas en Fase 3
 

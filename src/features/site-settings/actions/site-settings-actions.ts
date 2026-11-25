@@ -24,7 +24,6 @@ export async function saveSiteSettingsAction(
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from("site_settings").upsert({
-    singleton: true,
     site_name: parsed.data.siteName,
     tagline: parsed.data.tagline,
     seo_description: parsed.data.seoDescription,
@@ -34,6 +33,7 @@ export async function saveSiteSettingsAction(
   }, { onConflict: "singleton" });
 
   if (error) {
+    console.error("[site-settings] No se pudo guardar", { code: error.code });
     if (error.code === "42P01" || error.code === "PGRST205") {
       return { status: "error", message: "La configuración requiere la migración 0018 en Supabase." };
     }

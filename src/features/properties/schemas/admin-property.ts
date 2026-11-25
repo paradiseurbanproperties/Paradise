@@ -4,6 +4,7 @@ const propertyTypes = ["house", "apartment", "land", "country_house"] as const;
 const propertyStatuses = ["available", "in_deal", "sold"] as const;
 const propertyVisibilities = ["public", "premium", "both"] as const;
 const publicationStatuses = ["draft", "pending", "approved", "rejected", "archived"] as const;
+const MAX_PROPERTY_PRICE = 999_999_999_999.99;
 
 export const createPropertySchema = z.object({
   title: z.string().trim().min(4, "Escribe un nombre de al menos 4 caracteres.").max(120),
@@ -12,7 +13,7 @@ export const createPropertySchema = z.object({
     [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))].slice(0, 20),
   ),
   propertyType: z.enum(propertyTypes),
-  price: z.coerce.number().positive("El precio debe ser mayor que cero.").max(1_000_000_000),
+  price: z.coerce.number().positive("El precio debe ser mayor que cero.").max(MAX_PROPERTY_PRICE, "El precio supera el límite permitido por la base de datos."),
   bedrooms: z.coerce.number().int().min(0).max(30),
   bathrooms: z.coerce.number().min(0).max(30),
   parking: z.coerce.number().int().min(0).max(30),

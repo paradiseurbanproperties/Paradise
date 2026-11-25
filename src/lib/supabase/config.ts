@@ -25,15 +25,27 @@ export function getSupabasePublicConfig(): SupabasePublicConfig | null {
 }
 
 export function getPublicSiteUrl(): string {
-  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (configuredUrl) {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.VERCEL_ENV === "production"
+      ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+      : process.env.NEXT_PUBLIC_VERCEL_URL,
+    process.env.VERCEL_URL,
+  ];
+  const isVercel = process.env.VERCEL === "1" || Boolean(process.env.VERCEL_URL);
+
+  for (const candidate of candidates) {
+    const configuredUrl = candidate?.trim();
+    if (!configuredUrl) continue;
     try {
-      const url = new URL(configuredUrl);
-      if (url.protocol === "https:" || url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+      const hasScheme = /^[a-z][a-z\d+.-]*:\/\//i.test(configuredUrl);
+      const url = new URL(hasScheme ? configuredUrl : `https://${configuredUrl}`);
+      const isLocalHttp = url.protocol === "http:" && (url.hostname === "localhost" || url.hostname === "127.0.0.1");
+      if (url.protocol === "https:" || (isLocalHttp && !isVercel)) {
         return url.origin;
       }
     } catch {
-      // Use local development origin until the deployment URL is set correctly.
+      // Try the next deployment URL candidate.
     }
   }
   return "http://localhost:3000";

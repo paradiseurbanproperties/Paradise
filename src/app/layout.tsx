@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     siteName: settings.siteName,
     title,
     description,
-    images: [{ url: "/icons/paradise.png", width: 435, height: 458, alt: "Icono ilustrado de Paradise Bienes Raíces" }],
+    images: [{ url: "/icons/paradise.png", width: 435, height: 458, alt: "Logo de Paradise Bienes Raíces" }],
   },
   twitter: {
     card: "summary_large_image",

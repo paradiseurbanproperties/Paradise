@@ -1,6 +1,6 @@
 # Seguridad y permisos propuestos
 
-**Estado:** implementación por fases. La migración de Fase 4 activa RLS en `profiles` y limita el perfil propio. La migración de Fase 5 añade rol base, estado de cuenta, lectura global de perfiles solo para Admin, helpers seguros y un RPC acotado para cambiar el rol/estado de otra cuenta. El usuario reporta aplicar ambas migraciones y designar el primer Admin; las pruebas con cada identidad siguen pendientes.
+**Estado:** implementación por fases. El usuario confirma que RLS está aprobado. Esta sesión no repitió la matriz con identidades separadas ni verificó el historial remoto. La RPC geográfica anónima y la lectura posterior de catálogo respondieron HTTP 200 con un resultado cada una; falta validar el flujo de búsqueda en la interfaz.
 
 La migración de Fase 6 (`202611230003_properties.sql`) activa RLS y revoca grants amplios en propiedades, asignaciones, imágenes y características. El usuario informa que la aplicó sin error; las policies aún requieren pruebas negativas con distintas identidades. Visitantes solo consultan publicaciones aprobadas públicas/ambas; usuarios autenticados también pueden consultar asignaciones propias como agente y Admin puede operar el inventario. Las policies de `storage.objects` vinculan el objeto del bucket privado con su metadata y publicación; escritura queda reservada a Admin en esta etapa.
 
@@ -35,7 +35,7 @@ La migración crea helpers `private.current_profile_role()` y `private.is_active
 - favoritos/listas/actividad: CRUD únicamente por dueño; claves FK impiden referenciar recursos inexistentes.
 - visitas: cliente ve las suyas; agente asignado las administra; admin global. Evitar que estados se muten libremente por cliente.
 - availability: agente gestiona la propia; lectura pública limitada a franjas reservables; admin supervisa.
-- leads/interacciones/etapas: la migración 0013 concede SELECT solo a Admin activo y agente asignado activo; las notas son interacciones internas con actor de sesión; Cliente no consulta CRM. El visitante solo ejecuta RPC de captación, que valida consentimiento, propiedad activa/publicable y limita tres envíos por correo/propiedad/hora.
+- leads/interacciones/etapas: la migración 0013 concede SELECT solo a Admin activo y agente asignado activo; las notas son interacciones internas con actor de sesión; Cliente no consulta CRM. El visitante envía al endpoint `POST /api/crm/property-inquiry`, que valida el origen canónico (mismo host solo en desarrollo), formato/tamaño del body, honeypot y campos; el RPC SQL vuelve a validar consentimiento y propiedad activa/publicable, y limita tres envíos por correo/propiedad/hora.
 - favoritos: la migración 0014 concede acceso a filas propias solo a Clientes activos. La propiedad referenciada también debe ser legible por RLS; no se aceptan favoritos de propiedades privadas/invisibles. El usuario confirma CRM funcional (0013) y esta sesión no inspeccionó el estado remoto.
 - listas: la migración 0015 limita CRUD de listas e items al Cliente activo propietario. La inserción de `favorite_list_properties` exige propiedad visible y favorito propio; las acciones vuelven a comprobar rol en servidor.
 - actividad: la migración 0016 solo concede SELECT del propio Cliente activo y no permite INSERT directo por Data API. La RPC valida cuenta activa, categoría permitida, publicación/visibilidad y Premium vigente; no acepta ID de usuario, metadata, IP ni texto libre. El límite es de 500 filas por titular.
@@ -55,9 +55,10 @@ La migración crea helpers `private.current_profile_role()` y `private.is_active
 - Migración 0017: lectura propia y marcado leído bajo RLS; inserciones solo por triggers sobre suscripciones e historial de etapa. El usuario confirma que funciona; no se inspeccionó el historial remoto.
 - La descarga CSV repite autorización Admin en servidor y llama a las RPC agregadas (que también vuelven a validar Admin); responde `private, no-store`, escapa campos CSV y neutraliza prefijos de fórmula. El parámetro temporal acepta solo 7, 28 o 90 días. No exporta identificadores pseudónimos ni eventos individuales.
 - Migración 0018 `site_settings`: la tabla contiene solo campos destinados a publicación (identidad, descripción y contacto público); RLS permite leer el singleton y reserva INSERT/UPDATE a Admin activo. La Server Action repite la guarda Admin, obtiene el actor de la sesión y valida con Zod. No hay DELETE ni datos comerciales precargados.
+- El formulario no envía la columna `singleton` al upsert, porque no tiene grant UPDATE; PostgreSQL conserva su default `true`. Los enlaces de confirmación y recuperación apuntan al callback de la app y dependen de la lista permitida de Supabase Auth.
 - Migración 0019 `agent_assignments`: corrige una policy administrativa demasiado amplia de la migración 0003. Retira DELETE y los grants de UPDATE generales, limita inserción a columnas de asignación y autor, obliga `assigned_by = auth.uid()` y permite actualizar únicamente `revoked_at` de filas activas. El usuario confirma el flujo, sin inspección remota directa.
 - Migración 0020 añade un trigger `SECURITY DEFINER` sin ejecución de usuario para registrar altas y revocaciones de asignaciones en `audit_logs`, dentro de su transacción. Conserva actor y referencias de agente/propiedad sin PII. El usuario confirma su funcionamiento, sin inspección remota directa.
-- Migración 0021 mueve dirección, código postal, coordenadas exactas y actores de la fila pública de `properties` a `property_private_details`, cuya lectura se limita por RLS a Admin y agente activo asignado. Revoca SELECT de tabla y concede columnas permitidas; no concede `location`, IDs de actores ni timestamps internos. También excluye `property_images.uploaded_by` y `property_price_history.changed_by`. Coordenadas públicas se redondean a tres decimales. Pendiente de aplicar y probar.
+- Migración 0021 mueve dirección, código postal, coordenadas exactas y actores de la fila pública de `properties` a `property_private_details`, cuya lectura se limita por RLS a Admin y agente activo asignado. Revoca SELECT de tabla y concede columnas permitidas; no concede `location`, IDs de actores ni timestamps internos. También excluye `property_images.uploaded_by` y `property_price_history.changed_by`. Coordenadas públicas se redondean a tres decimales. El usuario confirma RLS aprobado; la sesión no revisó las identidades directamente.
 - reports: envío limitado de reporte; reportante ve estado propio; resolución solo admin.
 - notifications: lectura/actualización de lectura propia; emisión en servidor.
 
@@ -69,16 +70,23 @@ El panel `/admin` es de solo lectura y está protegido por la guarda Admin del l
 
 - Mantener `service_role` solo en variables de servidor. Preferir el cliente ligado a la sesión para conservar RLS; si se usa privilegio elevado, revalidar actor, permiso, entrada y registrar auditoría.
 - Validar entrada con Zod en servidor; validar MIME real, tamaño, dimensiones y nombre de archivo; limitar tipos y rutas Storage; evitar SVG no sanitizado.
-- Limitar solicitudes de contacto, login, geocodificación y eventos con rate limiting y límites por usuario/IP; definir implementación al desplegar.
+- Limitar solicitudes de contacto, login, geocodificación y eventos con rate limiting y límites por usuario/IP; la regla de Firewall preparada para `/api/crm/property-inquiry` y `/api/analytics/property-view` sigue pendiente de habilitarse en Vercel.
 - Usar cookies seguras/SameSite a través del patrón SSR recomendado por Supabase; comprobar sesión fresca en acciones sensibles; proteger CSRF según el mecanismo de sesión.
 - Escape/sanitización de contenido y salidas; no renderizar HTML de usuario como confiable.
 - No incluir PII, tokens ni cabeceras de autorización en logs. Retención mínima y eliminación de datos de analítica.
 - Analítica de vistas: el UUID aleatorio de `sessionStorage` es pseudónimo y temporal, no una identidad; se cuenta como máximo una vista diaria por ficha y no se recoge IP ni agente de usuario. La retención declarada depende de que la migración 0008 esté instalada.
-- `POST /api/analytics/property-view` compara `Origin` con `NEXT_PUBLIC_SITE_URL`, exige `application/json`, limita el cuerpo y valida UUIDs. El ID de sesión lo elige el llamante, así que esta telemetría no es resistente a fraude; configurar límites de tasa externos sin introducir IP persistente.
-- `next.config.ts` agrega `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` que bloquea cámara/micrófono y limita geolocalización al origen propio. La revisión de CSP/HSTS depende de dominio y recursos de despliegue.
+- `POST /api/analytics/property-view` compara `Origin` con `NEXT_PUBLIC_SITE_URL` en producción (mismo host solo en desarrollo), exige `application/json`, limita el body durante la lectura y valida UUIDs. El ID de sesión lo elige el llamante; la regla de Firewall añade una barrera por IP sin persistirla en Paradise, pero no impide fraude distribuido y sus contadores son regionales.
+- `next.config.ts` agrega `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` que bloquea cámara/micrófono y limita geolocalización al origen propio. En Vercel también envía HSTS por un año, sin `includeSubDomains` ni `preload`; quita `X-Powered-By`. CSP sigue pendiente de revisar con los proveedores reales de imágenes/teselas.
 - Cambios de precios, suscripción, publicación, roles, asignaciones y administración se auditan y deben ser atómicos cuando haya múltiples escrituras.
 
 ## Límites y pendientes
+
+### Revisión estática incremental — 2026-11-24
+
+- Se revisaron las migraciones de perfiles/roles, propiedades y Storage, 0019–0021, Premium, CRM, favoritos/listas, actividad y notificaciones. En el SQL inspeccionado, las operaciones sensibles conservan políticas RLS, grants acotados y comprobaciones de cuenta activa o relación con el recurso.
+- 0019 elimina `DELETE` de asignaciones, restringe columnas de inserción/actualización y exige `assigned_by = auth.uid()`; 0021 revoca el `SELECT` amplio heredado y concede columnas explícitas para catálogo e imágenes. La tabla privada de propiedad concede lectura a Admin activo o agente asignado activo.
+- Las funciones privilegiadas revisadas fijan `search_path` vacío y restringen `EXECUTE`; el RPC público de consulta valida publicación/visibilidad y serializa el límite por correo/propiedad.
+- Esta inspección solo cubre el SQL del repositorio. No confirma migraciones instaladas ni privilegios efectivos en Supabase. Antes de cerrar la matriz hay que probar anon, Cliente activo/suspendido, Agente asignado/no asignado/suspendido y Admin activo/suspendido, incluyendo columnas privadas y objetos Storage.
 
 No hay proyecto Supabase, políticas activas, pruebas de penetración, rate limiter ni almacenamiento configurado en Fase 0. La matriz es un diseño que deberá convertirse y probarse antes de declarar seguridad implementada.
 

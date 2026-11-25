@@ -153,12 +153,12 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
           prefetch
         >
           <Image
-            alt="Paradise Bienes Raíces"
+            alt="Logo de Paradise Bienes Raíces"
             className="site-logo site-logo--header"
-            height={400}
+            height={458}
             priority
-            src="/logos/paradise.png"
-            width={600}
+            src="/icons/paradise.png"
+            width={435}
           />
         </Link>
 

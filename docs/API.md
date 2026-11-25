@@ -1,6 +1,6 @@
 # API y casos de uso propuestos
 
-**Estado:** contrato conceptual para el proyecto; el endpoint de analítica indicado abajo ya está implementado. Se priorizan Server Actions para mutaciones invocadas desde la interfaz Next.js y Route Handlers para operaciones HTTP explícitas. No duplicar la misma operación en varios transportes.
+**Estado:** contrato parcial: están implementados los endpoints de consulta CRM y analítica. Se priorizan Server Actions para mutaciones internas de Next.js y Route Handlers para operaciones HTTP explícitas, públicas y limitables por infraestructura. No duplicar la misma operación en varios transportes.
 
 ## Servicios de dominio previstos
 
@@ -17,10 +17,12 @@
 - `visits`: solicitar, cancelar, aceptar/rechazar y proponer horario con verificación transaccional de disponibilidad.
 - `subscriptions`: consultar planes, iniciar simulación de pago y procesar resultado ficticio en servidor.
 - `agents`: `saveAgentProfileAction` crea/actualiza un perfil de agente existente solo para Admin activo; `assignPropertyToAgentAction` y `revokePropertyAssignmentAction` gestionan asignaciones desde Admin; `/agente` lista cartera activa del titular mediante sesión/RLS; `/agentes` y `/agentes/[slug]` presentan perfiles publicados de cuentas Agente activas.
-- `submit_property_inquiry(target_property_id, sender_name, sender_email, inquiry_message, privacy_consent)`: RPC pública que valida propiedad disponible y consentimiento, limita frecuencia y asigna al agente activo de la propiedad; no acepta estados ni identificadores de agente desde el navegador.
+- `POST /api/crm/property-inquiry`: transporte único del formulario público; verifica `Origin` del dominio canónico en producción (o mismo host en desarrollo local), JSON, body de hasta 4 KiB y honeypot antes de llamar a la RPC SQL. Responde 201 si guarda una consulta, 200 si el honeypot detecta automatización, 400 ante validación inválida, 403 ante origen no permitido, 429 ante límite SQL y 503 si la RPC/base no está disponible.
+- `submit_property_inquiry(target_property_id, sender_name, sender_email, inquiry_message, privacy_consent)`: RPC SQL que vuelve a validar propiedad disponible y consentimiento, limita frecuencia y asigna al agente activo de la propiedad; no acepta estados ni identificadores de agente desde el navegador.
 - `updateLeadStageAction` y `addLeadNoteAction`: acciones para Admin o Agente; RLS limita lead asignado, la etapa se registra en historial y las notas son internas. Vistas en `/admin/leads` y `/agente/leads`.
 - `analytics`: recibir eventos de una lista permitida con deduplicación y límite de frecuencia; exponer métricas agregadas autorizadas.
-- `/admin/configuracion`: `saveSiteSettingsAction` exige Admin activo, valida nombre/frase/descripción/contacto con Zod y persiste singleton con actor de sesión. `site_settings` es lectura pública por diseño y escritura RLS de Admin activo; campos de contacto opcionales.
+- `/admin/configuracion`: `saveSiteSettingsAction` exige Admin activo, valida nombre/frase/descripción/contacto con Zod y persiste la fila singleton con actor de sesión, omitiendo la clave fija del payload de upsert. `site_settings` es lectura pública por diseño y escritura RLS de Admin activo; campos de contacto opcionales.
+- Registro y recuperación envían `redirectTo` a `/auth/callback`; el origen usa `NEXT_PUBLIC_SITE_URL` y cae a los dominios de producción/deployment de Vercel. Supabase Auth debe incluir la URL exacta en Redirect URLs para aceptar ese destino.
 - `GET /sitemap.xml` produce rutas públicas estáticas más propiedades y agentes publicados visibles; `GET /robots.txt` declara sitemap y rutas privadas excluidas. `NEXT_PUBLIC_SITE_URL` aporta el origen canónico.
 
 ## Límites de contrato
@@ -31,15 +33,15 @@
 - Los casos de uso mutables repiten autorización por recurso y dependen de RLS. Acciones destructivas incluyen confirmación de producto y registro de auditoría.
 - Los webhooks externos no se requieren para pago simulado; no declarar ni aceptar callbacks de pasarelas reales.
 
-Los nombres, rutas y payloads definitivos se documentarán al implementar Fases 4–14. Se añadirá contrato OpenAPI solo si existe una API HTTP consumida por clientes externos.
+Los contratos pendientes se documentarán al implementar las fases restantes. Se añadirá contrato OpenAPI solo si existe una API HTTP consumida por clientes externos.
 
 ## Privacidad de propiedades (Fase 14)
 
-La migración 0021 limita los SELECT directos de `properties`, `property_images` e historial de precio a columnas explícitas. Dirección, código postal y coordenadas exactas residen en `property_private_details`; su RLS exige Admin activo o agente activo asignado y los grants solo exponen los campos que el panel necesita. La RPC pública `search_public_properties_nearby` devuelve IDs elegibles, y el catálogo obtiene después las fichas bajo RLS con latitud/longitud redondeadas. Aplicación y validación por roles siguen pendientes.
+La migración 0021 limita los SELECT directos de `properties`, `property_images` e historial de precio a columnas explícitas. Dirección, código postal y coordenadas exactas residen en `property_private_details`; su RLS exige Admin activo o agente activo asignado y los grants solo exponen los campos que el panel necesita. El usuario confirma que RLS está aprobado. La RPC anónima `search_public_properties_nearby` y la consulta posterior de catálogo respondieron HTTP 200 con un resultado cada una; falta comprobar el flujo de interfaz.
 
 ## Endpoint implementado — vistas de ficha
 
-`POST /api/analytics/property-view` acepta únicamente `{ propertyId, sessionId }` como UUID, con media type JSON y `Origin` igual al origen configurado por `NEXT_PUBLIC_SITE_URL`. El `sessionId` aleatorio se conserva en `sessionStorage` de la pestaña; la base registra una vista por ficha/sesión/día UTC, limita cada sesión a 30 fichas/día y elimina eventos con más de 90 días. No se guardan IP, usuario, navegador, referente ni URL. La ficha se valida de nuevo en SQL contra publicación y visibilidad. Respuesta `204` cuando se procesa, `400` para entrada inválida, `403` para origen no permitido y `503` si Supabase/RPC falla. El ID de sesión lo elige el llamante; este contador no sustituye una mitigación anti-abuso. El dashboard usa `admin_property_view_daily_counts`, que devuelve solo agregados y exige Admin activo.
+`POST /api/analytics/property-view` acepta únicamente `{ propertyId, sessionId }` como UUID, con media type JSON y `Origin` igual al origen configurado por `NEXT_PUBLIC_SITE_URL` en producción (o mismo host en desarrollo local). El body se limita a 512 bytes durante la lectura. El `sessionId` aleatorio se conserva en `sessionStorage` de la pestaña; la base registra una vista por ficha/sesión/día UTC, limita cada sesión a 30 fichas/día y elimina eventos con más de 90 días. No se guardan IP, usuario, navegador, referente ni URL en Paradise. La ficha se valida de nuevo en SQL contra publicación y visibilidad. Respuesta `204` cuando se procesa, `400` para entrada inválida, `403` para origen no permitido y `503` si Supabase/RPC falla. El ID de sesión lo elige el llamante; el rate limit por IP de Vercel queda preparado en documentación pero requiere publicarse en el panel. El dashboard usa `admin_property_view_daily_counts`, que devuelve solo agregados y exige Admin activo.
 
 `admin_property_view_top_properties(range_start, range_end, result_limit)` (migración 0009) devuelve las propiedades con más vistas en el intervalo, limita el rango a 90 días y el resultado a 20, y exige Admin activo.
 

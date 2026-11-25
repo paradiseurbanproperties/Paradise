@@ -1,6 +1,6 @@
 # Modelo inicial de datos
 
-**Estado:** modelo objetivo; el usuario reporta que aplicó las migraciones `202611230001_auth_foundation.sql` y `202611230002_roles_and_permissions.sql`. La sesión no tiene conexión para comprobar el estado remoto; siguen pendientes las pruebas RLS de cada rol. Todas las entidades tendrán UUID como clave primaria salvo catálogos pequeños. Se usarán `timestamptz` en UTC, claves foráneas explícitas, restricciones e índices. Tablas expuestas por Data API tendrán RLS y privilegios mínimos.
+**Estado:** modelo objetivo; el usuario reporta que aplicó las migraciones `202611230001_auth_foundation.sql` y `202611230002_roles_and_permissions.sql`, y confirma que RLS está aprobado. La sesión no reprodujo la matriz ni verificó el estado remoto de las migraciones. Todas las entidades tendrán UUID como clave primaria salvo catálogos pequeños. Se usarán `timestamptz` en UTC, claves foráneas explícitas, restricciones e índices. Tablas expuestas por Data API tendrán RLS y privilegios mínimos.
 
 ## Esquema versionado implementado en Fase 6
 
@@ -87,6 +87,8 @@ Los conflictos de horario se deben evitar en una transacción con restricción d
 - `property_views`: entidad de agregado por propiedad y periodo o evento deduplicado; materialización/actualización mediante operación protegida, no contador manipulable por el cliente.
 - Incremento inicial de Fase 9: `/admin` consulta conteos exactos de `properties`, `profiles`, `subscription_plans`, `subscriptions` y `payment_simulations` bajo sesión Admin/RLS; agrupa `properties.created_at` por mes, estados reales por categoría, simulaciones por semana y cambios recientes desde `property_price_history`. No introduce tablas ni guarda eventos; las simulaciones nunca se presentan como ingresos.
 - `site_settings` (migración 0018): fila singleton con nombre, frase, descripción SEO y contacto público, actor y fecha. Lectura pública de esa fila; INSERT/UPDATE requieren Admin activo y `updated_by = auth.uid()`. La aplicación valida campos con Zod; la base restringe longitudes y mantiene `updated_at` mediante trigger.
+
+El formulario guarda esta fila con `upsert` usando `singleton` como clave de conflicto, pero omite `singleton` del payload para que PostgreSQL use su default `true`. La migración no otorga UPDATE sobre esa clave fija; incluirla en el payload puede hacer que el upsert requiera un grant que el diseño no concede.
 - `audit_logs`: UUID, actor, acción, tipo/ID entidad, valores antes/después permitidos, correlación y fecha; solo inserción para servicios autorizados, lectura de admin.
 - `property_reports`: UUID, propiedad, reportante, motivo, detalle limitado, estado, resolutor y fechas.
 - `notifications`: UUID, destinatario, tipo, referencia, leído/fecha; cada usuario solo consulta y actualiza sus notificaciones.
@@ -134,4 +136,4 @@ Un trigger o RPC transaccional registrará `property_price_history` al cambiar `
 
 La migración `202611230005_geospatial_search.sql` agrega `properties.location` como `extensions.geography(Point,4326)`, la sincroniza desde las columnas latitud/longitud y crea índice GiST. También prepara RPC `search_public_properties_nearby` con `SECURITY INVOKER`, RLS, estados/visibilidad públicas y límites de radio/resultados.
 
-El usuario reporta haber habilitado PostGIS desde Database → Extensions en Supabase, en el esquema `extensions`. Una consulta confirma la columna y la RPC de 0005. La búsqueda con datos reales aún está pendiente. La búsqueda por área poligonal vendrá después; esta primera consulta usa radio geodésico. No se deben exponer direcciones exactas cuando la publicación requiera privacidad.
+El usuario reporta haber habilitado PostGIS desde Database → Extensions en Supabase, en el esquema `extensions`. Confirmó en SQL Editor la firma de la RPC de 0005. Una llamada anónima a `/rest/v1/rpc/search_public_properties_nearby` y la lectura posterior de la fila con selección pública respondieron HTTP 200 con un resultado cada una. El `PGRST125` de un sondeo anterior no se reprodujo con la ruta canónica; la causa inicial no quedó identificada. Falta validar el flujo de búsqueda desde la interfaz. La búsqueda por área poligonal vendrá después; esta primera consulta usa radio geodésico. No se deben exponer direcciones exactas cuando la publicación requiera privacidad.

@@ -2,7 +2,7 @@
 
 Plataforma inmobiliaria modular en planeación para un ejercicio académico. El objetivo es administrar propiedades y publicaciones, clientes, agentes, CRM, visitas, suscripciones Premium simuladas, analítica y configuración desde una experiencia pública y paneles con permisos.
 
-> **Estado:** Fase 14 en curso. El usuario confirma 0018–0020 funcionales y reporta que 0021 parece funcionar; la matriz RLS por rol aún no se verificó. El enlace de confirmación Auth ya funciona según reporte. Vercel sirve `https://paradise-kappa-gray.vercel.app/` con HTTP 200 tras fijar el framework Next.js. Las interacciones móviles siguen pendientes de revisión en dispositivo. `PARADISE.png` se configuró para icono de pestaña y vista previa al compartir.
+> **Estado:** Fase 14 en curso. El usuario confirma RLS aprobado; no se inspeccionó la matriz remota de forma independiente. Los enlaces Auth ahora resuelven al dominio de producción de Vercel si falta `NEXT_PUBLIC_SITE_URL`; Supabase aún debe permitir `/auth/callback` en URL Configuration. Guardado de contacto Admin y precios fuera de incrementos de $1,000 corregidos localmente, sin confirmación manual post-deployment. Vercel sirve `https://paradise-kappa-gray.vercel.app/` con HTTP 200, y el usuario confirma que móvil funciona al 100%. La RPC PostGIS anónima y la lectura del catálogo respondieron HTTP 200 con un resultado cada una; falta validar la búsqueda por radio en la interfaz. `public/icons/paradise.png` es la marca unificada para pestaña, vista previa, navbar y footer.
 
 ## Objetivos y problema
 
@@ -44,9 +44,9 @@ El catálogo paginado filtrará por ubicación, precio, tipo, características, 
 
 Supabase Auth gestiona identidad. El perfil mantiene rol base Cliente, Agente o Admin; Premium se determina por suscripción activa y vigente. El servidor autoriza cada acción y RLS protege los registros por usuario, asignación o alcance administrativo. Preferencias de tema quedan locales para visitantes y sincronizadas al perfil autenticado.
 
-En Fase 4 se crearon pantallas `/login`, `/registro`, `/recuperar-password`, `/verificar-email` y `/auth/cambiar-password`, acciones de servidor y callback PKCE. El usuario reporta aplicar la migración inicial y que el enlace de verificación ahora funciona. En Fase 5 se añadieron roles cliente/admin/agente, estados activos/suspendidos, guardas server-side, navegación con sesión, `/mi-cuenta` y `/admin/usuarios` para gestionar acceso y ver auditoría; el usuario reporta aplicar la migración y designar el primer Admin. La matriz integrada de permisos sigue pendiente.
+En Fase 4 se crearon pantallas `/login`, `/registro`, `/recuperar-password`, `/verificar-email` y `/auth/cambiar-password`, acciones de servidor y callback PKCE. El usuario reporta aplicar la migración inicial y que el enlace de verificación ahora funciona. En Fase 5 se añadieron roles cliente/admin/agente, estados activos/suspendidos, guardas server-side, navegación con sesión, `/mi-cuenta` y `/admin/usuarios` para gestionar acceso y ver auditoría; el usuario reporta aplicar la migración y designar el primer Admin. El usuario confirma que RLS quedó aprobado; no se reprodujo aquí la matriz por identidad.
 
-Fase 6 conecta el catálogo con Supabase y su panel Admin para gestionar fichas, características, fotografías, moderación e historial de precio. El usuario confirmó que el flujo completo funciona al 100%. Fase 7 integra selección de coordenadas con MapLibre en Admin y mapas en la ficha pública; el usuario confirma que estos mapas se muestran. La consulta en Supabase confirma que 0005 está aplicada (columna y RPC presentes), aunque la búsqueda con datos reales está pendiente. Fase 8 añade planes y checkout simulado en `/premium`, historial, cancelación por RPC y `/admin/suscripciones`. El usuario confirma que el flujo Premium completo funciona; la validación automatizada/negativa de RLS continúa pendiente en Fase 14.
+Fase 6 conecta el catálogo con Supabase y su panel Admin para gestionar fichas, características, fotografías, moderación e historial de precio. El usuario confirmó que el flujo completo funciona al 100%. Fase 7 integra selección de coordenadas con MapLibre en Admin y mapas en la ficha pública; el usuario confirma que estos mapas se muestran. La RPC geográfica y la lectura anónima de catálogo respondieron HTTP 200 con una ficha; falta confirmar la búsqueda desde la interfaz. Fase 8 añade planes y checkout simulado en `/premium`, historial, cancelación por RPC y `/admin/suscripciones`. El usuario confirma que el flujo Premium completo funciona.
 
 ### Herramientas del cliente
 
@@ -70,7 +70,7 @@ Fase 10 incluye perfiles profesionales moderados en `/admin/agentes` y directori
 
 ### Configuración y SEO
 
-`/admin/configuracion` permite a Admin definir nombre, frase, descripción SEO y contacto público. La migración 0018 define lectura pública y escrituras solo de Admin activo; correo y teléfono no se publican hasta que se capturen datos confirmados. Los metadatos raíz, sitemap XML, robots y canonical usan el dominio `NEXT_PUBLIC_SITE_URL`; las áreas privadas llevan `noindex`. El usuario confirma que la configuración funciona.
+`/admin/configuracion` permite a Admin definir nombre, frase, descripción SEO y contacto público. La migración 0018 define lectura pública y escrituras solo de Admin activo; correo y teléfono no se publican hasta que se capturen datos confirmados. Se corrigió el payload de upsert de contacto para respetar los grants de la llave singleton; falta confirmar el guardado en el deployment. Los metadatos raíz, sitemap XML, robots y canonical usan el dominio `NEXT_PUBLIC_SITE_URL`; las áreas privadas llevan `noindex`.
 
 ### Privacidad de inmuebles
 

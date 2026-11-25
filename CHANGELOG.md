@@ -2,6 +2,62 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.22] — 2026-11-24
+
+### Configuración, Auth y precios
+- La acción de configuración omite la llave `singleton` del payload de upsert, de modo que el conflicto solo actualice las columnas concedidas por 0018; registra el código de error en logs sin datos de contacto.
+- Los callbacks de confirmación/recuperación usan `NEXT_PUBLIC_SITE_URL` o el dominio Vercel de producción/deployment como fallback, en lugar de enviar links a localhost.
+- El precio de propiedad acepta centavos y deja de forzar incrementos de $1,000; el máximo de la validación se alinea con `numeric(14,2)` de Postgres.
+- Supabase Auth todavía requiere que el dominio y `/auth/callback` estén en Site URL/Redirect URLs; ver `docs/DEPLOYMENT.md`.
+- `pnpm lint`, `pnpm build` (Webpack), `pnpm typecheck` y `git diff --check` pasan. Build: advertencia no fatal `DEP0205` de Node 26.
+- Pendiente validar manualmente con la cuenta Admin y correos reales tras el deployment. No se ejecutaron pruebas de producto.
+
+## [0.17.21] — 2026-11-24
+
+### Búsqueda geográfica
+- El usuario confirmó la firma `search_public_properties_nearby(double precision,double precision,integer,integer)` en Supabase.
+- La RPC anónima respondió HTTP 200 con un resultado; la lectura posterior de catálogo con columnas permitidas respondió HTTP 200 con un resultado.
+- El `PGRST125` previo no se reprodujo con la ruta RPC canónica; no se identificó la causa inicial. Falta validar el flujo desde la interfaz. Sin cambios SQL ni push.
+
+## [0.17.20] — 2026-11-24
+
+### Estado de seguridad y mapas
+- El usuario confirma que la matriz RLS está aprobada; se registra como validación reportada por el usuario, sin inspección independiente de las identidades ni del historial remoto.
+- Consulta anónima de solo lectura: cero propiedades aprobadas públicas con coordenadas disponibles. `search_public_properties_nearby` respondió `PGRST125` (path inválido); búsqueda geográfica no se marca funcional.
+- Siguiente: revisar la ruta/esquema RPC y repetir con una propiedad real georreferenciada. Sin push.
+
+## [0.17.19] — 2026-11-24
+
+### Seguridad y CRM público
+- El formulario de consulta pasa a `POST /api/crm/property-inquiry`, con origen estricto, JSON, body limitado y honeypot; la restricción SQL por correo/propiedad permanece.
+- El lector de body corta la lectura al alcanzar 512 bytes en analítica o 4 KiB en CRM.
+- Preparada en documentación una regla WAF para las dos rutas; no está publicada en el panel de Vercel.
+- `pnpm lint`, `pnpm typecheck`, `pnpm build` (Webpack) y `git diff --check` pasan; la build incluye la ruta CRM. Persiste la advertencia no fatal `DEP0205`. Falta validar respuestas HTTP y publicar la regla WAF en Vercel. Sin push.
+
+## [0.17.18] — 2026-11-24
+
+### Marca
+- El nuevo `public/icons/paradise.png` sustituye al logo anterior en navbar, footer, icono de pestaña y vistas previas.
+- Se elimina el archivo visual anterior de `public/logos/` y se ajusta el tamaño del logo cuadrado en pantallas grandes y móviles.
+- `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan; no quedan referencias al archivo anterior en `src/` ni `public/`.
+- Pendiente revisión visual y despliegue para confirmar el icono en pestañas y previews. Sin push.
+
+## [0.17.16] — 2026-11-24
+
+### Seguridad y estado
+- El usuario confirma que el sitio móvil funciona al 100% en Vercel.
+- `next.config.ts` configura HSTS por un año solo en Vercel y elimina el encabezado `X-Powered-By`.
+- Revisión estática: la RPC pública de CRM limita 3 envíos por correo/propiedad/hora y usa advisory transaction lock para respetar el límite con solicitudes concurrentes; aún falta matriz RLS multirrol y rate limiting global contra variación de correos.
+- `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan. HSTS aún no está verificado en Vercel.
+- Sin push; cambios locales sujetos a validación.
+
+## [0.17.17] — 2026-11-24
+
+### Seguridad
+- Revisión estática de RLS/grants en Auth, propiedades/Storage, Premium, CRM y módulos de cliente; no se detectó una brecha crítica evidente en el SQL revisado.
+- Se documenta que el estado remoto y los permisos efectivos siguen pendientes de comprobar con identidades por rol y estado.
+- Sin cambios de código de producto ni push.
+
 ## [0.17.15] — 2026-11-24
 
 ### Verificado en Vercel

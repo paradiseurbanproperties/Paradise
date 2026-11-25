@@ -28,17 +28,18 @@ Después de cada avance significativo actualiza `PROGRESO.txt`, `CHANGELOG.md` y
 
 - El usuario confirma Fase 6 (CRUD de propiedades, fotografías, publicación e historial de precios) funcional al 100%.
 - El usuario confirma que el mapa ya se ve en administración y en el detalle público después de añadirlo allí.
-- MapLibre GL JS está en `package.json`; el usuario reporta habilitar PostGIS. Una consulta ejecutada por el usuario confirma la columna geográfica y la RPC de `supabase/migrations/202611230005_geospatial_search.sql`; la búsqueda con datos reales está pendiente.
+- MapLibre GL JS está en `package.json`; el usuario reporta habilitar PostGIS. El usuario confirmó la firma de la RPC de `supabase/migrations/202611230005_geospatial_search.sql`; una llamada anónima real y lectura de catálogo respondieron HTTP 200 con una fila. Falta validar búsqueda por radio en la interfaz.
 - El usuario reporta que el enlace de verificación de correo ahora funciona; no se verificó Auth remoto desde esta sesión.
-- Fase actual: Fase 14 — Seguridad y rendimiento. El usuario confirma que configuración/SEO de Fase 13 funciona; 0018 se considera validada según su reporte, sin inspección remota. No volver a ejecutar migraciones anteriores.
+- Fase actual: Fase 14 — Seguridad y rendimiento. El usuario reporta que nombre/SEO de Fase 13 funciona, pero correo/teléfono no guardaban; el upsert se corrigió localmente omitiendo la llave `singleton`. No repetir migraciones anteriores.
 - La página `/admin` quedó inicialmente bajo una carpeta con comillas literales y devolvía 404; se corrigió a `src/app/(admin)/admin/page.tsx`.
 - El usuario confirma que tracking, gráfica diaria, ranking, selector 7/28/90, desgloses por tipo/ciudad y CSV funcionan; Fase 9 queda validada funcionalmente por ese reporte.
 - El usuario confirma CRM completo; se considera 0013 funcional según su reporte, aunque esta sesión no inspeccionó el historial remoto.
 - El usuario confirma que favoritos, comparación, listas e historial de actividad funcionan; 0014–0016 se consideran validadas por su reporte, sin inspección directa del historial remoto.
 - Fase 12 implementa `/notificaciones` para avisos Premium y cambios CRM con contador no leído. El usuario confirma su funcionamiento; 0017 se considera validada según ese reporte.
 - Fase 13: SEO técnico y `/admin/configuracion` están implementados; el usuario confirma funcionamiento de 0018. No se inspeccionó Supabase remoto.
-- Fase 14: el usuario confirma asignación/revocación y auditoría tras 0019–0020, y reporta que 0021 parece funcionar, sin inspección remota. La captura móvil más reciente muestra menú/tema/perfil inertes y MapLibre en carga; tratar como posible fallo de bundles/hidratación compartido, revisar Network/Console desde el dispositivo antes de atribuir a Safari. El icono `PARADISE.png` se configuró como favicon/apple touch/preview social. El endpoint de vistas valida Origin con `NEXT_PUBLIC_SITE_URL`; faltan matriz RLS y mitigación anti-abuso.
+- Fase 14: el usuario confirma que RLS está aprobado y también confirma hamburguesa, tema, perfil y mapa al 100% en Vercel. No se inspeccionó la matriz remota de manera independiente. La RPC geográfica anónima y la lectura de catálogo respondieron HTTP 200 con un resultado cada una; validar la búsqueda por radio en la interfaz. El contacto Admin se corrigió para respetar los grants de 0018; Auth usa dominios Vercel como fallback; propiedades aceptan centavos y el máximo de `numeric(14,2)`. Falta validación manual post-deployment y publicar la regla WAF.
 - GitHub: `paradiseurbanproperties/Paradise`, rama `main`, commits subidos hasta `7c61e2b`. Tras añadir `vercel.json` con `framework: nextjs`, Vercel terminó el deployment y `https://paradise-kappa-gray.vercel.app/` responde HTTP 200 con `x-matched-path: /`. El 404 está resuelto.
-- Pendiente: confirmar en iOS/Android que hamburguesa, tema, perfil y mapa responden con la URL desplegada.
+- La revisión móvil se considera resuelta según confirmación del usuario; no se ha confirmado por separado Android.
+- Por instrucción del usuario, no hacer push a GitHub hasta recibir autorización explícita.
 - `pnpm lint` y `pnpm typecheck` pasan; no se ejecutaron pruebas de producto ni se consultó Supabase remoto.
 - El build con Turbopack ha fallado en este sandbox al crear un proceso/enlazar un puerto (`Operation not permitted`); `pnpm lint` y `pnpm typecheck` sí han pasado en el incremento de mapas.

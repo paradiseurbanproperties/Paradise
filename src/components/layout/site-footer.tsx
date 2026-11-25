@@ -9,11 +9,11 @@ export async function SiteFooter() {
       <div className="site-footer__inner">
         <Link aria-label="Paradise Bienes Raíces, ir al inicio" className="site-footer__brand" href="/">
           <Image
-            alt="Paradise Bienes Raíces"
+            alt="Logo de Paradise Bienes Raíces"
             className="site-logo site-logo--footer"
-            height={400}
-            src="/logos/paradise.png"
-            width={600}
+            height={458}
+            src="/icons/paradise.png"
+            width={435}
           />
         </Link>
         <p className="site-footer__message">{settings.tagline}</p>

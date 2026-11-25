@@ -43,11 +43,11 @@
 }
 
 .site-logo--header {
-  width: 8rem;
+  width: 3.5rem;
 }
 
 .site-logo--footer {
-  width: 7rem;
+  width: 3.5rem;
 }
 
 .site-footer__brand {
@@ -2598,7 +2598,7 @@
   }
 
   .site-logo--header {
-    width: 6.25rem;
+    width: 3rem;
   }
 
   .site-nav {
@@ -2725,7 +2725,7 @@
   }
 
   .site-logo--header {
-    width: 5.5rem;
+    width: 2.75rem;
   }
 
   .site-header__actions {

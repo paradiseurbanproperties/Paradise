@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getSiteOrigin } from "@/lib/seo/site-url";
+import { isTrustedOrigin } from "@/lib/security/is-trusted-origin";
+import { readLimitedBody } from "@/lib/security/read-limited-body";
 
 const propertyViewSchema = z.object({
   propertyId: z.string().uuid(),
@@ -12,8 +13,7 @@ function noContent() {
 }
 
 export async function POST(request: Request) {
-  const origin = request.headers.get("origin");
-  if (!origin || origin !== getSiteOrigin().origin) {
+  if (!isTrustedOrigin(request)) {
     return new Response(null, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
 
@@ -22,13 +22,8 @@ export async function POST(request: Request) {
     return new Response(null, { status: 400, headers: { "Cache-Control": "no-store" } });
   }
 
-  let rawBody: string;
-  try {
-    rawBody = await request.text();
-  } catch {
-    return new Response(null, { status: 400, headers: { "Cache-Control": "no-store" } });
-  }
-  if (new TextEncoder().encode(rawBody).byteLength > 512) {
+  const rawBody = await readLimitedBody(request, 512);
+  if (rawBody === null) {
     return new Response(null, { status: 400, headers: { "Cache-Control": "no-store" } });
   }
 
