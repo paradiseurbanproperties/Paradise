@@ -5625,3 +5625,63 @@ body {
     font-size: 16px;
   }
 }
+
+.admin-demo-properties-panel {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-sand) 20%, transparent), transparent 34%),
+    linear-gradient(120deg, color-mix(in srgb, var(--color-accent) 8%, var(--color-surface)), var(--color-surface));
+}
+
+.demo-properties-publisher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.demo-properties-publisher h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  font-weight: 550;
+}
+
+.demo-properties-publisher p {
+  max-width: 62ch;
+  margin: 0.45rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.demo-properties-publisher form {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.35rem;
+  justify-items: end;
+}
+
+.demo-properties-publisher form .admin-property-feedback {
+  max-width: 28rem;
+  margin: 0.5rem 0 0;
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  .demo-properties-publisher {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .demo-properties-publisher form {
+    justify-items: stretch;
+  }
+
+  .demo-properties-publisher form .admin-property-feedback {
+    text-align: left;
+  }
+}

@@ -26,7 +26,7 @@ export default async function HomePage() {
   const favoriteIds = new Set(favoriteState.ids);
   const featured = properties
     .filter((property) => property.featured)
-    .slice(0, 3);
+    .slice(0, 5);
 
   return (
     <div className="site-frame">

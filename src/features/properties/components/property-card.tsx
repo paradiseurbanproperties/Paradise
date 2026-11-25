@@ -29,7 +29,7 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
           className="property-card__image"
           fill
           priority={priority}
-          unoptimized={!property.demo}
+          unoptimized={!property.demo || cover.src.includes("/storage/v1/object/")}
           sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw"
           src={cover.src}
         />

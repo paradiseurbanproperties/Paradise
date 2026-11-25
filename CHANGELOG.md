@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.20.4] — 2026-11-25 (local)
+
+### Preparación de cinco propiedades de demostración
+- Se añadió una acción de lote Admin-only en `/admin/propiedades`: crea cinco casas con coordenadas privadas aproximadas, características, foto subida a Storage, publicación pública y marca destacada; la página principal ahora puede mostrar las cinco fichas.
+- Los datos quedan identificados como ficticios en descripción, tarjeta, ficha y precio. Slugs idempotentes impiden duplicados; el flujo intenta revertir filas y archivos ante fallos.
+- No se insertaron filas remotas: el entorno solo tiene la llave pública de Supabase, sin sesión/credencial Admin. Se necesita un clic de Admin tras desplegar para completar el alta. `pnpm lint`, `pnpm typecheck`, parseo PostCSS y `git diff --check` pasan. No se ejecutó build para no interferir con el servidor dev activo.
+
 ## [0.20.3] — 2026-11-25
 
 ### Controles select personalizados

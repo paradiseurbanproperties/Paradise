@@ -108,7 +108,7 @@ async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> 
       features,
       images: images.length ? images : [placeholderImage],
       featured: row.featured,
-      demo: false,
+      demo: row.description.startsWith("FICHA DE DEMOSTRACIÓN"),
     } satisfies Property;
   });
 }
@@ -140,7 +140,7 @@ export async function listPublicPropertySitemapEntries(): Promise<Array<{ slug: 
   if (!getSupabasePublicConfig()) return [];
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.from("properties")
-    .select("slug,updated_at")
+    .select("slug,updated_at,description")
     .eq("publication_status", "approved")
     .in("visibility", ["public", "both"])
     .order("updated_at", { ascending: false })
@@ -149,7 +149,9 @@ export async function listPublicPropertySitemapEntries(): Promise<Array<{ slug: 
     console.error("[properties] No se pudieron cargar URLs públicas para sitemap", { code: error.code });
     return [];
   }
-  return (data ?? []).map((row) => ({ slug: row.slug, updatedAt: row.updated_at }));
+  return (data ?? [])
+    .filter((row) => !row.description.startsWith("FICHA DE DEMOSTRACIÓN"))
+    .map((row) => ({ slug: row.slug, updatedAt: row.updated_at }));
 }
 
 export async function listPublicPropertiesNearby({

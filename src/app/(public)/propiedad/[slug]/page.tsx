@@ -88,13 +88,13 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
             transition={{ delay: 0.12, duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
           >
             <motion.figure className="property-gallery__main" initial={{ opacity: 0, scale: 1.035 }} transition={{ duration: 0.8 }} viewport={{ once: true }} whileInView={{ opacity: 1, scale: 1 }}>
-              <Image alt={cover.alt} fill priority sizes="(max-width: 800px) 100vw, 66vw" src={cover.src} unoptimized={!property.demo} />
+              <Image alt={cover.alt} fill priority sizes="(max-width: 800px) 100vw, 66vw" src={cover.src} unoptimized={!property.demo || cover.src.includes("/storage/v1/object/")} />
             </motion.figure>
             <motion.figure initial={{ opacity: 0, y: 16 }} transition={{ delay: 0.1, duration: 0.55 }} viewport={{ once: true }} whileInView={{ opacity: 1, y: 0 }}>
-              <Image alt={secondImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={secondImage.src} unoptimized={!property.demo} />
+              <Image alt={secondImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={secondImage.src} unoptimized={!property.demo || secondImage.src.includes("/storage/v1/object/")} />
             </motion.figure>
             <motion.figure initial={{ opacity: 0, y: 16 }} transition={{ delay: 0.18, duration: 0.55 }} viewport={{ once: true }} whileInView={{ opacity: 1, y: 0 }}>
-              <Image alt={thirdImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={thirdImage.src} unoptimized={!property.demo} />
+              <Image alt={thirdImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={thirdImage.src} unoptimized={!property.demo || thirdImage.src.includes("/storage/v1/object/")} />
             </motion.figure>
             <span className="property-gallery__label">{property.demo ? "Fotografía ilustrativa" : "Fotografía de la propiedad"}</span>
           </motion.div>

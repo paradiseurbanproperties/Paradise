@@ -6,6 +6,10 @@
 
 La migración `202611230003_properties.sql` define `properties`, `agent_assignments`, `property_images`, `property_features` y `property_feature_values`, con claves foráneas, restricciones, índices y RLS. El usuario informa que la aplicó sin error. `202611230004_property_price_history.sql` añade valores anterior/nuevo, actor, fecha y motivo opcional con trigger transaccional, acceso de lectura por visibilidad y sin grants de modificación directa; el usuario confirmó que el historial funciona. Las tablas pueden seguir vacías hasta que se ingresen inmuebles; la interfaz no carga ejemplos ficticios cuando Supabase está configurado.
 
+### Carga por lote de propiedades ficticias
+
+`/admin/propiedades` incluye una Server Action Admin-only que, tras un clic, prepara cinco casas de demostración con precios/superficies ficticios, colonia/ciudad, puntos de mapa aproximados, características y una foto por propiedad en `property-images`. La dirección privada indica que es ficticia; la descripción pública empieza con `FICHA DE DEMOSTRACIÓN`, y el catálogo usa ese marcador para no confundirla con una oferta real. Slugs fijos permiten evitar duplicados. La carga queda preparada en código, pero las filas de Supabase aún requieren que un Admin ejecute el botón tras el despliegue; no se verificó inserción remota en esta sesión.
+
 - `properties` conserva la ficha, precio, ubicación, coordenadas, estado comercial, visibilidad y moderación. `created_by` y `approved_by` enlazan a `profiles`.
 - `agent_assignments` enlaza agentes (`profiles`) y propiedades; una asignación puede revocarse y solo puede existir una asignación activa por pareja.
 - `property_images` guarda FK a inmueble, ruta única de Storage, texto alternativo, orden, portada, MIME, tamaño y autor. Un índice parcial asegura una sola portada actual.

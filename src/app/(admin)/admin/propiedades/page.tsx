@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { AdminPropertyForm } from "@/features/properties/components/admin-property-form";
+import { DemoPropertiesPublisher } from "@/features/properties/components/demo-properties-publisher";
 import { DeletePropertyButton, PropertyPublicationForm } from "@/features/properties/components/admin-property-controls";
 import { PropertyImageManager } from "@/features/properties/components/property-image-manager";
 import { requireProfileRole } from "@/lib/permissions/access";
@@ -61,6 +62,10 @@ export default async function AdminPropertiesPage() {
               <Link className="text-link" href="/admin/suscripciones">Planes Premium</Link>
             </p>
           </header>
+
+          <section className="admin-properties-panel admin-demo-properties-panel" aria-label="Propiedades de demostración">
+            <DemoPropertiesPublisher />
+          </section>
 
           <section className="admin-properties-panel" aria-labelledby="create-property-heading">
             <div className="admin-properties-panel__heading">

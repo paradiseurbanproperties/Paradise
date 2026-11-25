@@ -6,6 +6,12 @@
 
 Los tokens globales están en `src/styles/tokens.css`. La portada combina neutros de alto contraste con acentos verde jade, arcilla y arena; el bloque de herramientas usa un fondo bosque persistente en ambos temas y superficies translúcidas. Los controles mantienen estados de foco visibles. Los datos de inventario y conteos siguen viniendo del repositorio; no se agregan métricas de muestra como si fueran reales.
 
+## Fichas de demostración en Supabase
+
+`/admin/propiedades` ofrece una acción de lote exclusiva para Admin que crea cinco casas ilustrativas, carga una imagen por ficha al bucket privado `property-images`, registra las coordenadas privadas aproximadas y publica las fichas como destacadas. El identificador de demostración es el prefijo `FICHA DE DEMOSTRACIÓN` en la descripción; el catálogo lo convierte en etiqueta y evita registrar vistas/favoritos. Los slugs son fijos para que la acción no duplique las fichas. Los enlaces de imagen se generan desde Storage y las fichas aparecen en portada, catálogo y mapa.
+
+La acción valida rol Admin y RLS en las tablas/Storage; intenta limpiar filas y objetos subidos si alguna parte falla. La sesión local no dispone de llave administrativa para modificar Supabase directamente: después del despliegue, un Admin debe ejecutar la acción una vez. Esta preparación de código no implica que las filas ya existan en la base remota.
+
 ## Límites y responsabilidades
 
 - `app/`: rutas, layouts y composición por audiencia; no contiene consultas complejas ni reglas de negocio.

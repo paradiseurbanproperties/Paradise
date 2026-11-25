@@ -235,3 +235,7 @@ Se corrigió el botón de perfil para mostrar un único contorno (el aro dorado 
 El log local registró errores internos repetidos `CellId ... no longer exists` en HMR de Turbopack; el archivo `.next/dev/lock` apuntaba a un PID que ya no existía. `dev` ahora usa Webpack y `--hostname 0.0.0.0`; el usuario reinició y confirma que el blur desapareció al acceder por IP. No ejecutar el build en paralelo con dev: comparten `.next`. CUA no tiene navegador disponible, así que queda pendiente la revisión visual independiente. El usuario autorizó push junto con la petición de estilizar todos los `select`.
 
 Los `select` sencillos ahora reciben flecha de marca, estados de hover/foco, tema oscuro y tamaño táctil. Confirmar selección en Safari iOS, Chrome Android y escritorio; el menú de opciones sigue siendo nativo.
+
+## Lote de casas ficticias — 2026-11-25
+
+La acción de Admin preconfigura cinco casas con fotos en Storage, puntos aproximados y featured. Después del deploy, probar una vez con Admin activo: deben crearse cinco slugs `demo-*`, cada propiedad debe tener detalle privado, foto cubierta y cuatro características; en Catálogo deben quedar aprobadas/públicas y aparecer las cinco en Inicio y Mapa. Confirmar que cada tarjeta/detalle indica demostración, precio de muestra y fotografía ilustrativa; que las vistas no entren a la analítica; que una segunda ejecución no duplique filas; y que una cuenta Cliente/anon no pueda invocar la acción. La sesión actual no tenía credencial admin remota, así que no se insertaron filas ni se comprobó Storage remoto.
