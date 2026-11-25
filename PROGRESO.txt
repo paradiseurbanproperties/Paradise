@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 15 — QA y entrega
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]; Fase 15 [~]
-- Próxima actividad: desplegar la acción de carga por lote y, con sesión Admin, pulsar una vez “Publicar las cinco” en `/admin/propiedades`; luego confirmar que las cinco fichas demo aparecen en Inicio, Catálogo y Mapa. El entorno local no cuenta con credencial o sesión Admin remota, por lo que las filas aún no se insertaron.
+- Próxima actividad: después del deploy, entrar como Admin a `/admin/propiedades` y pulsar “Actualizar propiedades”; la acción completa el lote, actualiza los textos de las fichas previas y deja doce casas en Inicio, Catálogo y Mapa. No se insertaron filas remotas desde esta sesión porque no había navegador ni sesión Admin conectada.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -615,3 +615,13 @@ PRUEBAS
 - Publicación pública aprobada y marcada destacada; el inicio muestra hasta cinco. El prefijo de descripción identifica demos en cards/fichas y excluye sitemap; mapa usa coordenadas redondeadas. Slugs fijos evitan duplicados.
 - Se añadió botón de lote en `/admin/propiedades`. La sesión local solo tiene llave publicable de Supabase, sin credencial/service-role ni sesión Admin remota. Aún no se insertaron filas. El Admin tendrá que pulsar el botón una vez tras el deploy.
 - `pnpm lint`, `pnpm typecheck`, parseo PostCSS y `git diff --check` pasan sin advertencias. Rollback quedó revisado estáticamente; no se hizo prueba de producto ni build (dev comparte `.next`). Push `b74fb00` realizado a `main`; el deploy remoto no se verificó. Luego Admin ejecuta el lote y confirma cards, ficha, fotos y mapa.
+
+## AMPLIACIÓN A DOCE CASAS DE DEMOSTRACIÓN (2026-11-25)
+- Se añadieron siete fichas adicionales, con slugs, ciudades, barrios, precios, superficies, coordenadas aproximadas, características y foto distinta para cada ficha.
+- El botón pasa a “Publicar las doce”; la carga revisa slugs existentes y solo crea faltantes. Portada ahora muestra hasta doce destacadas.
+- `pnpm lint`, `pnpm typecheck`, `git diff --check` y la comprobación de 12 slugs/fotos únicos pasan. Aún no se insertaron filas remotas; la misma acción sirve para completar cinco+ siete o crear las doce si aún no se ejecutó. Push/deploy requieren autorización explícita; después el Admin debe ejecutar el lote.
+
+## COPY DE INVENTARIO RESIDENCIAL (2026-11-25)
+- Se retiraron de las vistas públicas las frases “Ejemplo académico”, “Ficha de demostración”, “Precio de muestra” y similares. Los títulos/descripciones usan tono residencial; el aviso permanece como “Ficha ilustrativa”, “Precio referencial” y una nota breve de que no es una oferta vigente.
+- La acción Admin actualiza título, descripción y texto alternativo de las cinco fichas existentes antes de completar las faltantes. El repositorio también normaliza contenido antiguo para que el sitio se vea limpio aun antes de volver a ejecutar la acción.
+- `pnpm lint`, `pnpm typecheck`, `git diff --check`, búsqueda de textos retirados en vistas públicas y unicidad de 12 slugs/fotos pasan. No se ejecutó build ni pruebas de producto para evitar modificar `.next` mientras el servidor dev pueda estar activo.

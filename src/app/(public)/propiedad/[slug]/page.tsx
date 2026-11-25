@@ -69,14 +69,14 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             <div>
-              <p className="eyebrow">{property.type}{property.demo ? " · Ficha de demostración" : property.visibility === "premium" ? " · Exclusiva Premium" : " · Paradise"}</p>
+              <p className="eyebrow">{property.type}{property.demo ? " · Ilustrativa" : property.visibility === "premium" ? " · Exclusiva Premium" : " · Paradise"}</p>
               <h1 className="page-title">{property.title}</h1>
               <p className="property-detail__location">
                 {property.location.neighborhood}, {property.location.city}, {property.location.state}
               </p>
             </div>
             <div className="property-detail__price">
-              <span>{property.demo ? "Precio de muestra" : "Precio"}</span>
+              <span>{property.demo ? "Precio referencial" : "Precio"}</span>
               <strong>{formatPropertyPrice(property.price, property.currency)}</strong>
             </div>
           </motion.header>
@@ -103,8 +103,8 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
             <div className="property-detail__main-column">
               {property.demo ? (
                 <div className="demo-disclosure">
-                  <strong>Ejemplo académico</strong>
-                  <span>Esta propiedad, su ubicación y precio son ficticios. No está a la venta.</span>
+                  <strong>Información referencial</strong>
+                  <span>Ubicación, precio y fotografías de carácter ilustrativo; esta ficha no representa una oferta vigente.</span>
                 </div>
               ) : null}
               <motion.section className="detail-section" aria-labelledby="property-description-title" initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.56 }} viewport={{ amount: 0.2, once: true }} whileInView={{ opacity: 1, y: 0 }}>

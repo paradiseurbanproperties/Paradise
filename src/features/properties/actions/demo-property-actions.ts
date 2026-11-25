@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireProfileRole } from "@/lib/permissions/access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AdminPropertyActionState } from "@/features/properties/schemas/admin-property";
+import { illustrativePropertyCopy } from "@/features/properties/data/demo-property-copy";
 
 const DEMO_MARKER = "FICHA DE DEMOSTRACIÓN";
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -11,8 +12,8 @@ const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const demoHomes = [
   {
     slug: "demo-casa-patio-de-luz",
-    title: "Demo · Casa Patio de Luz",
-    description: `${DEMO_MARKER}. Esta casa, su ubicación, precio, características y fotografía son ficticios; no constituye una oferta inmobiliaria real. Residencia ilustrativa con patio, espacios sociales abiertos y acabados de tonos naturales.`,
+    title: "Casa Patio de Luz",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-patio-de-luz"]}`,
     price: 8_950_000,
     neighborhood: "Del Valle",
     city: "Ciudad de México",
@@ -30,8 +31,8 @@ const demoHomes = [
   },
   {
     slug: "demo-casa-juriquilla-encino",
-    title: "Demo · Casa Juriquilla Encino",
-    description: `${DEMO_MARKER}. Los datos y la fotografía son ilustrativos, no corresponden a un inmueble disponible ni a una oferta real. Casa ficticia de diseño contemporáneo con jardín, estancia amplia y área de trabajo.`,
+    title: "Casa Juriquilla Encino",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-juriquilla-encino"]}`,
     price: 6_850_000,
     neighborhood: "Juriquilla",
     city: "Querétaro",
@@ -49,8 +50,8 @@ const demoHomes = [
   },
   {
     slug: "demo-casa-lomas-del-parque",
-    title: "Demo · Casa Lomas del Parque",
-    description: `${DEMO_MARKER}. Publicación enteramente ficticia: precio, ubicación, superficies y fotografía se muestran únicamente para probar Paradise. Casa ilustrativa con terraza, jardín y espacios para convivir.`,
+    title: "Casa Lomas del Parque",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-lomas-del-parque"]}`,
     price: 7_450_000,
     neighborhood: "Lomas de Angelópolis",
     city: "Puebla",
@@ -68,8 +69,8 @@ const demoHomes = [
   },
   {
     slug: "demo-casa-chapalita",
-    title: "Demo · Casa Arboleda Chapalita",
-    description: `${DEMO_MARKER}. Anuncio, precio, colonia, características y fotografía ficticios, sin relación con una propiedad en venta. Ejemplo residencial con patio arbolado, cocina abierta y espacios iluminados.`,
+    title: "Casa Arboleda Chapalita",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-chapalita"]}`,
     price: 9_250_000,
     neighborhood: "Chapalita",
     city: "Guadalajara",
@@ -87,8 +88,8 @@ const demoHomes = [
   },
   {
     slug: "demo-casa-valle-norte",
-    title: "Demo · Casa Valle Norte",
-    description: `${DEMO_MARKER}. Inmueble, precio, ubicación, amenidades y fotografía de muestra; no es una oferta comercial. Residencia ficticia con terraza, sala de TV y jardín para ilustrar el catálogo y mapa.`,
+    title: "Casa Valle Norte",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-valle-norte"]}`,
     price: 15_800_000,
     neighborhood: "Del Valle",
     city: "San Pedro Garza García",
@@ -103,6 +104,139 @@ const demoHomes = [
     landArea: 480,
     features: ["Jardín", "Terraza", "Sala de TV", "Cuarto de servicio"],
     photo: "photo-1600585154340-be6161a56a0c",
+  },
+  {
+    slug: "demo-casa-fresnos-coyoacan",
+    title: "Casa Fresnos de Coyoacán",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-fresnos-coyoacan"]}`,
+    price: 7_280_000,
+    neighborhood: "Del Carmen",
+    city: "Ciudad de México",
+    state: "Ciudad de México",
+    postalCode: "04100",
+    latitude: 19.3498,
+    longitude: -99.1620,
+    bedrooms: 3,
+    bathrooms: 2.5,
+    parking: 1,
+    builtArea: 205,
+    landArea: 260,
+    features: ["Patio arbolado", "Estudio", "Cocina integral", "Biblioteca"],
+    photo: "photo-1600210492486-724fe5c67fb0",
+  },
+  {
+    slug: "demo-casa-valle-real-zapopan",
+    title: "Casa Vistahermosa Valle Real",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-valle-real-zapopan"]}`,
+    price: 11_400_000,
+    neighborhood: "Valle Real",
+    city: "Zapopan",
+    state: "Jalisco",
+    postalCode: "45136",
+    latitude: 20.7420,
+    longitude: -103.4335,
+    bedrooms: 4,
+    bathrooms: 4.5,
+    parking: 3,
+    builtArea: 330,
+    landArea: 380,
+    features: ["Jardín", "Terraza", "Estudio independiente", "Cocina abierta"],
+    photo: "photo-1600566753190-17f0baa2a6c3",
+  },
+  {
+    slug: "demo-casa-roble-temozon",
+    title: "Casa Roble de Temozón",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-roble-temozon"]}`,
+    price: 5_920_000,
+    neighborhood: "Temozón Norte",
+    city: "Mérida",
+    state: "Yucatán",
+    postalCode: "97302",
+    latitude: 21.0547,
+    longitude: -89.6280,
+    bedrooms: 3,
+    bathrooms: 3,
+    parking: 2,
+    builtArea: 220,
+    landArea: 310,
+    features: ["Terraza sombreada", "Jardín", "Alberca", "Cocina integral"],
+    photo: "photo-1600047509782-20d39509f26d",
+  },
+  {
+    slug: "demo-casa-mar-de-cortes",
+    title: "Casa Mar de Cortés",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-mar-de-cortes"]}`,
+    price: 7_150_000,
+    neighborhood: "Playas de Tijuana",
+    city: "Tijuana",
+    state: "Baja California",
+    postalCode: "22504",
+    latitude: 32.5294,
+    longitude: -117.1150,
+    bedrooms: 3,
+    bathrooms: 2.5,
+    parking: 2,
+    builtArea: 215,
+    landArea: 290,
+    features: ["Terraza", "Patio", "Estudio", "Vista abierta"],
+    photo: "photo-1600047509807-ba8f99d2cdde",
+  },
+  {
+    slug: "demo-casa-bosque-niebla",
+    title: "Casa Bosque de Niebla",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-bosque-niebla"]}`,
+    price: 4_780_000,
+    neighborhood: "La Garita",
+    city: "San Cristóbal de las Casas",
+    state: "Chiapas",
+    postalCode: "29230",
+    latitude: 16.7370,
+    longitude: -92.6390,
+    bedrooms: 3,
+    bathrooms: 2,
+    parking: 2,
+    builtArea: 190,
+    landArea: 360,
+    features: ["Chimenea", "Ventanas amplias", "Patio", "Estudio"],
+    photo: "photo-1600566752355-35792bedcfea",
+  },
+  {
+    slug: "demo-casa-arboledas-calera",
+    title: "Casa Arboledas de La Calera",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-arboledas-calera"]}`,
+    price: 5_360_000,
+    neighborhood: "La Calera",
+    city: "Puebla",
+    state: "Puebla",
+    postalCode: "72560",
+    latitude: 19.0140,
+    longitude: -98.1940,
+    bedrooms: 3,
+    bathrooms: 2.5,
+    parking: 2,
+    builtArea: 205,
+    landArea: 300,
+    features: ["Terraza", "Jardín", "Área de lavado", "Cochera techada"],
+    photo: "photo-1600585154526-990dced4db0d",
+  },
+  {
+    slug: "demo-casa-cumbres-monterrey",
+    title: "Casa Cumbres del Norte",
+    description: `${DEMO_MARKER}. ${illustrativePropertyCopy["demo-casa-cumbres-monterrey"]}`,
+    price: 8_420_000,
+    neighborhood: "Cumbres 2.º Sector",
+    city: "Monterrey",
+    state: "Nuevo León",
+    postalCode: "64610",
+    latitude: 25.7300,
+    longitude: -100.3650,
+    bedrooms: 4,
+    bathrooms: 3.5,
+    parking: 2,
+    builtArea: 285,
+    landArea: 350,
+    features: ["Sala familiar", "Jardín", "Cocina integral", "Terraza"],
+    photo: "photo-1600573472591-ee6b68d14c68",
   },
 ] as const;
 
@@ -176,12 +310,27 @@ export async function publishDemoPropertiesAction(
       if (!existing) continue;
       if (!existing.description.startsWith(DEMO_MARKER)) throw new Error("demo_slug_conflict");
       if (existing.publication_status !== "approved" || !existing.featured) throw new Error("demo_partial_seed");
+
+      const { error: refreshError } = await supabase.from("properties").update({
+        title: home.title,
+        description: home.description,
+      }).eq("id", existing.id);
+      if (refreshError) throw new Error("demo_copy_refresh_failed");
+
+      const { error: imageAltError } = await supabase.from("property_images")
+        .update({ alt_text: `Fotografía ilustrativa de una casa en ${home.neighborhood}` })
+        .eq("property_id", existing.id);
+      if (imageAltError) throw new Error("demo_photo_copy_refresh_failed");
     }
 
     const pendingHomes = demoHomes.filter((home) => !existingBySlug.has(home.slug));
     skippedCount = demoHomes.length - pendingHomes.length;
     if (!pendingHomes.length) {
-      return { status: "success", message: "Las cinco fichas de demostración ya están publicadas; no se crearon duplicados." };
+      revalidatePath("/");
+      revalidatePath("/propiedades");
+      revalidatePath("/propiedades/mapa");
+      revalidatePath("/admin/propiedades");
+      return { status: "success", message: "El catálogo está actualizado; no se crearon duplicados." };
     }
 
     const photos = await Promise.all(pendingHomes.map(async (home) => [home.slug, await downloadDemoPhoto(home.photo)] as const));
@@ -219,7 +368,7 @@ export async function publishDemoPropertiesAction(
 
     const { error: privateDetailsError } = await supabase.from("property_private_details").insert(propertyHomes.map(({ home, propertyId }) => ({
         property_id: propertyId,
-        address: `Dirección ficticia de demostración en ${home.neighborhood}; no corresponde a un domicilio real.`,
+        address: `Domicilio de referencia en ${home.neighborhood}; no usar para visitas.`,
         postal_code: home.postalCode,
         exact_latitude: home.latitude,
         exact_longitude: home.longitude,
@@ -246,7 +395,7 @@ export async function publishDemoPropertiesAction(
     const { error: imageRowError } = await supabase.from("property_images").insert(imageRecords.map(({ home, propertyId, bytes, storagePath }) => ({
         property_id: propertyId,
         storage_path: storagePath,
-        alt_text: `Fotografía ilustrativa de una casa ficticia en ${home.neighborhood}`,
+        alt_text: `Fotografía ilustrativa de una casa en ${home.neighborhood}`,
         sort_order: 0,
         is_cover: true,
         mime_type: "image/jpeg",
@@ -277,7 +426,7 @@ export async function publishDemoPropertiesAction(
     const createdCount = pendingHomes.length;
     return {
       status: "success",
-      message: `Se publicaron ${createdCount} fichas ficticias con fotografías y mapa${skippedCount ? `; ${skippedCount} ya existían` : ""}.`,
+      message: `Se actualizaron o publicaron ${createdCount} propiedades con fotografías y mapa${skippedCount ? `; ${skippedCount} ya existían` : ""}.`,
     };
   } catch (error) {
     if (uploadedPaths.length) await supabase.storage.from("property-images").remove(uploadedPaths);
@@ -286,7 +435,7 @@ export async function publishDemoPropertiesAction(
     console.error("[properties] No se pudieron publicar las fichas de demostración", { code });
     return {
       status: "error",
-      message: "No se pudieron publicar las cinco fichas. Se intentó revertir lo creado; revisa el bucket de fotos y vuelve a intentarlo.",
+      message: "No se pudieron actualizar las propiedades. Se intentó revertir lo creado; revisa el bucket de fotos y vuelve a intentarlo.",
     };
   }
 }

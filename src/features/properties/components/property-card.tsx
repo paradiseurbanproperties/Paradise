@@ -33,7 +33,7 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
           sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw"
           src={cover.src}
         />
-        {property.demo ? <span className="property-card__demo">Ejemplo académico</span> : null}
+        {property.demo ? <span className="property-card__demo">Ficha ilustrativa</span> : null}
         {property.visibility === "premium" ? <span className="property-card__premium">✦ Exclusiva Premium</span> : null}
         {property.status === "in_deal" ? (
           <span className="property-card__status">En trato</span>
@@ -63,7 +63,7 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
         </ul>
         <div className="property-card__footer">
           <p className="property-card__price">
-            <span>{property.demo ? "Precio de muestra" : "Precio"}</span>
+            <span>{property.demo ? "Precio referencial" : "Precio"}</span>
             {formatPropertyPrice(property.price, property.currency)}
           </p>
           <Link className="property-card__link" href={`/propiedad/${property.slug}`}>

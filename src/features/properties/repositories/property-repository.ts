@@ -3,6 +3,7 @@ import type { Property } from "@/features/properties/types/property";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createPropertyImageUrlMap } from "@/features/properties/services/property-images";
+import { illustrativePropertyCopy } from "@/features/properties/data/demo-property-copy";
 
 const propertyTypeLabels: Record<string, Property["type"]> = {
   house: "Casa",
@@ -64,6 +65,16 @@ function summarize(description: string): string {
   return clean.length > 150 ? `${clean.slice(0, 147).trimEnd()}…` : clean;
 }
 
+function isIllustrativeProperty(row: Pick<PropertyCatalogRow, "slug" | "description">): boolean {
+  return row.slug.startsWith("demo-casa-") || row.description.startsWith("FICHA DE DEMOSTRACIÓN");
+}
+
+function getPublicDescription(row: Pick<PropertyCatalogRow, "slug" | "description">): string {
+  if (!isIllustrativeProperty(row)) return row.description;
+  return illustrativePropertyCopy[row.slug]
+    ?? row.description.replace(/^FICHA DE DEMOSTRACIÓN\.\s*/u, "");
+}
+
 async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> {
   const paths = rows.flatMap((row) => row.property_images.map((image) => image.storage_path));
   const signedUrls = paths.length ? await createPropertyImageUrlMap(paths) : new Map<string, string>();
@@ -73,7 +84,8 @@ async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> 
       .sort((a, b) => Number(b.is_cover) - Number(a.is_cover) || a.sort_order - b.sort_order)
       .flatMap((image) => {
         const src = signedUrls.get(image.storage_path);
-        return src ? [{ src, alt: image.alt_text || row.title }] : [];
+        const title = row.title.replace(/^Demo\s*·\s*/u, "");
+        return src ? [{ src, alt: isIllustrativeProperty(row) ? `Fotografía ilustrativa de ${title}` : image.alt_text || title }] : [];
       });
     const features = row.property_feature_values.flatMap((featureValue) => {
       const feature = Array.isArray(featureValue.property_features)
@@ -85,9 +97,9 @@ async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> 
     return {
       id: row.id,
       slug: row.slug,
-      title: row.title,
-      summary: summarize(row.description),
-      description: row.description,
+      title: row.title.replace(/^Demo\s*·\s*/u, ""),
+      summary: summarize(getPublicDescription(row)),
+      description: getPublicDescription(row),
       type: propertyTypeLabels[row.property_type] ?? "Casa",
       price: Number(row.price),
       currency: "MXN",
@@ -108,7 +120,7 @@ async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> 
       features,
       images: images.length ? images : [placeholderImage],
       featured: row.featured,
-      demo: row.description.startsWith("FICHA DE DEMOSTRACIÓN"),
+      demo: isIllustrativeProperty(row),
     } satisfies Property;
   });
 }
@@ -150,7 +162,7 @@ export async function listPublicPropertySitemapEntries(): Promise<Array<{ slug: 
     return [];
   }
   return (data ?? [])
-    .filter((row) => !row.description.startsWith("FICHA DE DEMOSTRACIÓN"))
+    .filter((row) => !isIllustrativeProperty(row))
     .map((row) => ({ slug: row.slug, updatedAt: row.updated_at }));
 }
 

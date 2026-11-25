@@ -55,7 +55,7 @@ export default async function PropertiesPage({
             <h1 className="page-title">Encuentra un lugar para llamar tuyo.</h1>
             <p className="page-description">
               {isDemoCatalog
-                ? "Explora una selección de ejemplo y prueba los filtros del catálogo. Los inmuebles, ubicaciones y precios son ficticios."
+                ? "Explora una selección editorial de espacios. Las fichas con sello «Ilustrativa» presentan información y precios referenciales."
                 : "Explora las propiedades disponibles y encuentra el espacio adecuado para ti."}
             </p>
           </motion.header>
@@ -79,7 +79,7 @@ export default async function PropertiesPage({
           <div className="catalog-results-heading">
             <div>
               <p className="catalog-results-heading__eyebrow">
-                {isDemoCatalog ? "Resultados de demostración" : "Propiedades publicadas"}
+                {isDemoCatalog ? "Selección editorial" : "Propiedades publicadas"}
               </p>
               <h2>
                 {result.totalItems} {result.totalItems === 1 ? "propiedad" : "propiedades"}

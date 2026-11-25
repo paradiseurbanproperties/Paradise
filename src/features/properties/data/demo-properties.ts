@@ -15,7 +15,7 @@ const photography = {
   },
 };
 
-// Escenarios ficticios para presentar la interfaz. No representan inmuebles disponibles.
+// Inventario editorial ilustrativo, identificado por la propiedad demo.
 export const demoProperties: Property[] = [
   {
     id: "demo-001",
@@ -23,7 +23,7 @@ export const demoProperties: Property[] = [
     title: "Casa Patio de Luz",
     summary: "Arquitectura serena, luz natural y un patio para disfrutar sin prisa.",
     description:
-      "Una propuesta residencial de demostración que reúne espacios abiertos, acabados cálidos y un patio central. La ficha y sus características son ilustrativas y no corresponden a una oferta inmobiliaria real.",
+      "Residencia de líneas contemporáneas con espacios abiertos, acabados cálidos y un patio central.",
     type: "Casa",
     price: 8_950_000,
     currency: "MXN",
@@ -46,7 +46,7 @@ export const demoProperties: Property[] = [
     title: "Residencia Olivar",
     summary: "Una casa contemporánea rodeada de vegetación y espacios amplios.",
     description:
-      "Ejemplo académico de residencia contemporánea con jardín, áreas sociales conectadas y una distribución pensada para convivir. La ficha y sus características son ficticias.",
+      "Residencia contemporánea con jardín, áreas sociales conectadas y una distribución pensada para convivir.",
     type: "Casa",
     price: 12_400_000,
     currency: "MXN",
@@ -69,7 +69,7 @@ export const demoProperties: Property[] = [
     title: "Departamento Loma Norte",
     summary: "Interiores tranquilos con una distribución flexible y funcional.",
     description:
-      "Ficha ficticia para mostrar la presentación de un departamento, sus espacios y los elementos destacados del catálogo.",
+      "Departamento de interiores tranquilos, distribución flexible y detalles funcionales para la vida urbana.",
     type: "Departamento",
     price: 5_280_000,
     currency: "MXN",
@@ -92,7 +92,7 @@ export const demoProperties: Property[] = [
     title: "Casa Jardín de Olmos",
     summary: "Un hogar de líneas sencillas con jardín y comedor al aire libre.",
     description:
-      "Ejemplo visual de una casa familiar. La ubicación, el precio y las características presentadas son datos de demostración.",
+      "Casa familiar de líneas sencillas, con jardín y comedor para disfrutar al aire libre.",
     type: "Casa",
     price: 7_150_000,
     currency: "MXN",
@@ -115,7 +115,7 @@ export const demoProperties: Property[] = [
     title: "Loft Estación Central",
     summary: "Un espacio compacto, abierto y lleno de luz para la vida urbana.",
     description:
-      "Ficha demostrativa de un loft urbano con planta abierta. No es una publicación activa ni una oferta comercial.",
+      "Loft urbano de planta abierta, con luz natural y una distribución eficiente.",
     type: "Departamento",
     price: 3_890_000,
     currency: "MXN",
@@ -138,7 +138,7 @@ export const demoProperties: Property[] = [
     title: "Casa de Campo Las Nubes",
     summary: "Un refugio amplio con terrazas y vistas abiertas al paisaje.",
     description:
-      "Propiedad enteramente ficticia para ilustrar una ficha de casa de campo con superficies y amenidades destacadas.",
+      "Casa de campo con terrazas amplias, chimenea y vistas abiertas al paisaje.",
     type: "Casa de campo",
     price: 9_600_000,
     currency: "MXN",
@@ -161,7 +161,7 @@ export const demoProperties: Property[] = [
     title: "Terreno Sendero del Valle",
     summary: "Un lienzo amplio para imaginar un proyecto residencial propio.",
     description:
-      "Ficha ficticia de terreno incluida únicamente para demostrar filtros y tipos de propiedad.",
+      "Terreno residencial con acceso controlado y servicios a pie de lote.",
     type: "Terreno",
     price: 2_450_000,
     currency: "MXN",
@@ -184,7 +184,7 @@ export const demoProperties: Property[] = [
     title: "Residencia Encino Azul",
     summary: "Volúmenes limpios, texturas naturales y espacios para reunirse.",
     description:
-      "Ejemplo de residencia de mayor superficie para presentar el detalle de una publicación. Todos sus datos son ficticios.",
+      "Residencia amplia con jardín, sala de TV, terraza y espacios de servicio independientes.",
     type: "Casa",
     price: 14_200_000,
     currency: "MXN",

@@ -26,7 +26,8 @@ export default async function HomePage() {
   const favoriteIds = new Set(favoriteState.ids);
   const featured = properties
     .filter((property) => property.featured)
-    .slice(0, 5);
+    .sort((first, second) => Number(second.demo) - Number(first.demo))
+    .slice(0, 12);
 
   return (
     <div className="site-frame">
@@ -77,7 +78,7 @@ export default async function HomePage() {
             <p className="intro__note">
               <span aria-hidden="true" className="intro__note-dot" />
               {properties.some((property) => property.demo)
-                ? "Vitrina académica con propiedades ficticias"
+                ? "Selección editorial de espacios residenciales"
                 : "Inventario actualizado desde Paradise"}
             </p>
           </motion.div>
@@ -128,7 +129,7 @@ export default async function HomePage() {
           </div>
           {featured.some((property) => property.demo) ? (
             <p className="demo-banner">
-              Las propiedades, fotografías, ubicaciones y precios de esta vitrina son ilustrativos.
+              Las fichas con sello «Ilustrativa» muestran referencias de precio, ubicación y fotografía; no representan ofertas vigentes.
             </p>
           ) : null}
           {featured.length ? (

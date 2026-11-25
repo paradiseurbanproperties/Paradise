@@ -10,12 +10,12 @@ export function DemoPropertiesPublisher() {
   return (
     <div className="demo-properties-publisher">
       <div>
-        <h3>Cargar cinco casas de demostración</h3>
-        <p>Una sola acción crea fichas públicas, fotos en Storage, puntos aproximados y las destaca en portada. Las propiedades, precios y fotos se identificarán como ficticios.</p>
+        <h3>Actualizar selección residencial</h3>
+        <p>Publica las propiedades ilustrativas que falten, actualiza sus descripciones y fotografías, y las destaca en portada. Si ya cargaste cinco, agrega las siete restantes.</p>
       </div>
       <form action={formAction}>
         <button className="button button--primary button--medium" disabled={pending} type="submit">
-          {pending ? "Preparando fotos y publicaciones…" : "Publicar las cinco"}
+          {pending ? "Preparando las publicaciones…" : "Actualizar propiedades"}
         </button>
         {state.message ? (
           <p aria-live="polite" className={`admin-property-feedback admin-property-feedback--${state.status}`} role={state.status === "error" ? "alert" : "status"}>

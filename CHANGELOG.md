@@ -2,6 +2,13 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.20.5] — 2026-11-25 (local)
+
+### Selección residencial ilustrativa
+- El lote ahora contiene doce casas distintas y evita duplicados por slug. Al ejecutarlo, omite las primeras cinco si ya existen y crea las siete nuevas; si no se ha ejecutado todavía, crea las doce.
+- Cada ficha tiene un slug y una fuente de foto únicos; la portada muestra hasta doce destacadas. El copy público usa tono residencial, etiqueta «Ficha ilustrativa» y precios referenciales. Repetir la acción de Admin también actualiza las cinco fichas anteriores.
+- Validado: 12/12 slugs/fotos únicos, `pnpm lint`, `pnpm typecheck` y `git diff --check`. No se insertaron filas remotas; el Admin deberá ejecutar el botón tras el deploy.
+
 ## [0.20.4] — 2026-11-25 (local)
 
 ### Preparación de cinco propiedades de demostración

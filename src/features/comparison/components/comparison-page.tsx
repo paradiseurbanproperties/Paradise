@@ -41,7 +41,7 @@ export function ComparisonPage({ properties }: { properties: Property[] }) {
                     <th key={property.id} scope="col">
                       <div className="comparison-property-heading">
                         <Link href={`/propiedad/${property.slug}`}>{property.title}</Link>
-                        {property.demo ? <span>Demo</span> : null}
+                        {property.demo ? <span>Referencial</span> : null}
                         <button aria-label={`Quitar ${property.title} de la comparación`} onClick={() => remove(property.id)} type="button">Quitar</button>
                       </div>
                     </th>
@@ -62,7 +62,7 @@ export function ComparisonPage({ properties }: { properties: Property[] }) {
               </tbody>
             </table>
           </div>
-          {selected.some((property) => property.demo) ? <p className="comparison-demo-note">Las filas marcadas “Demo” muestran datos académicos ficticios.</p> : null}
+          {selected.some((property) => property.demo) ? <p className="comparison-demo-note">Las fichas marcadas «Referencial» no representan ofertas vigentes.</p> : null}
         </>
       )}
     </div>
