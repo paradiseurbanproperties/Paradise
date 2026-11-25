@@ -30,7 +30,7 @@ async function expectNoAccessibilityViolations(page: import("@playwright/test").
 
 test("portada y catálogo cargan con accesibilidad WCAG automatizada", async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" });
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Un lugar para sentirte");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Encuentra un lugar que se sienta tuyo");
   await expectNoAccessibilityViolations(page);
 
   await page.getByRole("button", { name: "Cambiar al tema oscuro" }).click();
