@@ -167,6 +167,11 @@ FUNCIONES PENDIENTES
 - El deployment de Vercel para `3d25e3f` terminó como exitoso; `/registro` respondió HTTP 200. El nuevo commit debe volver a correr CI.
 - Se mantiene pendiente una prueba real de alta con correo de prueba. El endpoint confirma signup habilitado y email con verificación obligatoria; no se creó ninguna cuenta artificial.
 
+## FASE 15 — INCREMENTO 6: NOMBRE NATIVO DE ENLACES DE TARJETAS
+- La corrida de CI para `52bf1ac` confirmó que `aria-label` manual todavía reemplazaba el texto de las etiquetas internas y fallaba `label-content-name-mismatch` en tarjetas con “Ejemplo académico” y “En trato”.
+- Se eliminó el `aria-label` en el enlace que envuelve la foto y distintivos; el nombre nativo ahora conserva el texto alternativo de imagen y los badges visibles.
+- Validar build y E2E localmente, volver a ejecutar lint/tipos/unitarias, hacer push autorizado y confirmar una tercera corrida de CI y deployment.
+
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.
 - El build Turbopack falla en este sandbox al enlazar un puerto interno; `pnpm build` usa Webpack y completó fuera del sandbox. Persiste la advertencia no fatal `DEP0205` de Node 26.

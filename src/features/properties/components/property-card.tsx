@@ -18,17 +18,9 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
     src: "/images/property-placeholder.svg",
     alt: "Propiedad sin fotografía disponible",
   };
-  const visibleMediaLabels = [
-    property.demo ? "Ejemplo académico" : null,
-    property.visibility === "premium" ? "✦ Exclusiva Premium" : null,
-    property.status === "in_deal" ? "En trato" : null,
-  ].filter((label): label is string => Boolean(label));
-  const mediaLabel = [`Ver ficha de ${property.title}`, ...visibleMediaLabels].join(". ");
-
   return (
     <article className="property-card">
       <Link
-        aria-label={mediaLabel}
         className="property-card__media"
         href={`/propiedad/${property.slug}`}
       >
