@@ -619,9 +619,10 @@ PRUEBAS
 ## AMPLIACIÓN A DOCE CASAS DE DEMOSTRACIÓN (2026-11-25)
 - Se añadieron siete fichas adicionales, con slugs, ciudades, barrios, precios, superficies, coordenadas aproximadas, características y foto distinta para cada ficha.
 - El botón pasa a “Publicar las doce”; la carga revisa slugs existentes y solo crea faltantes. Portada ahora muestra hasta doce destacadas.
-- `pnpm lint`, `pnpm typecheck`, `git diff --check` y la comprobación de 12 slugs/fotos únicos pasan. Aún no se insertaron filas remotas; la misma acción sirve para completar cinco+ siete o crear las doce si aún no se ejecutó. Push/deploy requieren autorización explícita; después el Admin debe ejecutar el lote.
+- `pnpm lint`, `pnpm typecheck`, `git diff --check` y la comprobación de 12 slugs/fotos únicos pasan. Aún no se insertaron filas remotas; la misma acción sirve para completar cinco+ siete o crear las doce si aún no se ejecutó.
 
 ## COPY DE INVENTARIO RESIDENCIAL (2026-11-25)
 - Se retiraron de las vistas públicas las frases “Ejemplo académico”, “Ficha de demostración”, “Precio de muestra” y similares. Los títulos/descripciones usan tono residencial; el aviso permanece como “Ficha ilustrativa”, “Precio referencial” y una nota breve de que no es una oferta vigente.
 - La acción Admin actualiza título, descripción y texto alternativo de las cinco fichas existentes antes de completar las faltantes. El repositorio también normaliza contenido antiguo para que el sitio se vea limpio aun antes de volver a ejecutar la acción.
 - `pnpm lint`, `pnpm typecheck`, `git diff --check`, búsqueda de textos retirados en vistas públicas y unicidad de 12 slugs/fotos pasan. No se ejecutó build ni pruebas de producto para evitar modificar `.next` mientras el servidor dev pueda estar activo.
+- El usuario autorizó el push; commit `9162a41` quedó en `main`. El estado del deploy de Vercel no se verificó. Después del deploy, un Admin debe pulsar “Actualizar propiedades” para completar el lote y sincronizar las fichas previas en Supabase.
