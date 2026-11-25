@@ -1,6 +1,6 @@
 # Despliegue y operación
 
-**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. Esta sesión no verificó el estado del deployment tras los cambios locales. Backups, monitorización, CI y dominio propio no constan configurados/verificados.
+**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. Esta sesión no verificó el estado del deployment tras los cambios locales. Se añadió un workflow de CI en `.github/workflows/quality.yml`; está en el checkout local y aún no se ha ejecutado en GitHub. Backups, monitorización y dominio propio no constan configurados/verificados.
 
 ## Vercel — destino solicitado
 
@@ -22,9 +22,9 @@ Vercel detecta Next.js y ejecuta la build del proyecto por cada push según su c
 
 El formulario de consulta usa `POST /api/crm/property-inquiry`; analítica usa `POST /api/analytics/property-view`. Ambos validan `Origin`, JSON y tamaño del body. CRM añade además honeypot y un límite SQL de tres envíos por correo/propiedad/hora.
 
-Crear en Vercel → proyecto → Firewall una regla WAF de Rate Limit con método `POST` y dos grupos de ruta (unidos por OR): cada endpoint anterior. Como valor inicial, usar ventana fija de 60 segundos, 30 solicitudes por IP y respuesta 429. En el primer despliegue se puede dejar `Log`, revisar el tráfico y después publicar el límite. Esto combina las dos rutas en una sola regla y evita persistir IP en la base de Paradise. Rate Limit se activa en configuración Firewall del proyecto; las acciones de WAF por `routes` en `vercel.json` solo admiten challenge/deny, no limitación de tasa.
+**Estado actual:** por decisión del usuario, no se habilita esta regla debido al costo potencial. Se mantiene esta configuración como referencia opcional si se reconsidera. Los límites actuales de aplicación no son globales por IP: el CRM limita por correo/propiedad y analítica por sesión.
 
-Según [la documentación WAF de Vercel](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting), el rate limiting está disponible en todos los planes, Hobby incluye una regla, usa ventana fija y tiene una cuota de 1 millón de solicitudes permitidas; la tabla de precios muestra $0.50 por millón de solicitudes permitidas. Los contadores son regionales, de modo que tráfico repartido en regiones puede exceder el límite por región. Vercel procesa la IP como clave del firewall, pero la aplicación no la guarda. Se puede configurar por [Dashboard, Firewall API o CLI](https://vercel.com/docs/vercel-firewall/firewall-api); esta regla todavía no está habilitada.
+La configuración y el costo de esta función pueden cambiar; consultar [rate limiting de Vercel](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting) y [Firewall API](https://vercel.com/docs/vercel-firewall/firewall-api) antes de activarla. La regla no está habilitada.
 
 ### Diagnóstico de 404
 
@@ -42,7 +42,7 @@ Según [la documentación WAF de Vercel](https://vercel.com/docs/vercel-firewall
 - Aplicación Next.js en un runtime compatible con la versión elegida.
 - Supabase gestionado para PostgreSQL/Auth/Storage, con migraciones versionadas y separación entre desarrollo y producción.
 - Proveedor de mapas/teselas y geocodificación seleccionado según atribución, límites, privacidad y costo.
-- CI para instalación reproducible, tipos, lint, unitarias, integración y build cuando existan esos comandos.
+- CI local en `.github/workflows/quality.yml`: instalación reproducible, tipos, lint, unitarias, build e E2E. Falta el primer resultado remoto tras un push autorizado; la integración real con Supabase/RLS no está dentro del workflow.
 
 ## Configuración y secretos
 

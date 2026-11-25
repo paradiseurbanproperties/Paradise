@@ -1,6 +1,6 @@
 # Estrategia de pruebas
 
-**Estado:** estrategia de todo el proyecto. Fase 3 ejecutó lint, verificación TypeScript, parseo CSS y smoke checks de las reglas puras del catálogo con el test runner integrado de Node; aún no existe una suite formal Vitest/Playwright. En Fase 6 `pnpm lint` y `pnpm typecheck` pasan; el build quedó bloqueado por el sandbox de Turbopack. El usuario confirmó el flujo funcional de propiedades, Storage, publicación e historial de precios y reporta que el enlace de verificación Auth ya funciona; la batería Auth no se ha probado de extremo a extremo en esta sesión.
+**Estado:** Fase 15 en curso. Vitest 4 está configurado con `pnpm test`; 15 pruebas cubren filtros/paginación, fechas UTC de analítica, lectura de cuerpos HTTP limitada, esquemas de propiedades/CRM y mensajes seguros de Auth. Playwright ejecuta 5 E2E en Chromium; axe analiza portada, catálogo, registro, mapa, login y estados móvil/oscuro que cubren los flujos. `pnpm test`, `pnpm test:e2e`, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan localmente. El workflow `.github/workflows/quality.yml` se ejecutará al hacer el push autorizado. Todavía faltan matriz RLS automatizada, pruebas Auth con inbox de prueba y Lighthouse/Web Vitals. El build conserva el aviso no fatal `DEP0205` de Node 26.
 
 ## Unitarias — Vitest
 
@@ -48,11 +48,26 @@ Referencias de accesibilidad/interacción:
 
 La fase que introduzca cada función define sus casos de prueba y resultado observado en `PROGRESO.txt`. Los errores críticos de permisos, pérdida/inconsistencia de datos o exposición de secretos bloquean el avance de esa fase.
 
+## Fase 15 — QA incremental
+
+- Unitarias: `pnpm test` ejecuta `src/**/*.test.ts` con Vitest; casos actuales verifican filtros/orden de propiedades, periodos UTC, límite/decodificación del body, precio con centavos/coordenadas y validación CRM.
+- Gates locales del incremento 1: `pnpm test`, `pnpm lint`, `pnpm typecheck` y `pnpm build` (Webpack) pasan.
+- Los E2E requieren primero un build fresco con `pnpm build`; GitHub Actions sigue esta secuencia explícitamente.
+- `pnpm test:e2e` pasa 4 pruebas en Chromium: portada/catálogo, etiquetas de login, navegación móvil con tema/perfil y controles del mapa. axe no encuentra violaciones en los scans de portada y catálogo claro/oscuro, login, mapa ni menú/perfil móvil.
+- El primer scan oscuro detectó `.eyebrow` con contraste 3.85:1 y se cambió a `var(--color-muted)`. Una corrida posterior midió el tema durante su transición de 420 ms y recibió colores intermedios; el E2E ahora espera a que se estabilice la paleta y vuelve a pasar sin violaciones.
+- `.github/workflows/quality.yml` define gates para PR/push a `main`: instalación congelada, lint, tipos, unitarias, build e E2E. Su ejecución en GitHub queda pendiente del próximo push autorizado.
+- Smoke del servidor local de producción y remoto de solo lectura: portada, `/propiedades`, `/propiedades/mapa`, `/login` responden 200; una ruta inexistente responde 404; el icono remoto responde 200. Vercel incluye HSTS, `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy`.
+- Se tomó una sola muestra de TTFB por ruta; no reemplaza Lighthouse, Web Vitals ni prueba de carga.
+- La inspección visual con teclado/lector de pantalla, iPhone/Safari y Android/Chrome y los flujos con cuentas Supabase no se repitieron en este incremento.
+
 ## Fase 4 — Auth y migración inicial
 
 - Unitarias: normalización/validación de email, longitud de contraseña, coincidencia de confirmación, rechazo de parámetros extras de redirección.
 - Integración Supabase: migración desde base vacía; trigger al crear usuario; perfil propio legible/editable; denegar lectura ajena, INSERT, modificación de id u otras columnas; bucket privado y límites.
 - E2E: registro con verificación, login/logout, correo de recuperación, uso único/expiración de enlace, cambio de contraseña y mensajes que no revelen si existe un correo.
+- E2E público actual: `/registro` muestra nombre, correo y contraseña etiquetados, mínimo de 10 caracteres y pasa axe. El submit real requiere inbox de prueba y no forma parte de E2E aislado.
+- Diagnóstico: el endpoint público de configuración de Supabase confirmó `disable_signup=false`, email habilitado y `mailer_autoconfirm=false`; por eso cada alta nueva necesita verificar correo. Una alta real no se envió durante el diagnóstico para evitar crear una cuenta huérfana.
+- Si el alta devuelve error, Vercel registra únicamente `code`/`status` de Auth. Revisar esos dos campos en logs de la Server Action, sin registrar correo, contraseña ni el cuerpo de solicitud.
 - Solo marcar estos flujos completos después de correrlos con un proyecto Supabase de desarrollo y correo accesible.
 - En esta sesión, `pnpm lint` y `pnpm typecheck` pasan. `pnpm build` queda bloqueado por el sandbox al enlazar un puerto interno de Turbopack (`Operation not permitted`); el usuario debe repetirlo en su terminal local.
 
@@ -117,7 +132,7 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - El usuario confirma que los perfiles 0011 funcionan tras aplicarla. Admin puede crear/editar perfil de cuenta con rol Agente; slug duplicado se rechaza; los límites de listas y biografía se validan; visitante lee solo perfil publicado de agente activo; cuenta suspendida y perfil despublicado no aparecen; Cliente/Agente no guardan datos profesionales; Admin puede despublicar incluso perfil de cuenta suspendida.
 - El usuario confirma que el dashboard de cartera y las asignaciones funcionan tras aplicar 0012. La matriz independiente pendiente de Fase 14 comprobará roles, cuenta suspendida, asignación revocada, borrador y visibilidad pública.
 - CRM 0013: una consulta válida crea un lead y lo asigna al agente activo de la propiedad; sin agente activo queda visible solo a Admin; propiedad demo, vendida, no aprobada, privada sin entitlement o consentimiento falso no crea lead; el cuarto envío reciente del mismo correo/propiedad se limita; visitante/Cliente no leen leads; agente asignado sí; otro agente y cuenta suspendida no; cambios de etapa generan historial; notas solo aparecen a equipo autorizado; Admin y Agente no escriben notas como otro actor.
-- API CRM: rechazar origin ausente/foráneo, content type distinto de JSON, JSON inválido y body mayor a 4 KiB; en desarrollo local aceptar solo origen con el mismo host; honeypot lleno responde éxito sin insertar lead; el rate limit por correo/propiedad del RPC sigue activo. Tras habilitar Vercel WAF, confirmar 429 al superar su límite por IP.
+- API CRM: rechazar origin ausente/foráneo, content type distinto de JSON, JSON inválido y body mayor a 4 KiB; en desarrollo local aceptar solo origen con el mismo host; honeypot lleno responde éxito sin insertar lead; el rate limit por correo/propiedad del RPC sigue activo. El usuario decidió omitir el rate limit WAF por costo, así que no se espera un 429 de firewall.
 - API analytics: confirmar que el body mayor a 512 bytes se corta durante lectura, no tras cargarlo completo; comprobar origin/content type/JSON/UUID inválidos y respuesta 503 controlada ante fallo de RPC.
 - Revisar estados sin migración, sin agentes, sin biografía/listas y en móvil. No presentar un perfil ficticio si no hay cuentas reales.
 

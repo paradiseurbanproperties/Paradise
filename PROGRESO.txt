@@ -4,10 +4,10 @@ OBJETIVO
 Diseñar y desarrollar por fases una plataforma inmobiliaria modular con catálogo público, cuentas de cliente, agentes, CRM, administración, suscripciones Premium simuladas, analítica y controles de seguridad adecuados para un producto académico de calidad comercial.
 
 ESTADO GENERAL
-- Fase actual: FASE 14 — Seguridad y rendimiento
+- Fase actual: FASE 15 — QA y entrega
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
-- Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]
-- Próxima actividad: activar la regla WAF de rate limit en el proyecto Vercel y observar su tráfico. Se alineó la validación Origin de las APIs con el mismo dominio Vercel que Auth usa como fallback, para evitar rechazar tráfico legítimo si falta `NEXT_PUBLIC_SITE_URL`.
+- Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]; Fase 15 [~]
+- Próxima actividad: medir Lighthouse/Web Vitals y completar revisión de teclado/navegador y roles con cuentas de prueba. El usuario autorizó push de la corrección de registro y el avance local de QA. El rate limit WAF se omite por decisión del usuario.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -46,7 +46,7 @@ Este resumen representa el alcance aprobado del proyecto; no significa que los m
 - [x] Agentes y CRM: el usuario confirma perfiles, cartera, captación de leads, Kanban y notas; 0013 queda validada funcionalmente según su reporte, sin inspección directa del historial remoto.
 - [ ] Administración: usuarios, agentes, publicaciones, suscripciones, reclamaciones, ajustes, auditoría e informes.
 - [x] Analítica: dashboard `/admin` con gráfica diaria, ranking, desgloses por tipo/ciudad, exportación CSV y periodo 7/28/90 días. El usuario confirma el funcionamiento de filtro, desgloses y exportación.
-- [ ] Operación: notificaciones, configuración general, accesibilidad, rendimiento, seguridad, pruebas, CI, despliegue y documentación académica.
+- [~] Operación: notificaciones y configuración implementadas; CI definido localmente. Aún faltan accesibilidad manual, rendimiento medido, matriz de seguridad por roles, ejecución remota de CI, backups/monitorización y documentación académica.
 
 DOCUMENTACIÓN DEL ALCANCE Y DISEÑO
 - `README.md`: descripción general, módulos planeados, instalación y estado real.
@@ -72,8 +72,8 @@ FASES DEL DESARROLLO
 [x] Fase 11 — Herramientas del cliente (el usuario confirma favoritos, comparación, listas y actividad; 0014–0016 se consideran funcionales por su reporte)
 [x] Fase 12 — Historiales y notificaciones (usuario confirma funcionamiento; 0017 se considera validada por su reporte, sin inspección remota directa)
 [x] Fase 13 — Configuración y SEO (usuario reporta que contacto público también guarda después del ajuste)
-[~] Fase 14 — Seguridad y rendimiento (usuario confirma RLS aprobado; WAF pendiente; búsqueda PostGIS respondió en sondeo anónimo)
-[ ] Fase 15 — QA y entrega
+[~] Fase 14 — Seguridad y rendimiento (usuario confirma RLS aprobado; rate limit WAF omitido por costo; búsqueda PostGIS respondió en sondeo anónimo)
+[~] Fase 15 — QA y entrega (12 unitarias, 4 E2E Chromium, axe, workflow CI local y smoke previo de deployment; RLS por rol, accesibilidad manual, Lighthouse/Web Vitals y primera corrida CI remota pendientes)
 
 FUNCIONES TERMINADAS
 - Inspección inicial del espacio de trabajo: directorio sin archivos de aplicación y sin repositorio Git detectable.
@@ -98,12 +98,15 @@ FUNCIONES TERMINADAS
 
 FUNCIONES PENDIENTES
 - Fase 14: el usuario confirma RLS aprobado. No se hizo inspección independiente de la matriz ni del estado remoto en esta sesión; conservar su aprobación como reporte del usuario.
-- Fase 14: `POST /api/crm/property-inquiry` valida origen, JSON, body máx. 4 KiB, campos y honeypot; CRM conserva su límite de 3 por correo/propiedad/hora con advisory lock. `POST /api/analytics/property-view` limita el body a 512 bytes durante la lectura. Se documentó una regla WAF única (30 req/60 s/IP, ambos endpoints); falta publicarla y observar el comportamiento. La protección por IP no impide abuso distribuido ni excedencias regionales.
+- Fase 14: `POST /api/crm/property-inquiry` valida origen, JSON, body máx. 4 KiB, campos y honeypot; CRM conserva su límite de 3 por correo/propiedad/hora con advisory lock. `POST /api/analytics/property-view` limita el body a 512 bytes durante la lectura y cada sesión a 30 vistas/día. El usuario decidió omitir el rate limit WAF por costo: no hay un límite global por IP; variar correos o sesiones puede eludir los límites actuales.
 - Fase 7: el primer sondeo devolvió `PGRST125`, pero la llamada POST a `/rest/v1/rpc/search_public_properties_nearby` con la firma confirmada respondió HTTP 200; la lectura posterior del catálogo también respondió HTTP 200. La ruta pública `/propiedades/mapa?lat=19.4326&lon=-99.1332&radius=5000` respondió HTTP 200 y SSR mostró un resultado. No se revisó la interacción cliente en navegador; el usuario confirma que el mapa funciona.
 - Fase 4: completar prueba de registro, verificación, login, recuperación y cambio de contraseña contra el dominio Vercel/Supabase; el usuario reporta que el enlace funciona, sin verificación de esta sesión.
-- Fase 15: pruebas de producto automatizadas/E2E, accesibilidad y rendimiento; completar visitas/agenda y áreas administrativas que siguen fuera del alcance implementado.
+- Fase 15: quedan pruebas Auth/Cliente/Agente/Admin y matriz RLS/Storage con cuentas separadas, revisión manual de teclado/lector de pantalla y dispositivo móvil real, perfil Lighthouse/Web Vitals y primera ejecución remota del CI. El E2E local solo usa Chromium sin iniciar sesión; el smoke de Vercel no mide estos comportamientos.
 - Operación: revisar variables y redirects de Supabase, dominio propio si se desea, límites/proveedor de geocodificación, backups y monitorización antes de tratarlo como producción comercial.
 - `pnpm build` con Webpack, `pnpm lint` y `pnpm typecheck` pasaron en esta sesión; queda una advertencia no fatal `DEP0205` de Node 26.
+- Fase 15: se añadieron 15 unitarias y 5 E2E Chromium. axe pasó portada/registro/catálogo en claro y oscuro, login, mapa y estados de menú/perfil móvil. También se corrigió contraste bajo en `.eyebrow`. `pnpm test`, `pnpm test:e2e`, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan; build mantiene advertencia no fatal `DEP0205`.
+- CI: `.github/workflows/quality.yml` instala con lockfile congelado y ejecuta lint, tipos, unitarias, build, Chromium y E2E en PR/push a `main`. El YAML se parseó localmente; GitHub aún no ha corrido el workflow porque el usuario no ha autorizado un push.
+- Smoke HTTP de solo lectura a Vercel: `/`, `/propiedades`, `/propiedades/mapa`, `/login` y el icono respondieron 200; ruta inexistente respondió 404. HSTS, `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy` están presentes. Una muestra de TTFB fue 0.87–1.07 s; no es benchmark.
 
 ## FASE 14 — INCREMENTO 14: CONFIGURACIÓN, REDIRECTS AUTH Y PRECIO
 - Configuración 0018: se quitó `singleton: true` del payload upsert. PostgreSQL aplica el default y el conflicto ya no requiere UPDATE sobre la llave fija, que la migración no concede. Se añade log de código de error sin exponer correo/teléfono.
@@ -116,13 +119,47 @@ FUNCIONES PENDIENTES
 ## FASE 14 — INCREMENTO 15: VALIDACIÓN DE RUTA DE MAPA
 - GET público a la URL de búsqueda por radio de producción (`lat=19.4326`, `lon=-99.1332`, `radius=5000`) respondió HTTP 200; el HTML renderizado mostró una propiedad.
 - El usuario confirma que el mapa funciona. No hay navegador accesible en esta sesión, así que no se observó el movimiento del mapa ni el toque/cambio de centro.
-- La regla WAF sigue pendiente: Vercel CLI no está instalada, el checkout no está enlazado y el host del navegador no está disponible. No hubo cambios de aplicación ni push.
+- No hay cambios de aplicación ni push en este incremento.
 
 ## FASE 14 — INCREMENTO 16: ORIGEN CONFIABLE EN VERCEL
 - Revisión estática encontró que Origin de CRM/analítica usaba `getSiteOrigin()` con fallback `localhost`, distinto al fallback Vercel que Auth ya usa. Si faltara `NEXT_PUBLIC_SITE_URL` en producción, formularios/analítica podían responder 403.
 - `getSiteOrigin()` ahora reutiliza `getPublicSiteUrl()`: prioriza configuración explícita, usa dominio Vercel de producción/deployment y mantiene HTTP de loopback/LAN solo en desarrollo.
 - Verificación: `pnpm lint`, `pnpm build` (Webpack), `pnpm typecheck` y `git diff --check` pasan. El build conservó `DEP0205`; un primer intento encadenado dio un error transitorio de lectura de `tsc --showConfig`, pero el build independiente pasó.
 - No se ejecutaron pruebas de producto ni se enviaron solicitudes de origen. Sin migración ni cambio SQL. Push pendiente de revisión final.
+
+## FASE 14 — INCREMENTO 17: WAF OMITIDO POR COSTO
+- El usuario decidió no activar el rate limit WAF de Vercel por su costo. Se conserva como opción futura, no como pendiente obligatorio.
+- CRM mantiene el límite de tres envíos por correo/propiedad/hora; analítica limita cada sesión a 30 fichas/día. Ninguno proporciona protección global por IP; correos o sesiones variables pueden eludirlos.
+- Se actualizaron `README.md`, `AGENTS.md`, `CHANGELOG.md`, `docs/DEPLOYMENT.md`, `docs/SECURITY.md`, `docs/API.md` y `docs/TESTING.md` para reflejar la decisión, el alcance de límites actuales y el siguiente paso.
+- Validación: `git diff --check` pasa. Solo documentación; no hubo cambios de aplicación ni push.
+
+## FASE 15 — INCREMENTO 1: SUITE INICIAL Y SMOKE DE PRODUCCIÓN
+- Se añadió Vitest 4, el script `pnpm test` y 12 pruebas unitarias para filtros de catálogo, fechas UTC de analítica, lectura limitada de bodies HTTP, precios con centavos, coordenadas emparejadas y validación de consultas CRM.
+- `pnpm test`: 5 archivos, 12 pruebas pasan. `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan; el build produce las 32 rutas y mantiene el aviso no fatal `DEP0205` de Node 26.
+- El deployment existente respondió HTTP 200 en portada, catálogo, mapa, login e icono; una ruta inexistente devuelve 404. Cabeceras observadas: HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` y Referrer Policy `strict-origin-when-cross-origin`.
+- El servidor local del build de producción respondió 200 en portada, catálogo, mapa y login; la ruta inexistente respondió 404.
+- TTFB de una solicitud por portada/catálogo/mapa quedó entre 0.87 y 1.07 s; es una muestra simple, no una prueba de carga. El deployment consultado no contiene los cambios locales de esta suite.
+- Sin E2E, auditoría automatizada de accesibilidad ni matriz remota por roles; esos trabajos siguen abiertos. Cambios locales, sin push.
+
+## FASE 15 — INCREMENTO 2: E2E Y ACCESIBILIDAD EN CHROMIUM
+- Se añadieron cuatro pruebas Playwright con build servido en producción: portada/catálogo, login, interacción móvil simulada con menú/tema/perfil y mapa. axe-core analiza las rutas principales y el cambio a tema oscuro.
+- axe detectó el texto `.eyebrow` en fondo de tarjeta oscuro con contraste 3.85:1. El selector compartido ahora usa `var(--color-muted)`; los scans finales no reportan violaciones en los cuatro estados de página comprobados, ni en catálogo oscuro.
+- `pnpm test:e2e --workers=1`: 4/4 pasan. `pnpm lint` y `pnpm typecheck` pasan; el build anterior produjo 32 rutas. Los logs del servidor incluyen avisos React `The destination stream closed early` cuando Playwright interrumpe streams al cerrar/navegar; no afectan los asserts ni el resultado de axe.
+- QA no cubre Safari/WebKit, Android físico, Auth real ni roles de Supabase. No hacer push.
+
+## FASE 15 — INCREMENTO 3: CI Y ACCESIBILIDAD ESTABLE
+- Se añadió `.github/workflows/quality.yml` con gates de lint, typecheck, 12 unitarias, build de producción e instalación/E2E Chromium en PR y push a `main`. Su YAML se validó localmente, pero GitHub aún no da resultado porque no se hizo push.
+- Se extendieron los escaneos axe a portada oscura y controles móviles abiertos. Una alerta inicial midió el fondo durante la animación de cambio de tema (420 ms) y produjo colores intermedios; Playwright ahora espera a que se estabilice la paleta antes del scan. No se ocultaron reglas ni nodos.
+- Validación final: `pnpm test` 12/12, `pnpm test:e2e` 4/4, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan. La build generó 32 rutas y mostró el aviso no fatal `DEP0205` de Node 26.
+- Se actualizaron README, estrategia de pruebas, despliegue, changelog e instrucciones de continuidad. No se consultó Supabase ni se probó el deployment en esta sesión. Sin push.
+- Próxima actividad: medir Lighthouse/Web Vitals y completar QA manual y por roles si hay dispositivos/cuentas Supabase de prueba; después, primer resultado del workflow cuando exista autorización explícita para push.
+
+## FASE 15 — INCREMENTO 4: REGISTRO Y DIAGNÓSTICO DE AUTH
+- Inspección de solo lectura al endpoint público Auth de Supabase: signup no está deshabilitado, email está habilitado y `mailer_autoconfirm=false` (confirmación requerida). No se creó una cuenta de prueba ni se cambió configuración remota.
+- El formulario presentaba un error genérico que ocultaba la causa. Ahora clasifica errores comunes sin revelar existencia de cuentas y registra en servidor solo `code` y `status`, nunca email/password.
+- Se añadieron 3 pruebas unitarias para mensajes seguros y un E2E de la página `/registro` que verifica campos, mínimo de contraseña y axe.
+- Limitación: la creación real necesita un inbox de prueba y no se ejecutó para evitar dejar una cuenta huérfana. Si falla el siguiente intento en producción, el código/status estará en logs de Vercel para distinguir política, SMTP, rate limit o fallo de trigger/DB.
+- El usuario autorizó push para que la corrección llegue a Vercel. Ejecutar el conjunto completo, confirmar CI/deploy y probar solo lectura de rutas; no hacer una alta externa sin correo de prueba.
 
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.
@@ -269,7 +306,7 @@ REGISTRO DE FASE 3
 2026-11-24 — El usuario confirma que 0019 y 0020 funcionan y reporta que 0021 parece funcionar; no se inspeccionó Supabase. La revisión de API detectó lectura excesiva de datos privados; 0021 separa dirección/coordenadas exactas y limita grants. El usuario reporta que el enlace de verificación Auth ahora funciona.
 
 PRÓXIMA ACTIVIDAD
-Fase 14, incremento 4: el usuario indica que 0021 parece funcionar; no se verificó la base ni cada rol de manera independiente. Próximo: completar matriz con anon, Cliente, Agente asignado/no asignado y Admin, además de pruebas negativas RLS y mitigación anti-abuso para captación pública. El enlace de verificación Auth ya funciona según reporte del usuario.
+Fase 14, cerrar solo los pendientes que no requieran un servicio de pago: validar la matriz RLS con identidades disponibles y la búsqueda PostGIS desde UI. El usuario decidió omitir el rate limit WAF por costo; CRM y analítica mantienen límites de aplicación sin protección global por IP. Después, continuar QA de entrega. El enlace de verificación Auth ya funciona según reporte del usuario.
 
 ## REGISTRO DE FASE 9 — INCREMENTO 1
 - Objetivo: dar al Admin un resumen de actividad operativa usando solo filas persistidas existentes.
@@ -473,7 +510,7 @@ Fase 14, incremento 4: el usuario indica que 0021 parece funcionar; no se verifi
 - El usuario confirmó en SQL Editor la función `search_public_properties_nearby(double precision,double precision,integer,integer)`.
 - Se repitió una solicitud anónima de solo lectura usando `POST /rest/v1/rpc/search_public_properties_nearby` y la firma confirmada: HTTP 200, una fila. La consulta siguiente a `properties` con la selección del catálogo y filtros de aprobación/visibilidad también respondió HTTP 200 con una fila.
 - El `PGRST125` del primer sondeo no se reprodujo con la ruta canónica; la causa concreta de aquella respuesta no quedó identificada. No se cambió SQL remoto ni se expusieron coordenadas/IDs en el registro.
-- Falta comprobar el flujo visible de búsqueda por radio en la interfaz. Después, publicar/verificar la regla WAF de Vercel. Sin push.
+- Falta comprobar el flujo visible de búsqueda por radio en la interfaz. Después, continuar pendientes RLS/seguridad sin costo; el WAF quedó omitido por decisión del usuario. Sin push.
 
 PRUEBAS
 - No se ejecutaron pruebas: Fase 0 fue análisis/documentación y Fase 1 prepara el entorno, no módulos de producto.
@@ -486,4 +523,4 @@ PRUEBAS
 - Fase 7, incremento 1: instalación de MapLibre falló en sandbox por DNS; el usuario reporta que instaló la dependencia y habilitó PostGIS en Supabase.
 - Fase 8: el usuario confirma que Premium funciona integralmente, incluida la cancelación. No hay prueba E2E independiente en esta sesión.
 - Build de producción de la entrega anterior no se verificó aquí: Turbopack fue bloqueado por permisos de puerto/proceso en el sandbox.
-- No hay todavía suite formal Vitest/Playwright. Los smoke checks manuales de catálogo sí se ejecutaron; las rutas visuales de Fase 3 aún requieren revisión local.
+- No hay todavía suite Playwright; Vitest ahora cubre reglas unitarias iniciales. Los smoke checks manuales de catálogo sí se ejecutaron; las rutas visuales de Fase 3 aún requieren revisión local.

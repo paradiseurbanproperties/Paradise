@@ -2,6 +2,44 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.30] — 2026-11-24
+
+### Diagnóstico de registro
+- La configuración pública del proyecto Supabase consultada en modo de solo lectura confirma registro habilitado, email habilitado y verificación obligatoria. No se creó una cuenta de prueba.
+- El registro ya muestra mensajes de ayuda para contraseña débil, correo inválido, registro desactivado y límites de envío; conserva una respuesta genérica para no revelar si un correo existe.
+- Vercel registra solo el código y estado del error de Supabase, sin almacenar ni escribir en logs correo, contraseña o datos del formulario. Añadidas pruebas unitarias y E2E de la pantalla de registro.
+- Pendiente confirmar un alta real con un correo/inbox de prueba y revisar el código si el backend informa un fallo de base de datos o correo. Push autorizado por el usuario.
+
+## [0.17.29] — 2026-11-24
+
+### CI y estabilidad de accesibilidad
+- Se añadió `.github/workflows/quality.yml` para instalar desde lockfile y ejecutar lint, tipos, unitarias, build y E2E Chromium en pushes/PR a `main`. El workflow existe localmente; todavía no se ha disparado en GitHub porque no se autorizó push.
+- El escaneo axe de portada en tema oscuro coincidió con la transición animada de colores y leyó una paleta intermedia. El E2E ahora espera que termine la animación antes de medir contraste; no se cambió ni se ocultó ninguna regla de accesibilidad.
+- Revalidación local: 12/12 unitarias, 4/4 E2E Chromium, lint, typecheck y build pasan. Build produce 32 rutas y emite el aviso no fatal `DEP0205` de Node 26.
+- Próximo: Lighthouse/Web Vitals y pruebas manuales/por rol que necesitan Safari/iPhone, Android y cuentas Supabase de prueba. Sin push.
+
+## [0.17.28] — 2026-11-24
+
+### E2E y accesibilidad
+- Añadidos Playwright y axe-core. Cuatro E2E verifican rutas públicas, controles de login, navegación/tema/perfil móvil y controles del mapa.
+- axe no encontró violaciones en portada, catálogo, login, mapa y catálogo oscuro. Corrige contraste de `.eyebrow` en tema oscuro (3.85:1) usando `var(--color-muted)`.
+- `pnpm test:e2e --workers=1` pasa 4/4; unitarias, lint, tipos y build siguen pasando. Los logs del servidor muestran avisos React de streams cancelados al terminar/navegar tests; los asserts pasan.
+- Aún faltan Safari/WebKit y Android físicos, login/RLS con cuentas de prueba y Lighthouse/Web Vitals. Sin push.
+
+## [0.17.27] — 2026-11-24
+
+### QA y entrega
+- Añadido Vitest 4 y `pnpm test`; 12 pruebas cubren filtros de catálogo, fechas del reporte, lectura limitada de cuerpos HTTP, validación CRM y esquema de propiedades.
+- `pnpm test`, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan. Build genera las 32 rutas y conserva aviso no fatal `DEP0205`.
+- El servidor local del build y el deployment de Vercel responden 200 en las rutas principales y 404 en ruta inexistente; icono 200. Vercel presenta HSTS, `nosniff`, `DENY` y Referrer Policy. Una única muestra de TTFB no es benchmark.
+- E2E, axe/Lighthouse y matriz remota Auth/RLS pendientes. Sin push.
+
+## [0.17.26] — 2026-11-24
+
+### Alcance de seguridad
+- Por decisión del usuario, se omite la regla WAF de rate limit de Vercel por costo. Permanecen el límite CRM por correo/propiedad y el límite de analítica por sesión; no ofrecen límite global por IP.
+- Se actualiza el siguiente paso a pendientes de seguridad sin costo y QA de entrega. Solo documentación; no se hicieron cambios de aplicación ni push.
+
 ## [0.17.25] — 2026-11-24
 
 ### Origen de solicitudes públicas

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createAuthRedirectUrl, getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getSignUpErrorMessage } from "@/features/auth/services/sign-up-error";
 import {
   formDataRecord,
   recoveryEmailSchema,
@@ -51,7 +52,11 @@ export async function signUpAction(
   });
 
   if (error) {
-    return { status: "error", message: "No se pudo crear la cuenta. Revisa los datos o prueba iniciar sesión." };
+    console.error("[auth:sign-up] Supabase rejected registration", {
+      code: error.code ?? "unknown",
+      status: error.status ?? null,
+    });
+    return { status: "error", message: getSignUpErrorMessage(error) };
   }
   if (data.session) redirect("/");
   return {

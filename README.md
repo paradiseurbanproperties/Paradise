@@ -2,7 +2,7 @@
 
 Plataforma inmobiliaria modular en planeación para un ejercicio académico. El objetivo es administrar propiedades y publicaciones, clientes, agentes, CRM, visitas, suscripciones Premium simuladas, analítica y configuración desde una experiencia pública y paneles con permisos.
 
-> **Estado:** Fase 14 en curso. El usuario confirma RLS aprobado; no se inspeccionó la matriz remota de forma independiente. El usuario reporta que contacto Admin, redirects de correo y precios funcionan tras el ajuste. CRM y analítica ahora comparten el fallback de origen Vercel usado por Auth cuando falta `NEXT_PUBLIC_SITE_URL`. Vercel sirve `https://paradise-kappa-gray.vercel.app/` con HTTP 200, y el usuario confirma que móvil funciona al 100%. La RPC PostGIS, lectura del catálogo y ruta pública de mapa respondieron HTTP 200; el HTML de la búsqueda de 5 km renderizó una propiedad. El rate limit WAF sigue pendiente en la configuración del proyecto. `public/icons/paradise.png` es la marca unificada para pestaña, vista previa, navbar y footer.
+> **Estado:** Fase 15 (QA y entrega) en curso. El usuario confirma RLS aprobado; no se inspeccionó la matriz remota de forma independiente. Fase 15 incluye 15 unitarias y 5 E2E Chromium; axe analiza páginas públicas, registro, estados oscuro y controles móviles sin violaciones en las corridas actuales. `pnpm test`, `pnpm test:e2e`, lint, typecheck y build pasan localmente. Se añadió CI con GitHub Actions; el usuario autorizó push para disparar su primera corrida. Faltan Lighthouse/Web Vitals y la matriz remota por roles. El deployment respondió 200 en rutas públicas y envía cabeceras de seguridad básicas en una verificación previa; no se comprobó tras los cambios locales. El usuario reporta que móvil funciona al 100%. Por decisión del usuario, se omite el rate limit WAF de Vercel por costo; los límites de CRM/analítica son de aplicación y no cubren globalmente por IP. `public/icons/paradise.png` es la marca unificada para pestaña, vista previa, navbar y footer.
 
 ## Objetivos y problema
 
@@ -44,7 +44,7 @@ El catálogo paginado filtrará por ubicación, precio, tipo, características, 
 
 Supabase Auth gestiona identidad. El perfil mantiene rol base Cliente, Agente o Admin; Premium se determina por suscripción activa y vigente. El servidor autoriza cada acción y RLS protege los registros por usuario, asignación o alcance administrativo. Preferencias de tema quedan locales para visitantes y sincronizadas al perfil autenticado.
 
-En Fase 4 se crearon pantallas `/login`, `/registro`, `/recuperar-password`, `/verificar-email` y `/auth/cambiar-password`, acciones de servidor y callback PKCE. El usuario reporta aplicar la migración inicial y que el enlace de verificación ahora funciona. En Fase 5 se añadieron roles cliente/admin/agente, estados activos/suspendidos, guardas server-side, navegación con sesión, `/mi-cuenta` y `/admin/usuarios` para gestionar acceso y ver auditoría; el usuario reporta aplicar la migración y designar el primer Admin. El usuario confirma que RLS quedó aprobado; no se reprodujo aquí la matriz por identidad.
+En Fase 4 se crearon pantallas `/login`, `/registro`, `/recuperar-password`, `/verificar-email` y `/auth/cambiar-password`, acciones de servidor y callback PKCE. La configuración pública de Supabase confirma que el registro por email está habilitado y requiere verificación; una nueva cuenta no puede iniciar sesión hasta confirmar el mensaje recibido. La pantalla registra en servidor solo el código/estado de errores de alta para diagnóstico, sin datos personales. El usuario reporta que los enlaces de verificación funcionan; el flujo de alta con un inbox nuevo requiere una prueba real. En Fase 5 se añadieron roles cliente/admin/agente, estados activos/suspendidos, guardas server-side, navegación con sesión, `/mi-cuenta` y `/admin/usuarios` para gestionar acceso y ver auditoría; el usuario reporta aplicar la migración y designar el primer Admin. El usuario confirma que RLS quedó aprobado; no se reprodujo aquí la matriz por identidad.
 
 Fase 6 conecta el catálogo con Supabase y su panel Admin para gestionar fichas, características, fotografías, moderación e historial de precio. El usuario confirmó que el flujo completo funciona al 100%. Fase 7 integra selección de coordenadas con MapLibre en Admin y mapas en la ficha pública; el usuario confirma que estos mapas se muestran. La RPC geográfica y la lectura anónima de catálogo respondieron HTTP 200 con una ficha; falta confirmar la búsqueda desde la interfaz. Fase 8 añade planes y checkout simulado en `/premium`, historial, cancelación por RPC y `/admin/suscripciones`. El usuario confirma que el flujo Premium completo funciona.
 
@@ -86,7 +86,7 @@ Supabase Auth será la identidad. `profiles` guardará datos de aplicación y ro
 
 ## Seguridad y límites
 
-No se aceptan roles ni estado Premium enviados por el cliente como autoridad. Las acciones privilegiadas se ejecutan en servidor, la clave `service_role` no se publica, y las políticas RLS limitan propiedad de datos y asignaciones. El pago Premium será ficticio: no se recogen tarjetas ni se procesan fondos. Backups, monitorización, CI y despliegue no están configurados ni se consideran operativos.
+No se aceptan roles ni estado Premium enviados por el cliente como autoridad. Las acciones privilegiadas se ejecutan en servidor, la clave `service_role` no se publica, y las políticas RLS limitan propiedad de datos y asignaciones. El pago Premium será ficticio: no se recogen tarjetas ni se procesan fondos. El CI está definido localmente pero aún no se ha ejecutado en GitHub; backups y monitorización no están configurados ni se consideran operativos.
 
 La matriz de roles, reglas de publicación, protección de CRM, Storage, auditoría y límites conocidos está en [docs/SECURITY.md](docs/SECURITY.md). La propuesta de esquema normalizado y relaciones está en [docs/DATABASE.md](docs/DATABASE.md).
 
@@ -105,7 +105,7 @@ Para producción configura también `NEXT_PUBLIC_SITE_URL` con el origen HTTPS c
 
 ## Pruebas
 
-La estrategia incluye pruebas unitarias, integración de repositorios/RLS y E2E. Consulta [docs/TESTING.md](docs/TESTING.md). En esta entrega `pnpm lint` y `pnpm typecheck` pasan. Aún no hay suite formal Vitest/Playwright ni verificación automatizada de RLS; falta probar alta, fotos y publicación con el proyecto Supabase.
+La estrategia incluye pruebas unitarias, integración de repositorios/RLS y E2E. Consulta [docs/TESTING.md](docs/TESTING.md). Ejecuta `pnpm test` para Vitest; para E2E, primero `pnpm build` y después `pnpm test:e2e`, que usa Chromium y axe. La matriz RLS automatizada y el perfil Lighthouse/Web Vitals siguen pendientes.
 
 ## Documentación
 
