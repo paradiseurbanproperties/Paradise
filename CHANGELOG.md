@@ -2,6 +2,15 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.17.34] — 2026-11-24
+
+### Rendimiento de la portada
+- Lighthouse 13.6.0 auditó una vez la portada pública con perfil móvil: rendimiento 99; accesibilidad, buenas prácticas y SEO 100.
+- La muestra dio FCP 1.0 s, LCP 1.0 s, CLS 0, TBT 70 ms, Speed Index 2.8 s y TTI 5.2 s. Es sintética; no valida INP/CrUX de usuarios.
+- Una muestra adicional de escritorio también dio rendimiento 99 y 100 en las demás categorías; LCP 0.5 s, CLS 0, TBT 10 ms y Speed Index 1.2 s.
+- Oportunidades estimadas: 366 KiB en imágenes, 323 KiB de vida de caché, 103 KiB de JS no usado y 25 KiB de CSS no usado. Revisar con mediciones repetidas antes de cambiar código.
+- Reporte detallado: `docs/PERFORMANCE.md`; JSON temporal: `/tmp/paradise-home-mobile.json`.
+
 ## [0.17.33] — 2026-11-24
 
 ### Estabilizar axe al cambiar tema en móvil

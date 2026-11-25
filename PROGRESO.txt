@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 15 — QA y entrega
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]; Fase 15 [~]
-- Próxima actividad: medir Lighthouse/Web Vitals y completar revisión de teclado/navegador y roles con cuentas de prueba. El usuario autorizó y ya se publicó la corrección del registro; no hacer nuevos push sin autorización explícita. El rate limit WAF se omite por decisión del usuario.
+- Próxima actividad: repetir Lighthouse en desktop/catálogo y revisar teclado/navegador y roles con cuentas de prueba. Una muestra Lighthouse móvil ya está documentada. No hacer nuevos push sin autorización explícita. El rate limit WAF se omite por decisión del usuario.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -73,7 +73,7 @@ FASES DEL DESARROLLO
 [x] Fase 12 — Historiales y notificaciones (usuario confirma funcionamiento; 0017 se considera validada por su reporte, sin inspección remota directa)
 [x] Fase 13 — Configuración y SEO (usuario reporta que contacto público también guarda después del ajuste)
 [~] Fase 14 — Seguridad y rendimiento (usuario confirma RLS aprobado; rate limit WAF omitido por costo; búsqueda PostGIS respondió en sondeo anónimo)
-[~] Fase 15 — QA y entrega (12 unitarias, 4 E2E Chromium, axe, workflow CI local y smoke previo de deployment; RLS por rol, accesibilidad manual, Lighthouse/Web Vitals y primera corrida CI remota pendientes)
+[~] Fase 15 — QA y entrega (15 unitarias, 5 E2E Chromium, axe, CI remoto verde y Lighthouse móvil de una muestra; RLS por rol, accesibilidad manual, datos de campo Web Vitals y otras muestras pendientes)
 
 FUNCIONES TERMINADAS
 - Inspección inicial del espacio de trabajo: directorio sin archivos de aplicación y sin repositorio Git detectable.
@@ -101,11 +101,11 @@ FUNCIONES PENDIENTES
 - Fase 14: `POST /api/crm/property-inquiry` valida origen, JSON, body máx. 4 KiB, campos y honeypot; CRM conserva su límite de 3 por correo/propiedad/hora con advisory lock. `POST /api/analytics/property-view` limita el body a 512 bytes durante la lectura y cada sesión a 30 vistas/día. El usuario decidió omitir el rate limit WAF por costo: no hay un límite global por IP; variar correos o sesiones puede eludir los límites actuales.
 - Fase 7: el primer sondeo devolvió `PGRST125`, pero la llamada POST a `/rest/v1/rpc/search_public_properties_nearby` con la firma confirmada respondió HTTP 200; la lectura posterior del catálogo también respondió HTTP 200. La ruta pública `/propiedades/mapa?lat=19.4326&lon=-99.1332&radius=5000` respondió HTTP 200 y SSR mostró un resultado. No se revisó la interacción cliente en navegador; el usuario confirma que el mapa funciona.
 - Fase 4: completar prueba de registro, verificación, login, recuperación y cambio de contraseña contra el dominio Vercel/Supabase; el usuario reporta que el enlace funciona, sin verificación de esta sesión.
-- Fase 15: quedan pruebas Auth/Cliente/Agente/Admin y matriz RLS/Storage con cuentas separadas, revisión manual de teclado/lector de pantalla y dispositivo móvil real, perfil Lighthouse/Web Vitals y primera ejecución remota del CI. El E2E local solo usa Chromium sin iniciar sesión; el smoke de Vercel no mide estos comportamientos.
+- Fase 15: quedan pruebas Auth/Cliente/Agente/Admin y matriz RLS/Storage con cuentas separadas, revisión manual de teclado/lector/dispositivo móvil, repetición Lighthouse en desktop y catálogo, y datos de campo Web Vitals. El E2E local solo usa Chromium sin iniciar sesión.
 - Operación: revisar variables y redirects de Supabase, dominio propio si se desea, límites/proveedor de geocodificación, backups y monitorización antes de tratarlo como producción comercial.
 - `pnpm build` con Webpack, `pnpm lint` y `pnpm typecheck` pasaron en esta sesión; queda una advertencia no fatal `DEP0205` de Node 26.
-- Fase 15: se añadieron 15 unitarias y 5 E2E Chromium. axe pasó portada/registro/catálogo en claro y oscuro, login, mapa y estados de menú/perfil móvil. También se corrigió contraste bajo en `.eyebrow`. `pnpm test`, `pnpm test:e2e`, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan; build mantiene advertencia no fatal `DEP0205`.
-- CI: `.github/workflows/quality.yml` instala con lockfile congelado y ejecuta lint, tipos, unitarias, build, Chromium y E2E en PR/push a `main`. El YAML se parseó localmente; GitHub aún no ha corrido el workflow porque el usuario no ha autorizado un push.
+- Fase 15: se añadieron 15 unitarias y 5 E2E Chromium. axe pasó portada/registro/catálogo en claro y oscuro, login, mapa y estados de menú/perfil móvil. `pnpm test`, `pnpm test:e2e`, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan; build mantiene advertencia no fatal `DEP0205`.
+- CI: `.github/workflows/quality.yml` ejecuta lint, tipos, unitarias, build, Chromium y E2E; GitHub Actions pasó todos los steps para `554b45c`. Vercel marcó exitoso el deployment y `/registro` respondió HTTP 200.
 - Smoke HTTP de solo lectura a Vercel: `/`, `/propiedades`, `/propiedades/mapa`, `/login` y el icono respondieron 200; ruta inexistente respondió 404. HSTS, `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy` están presentes. Una muestra de TTFB fue 0.87–1.07 s; no es benchmark.
 
 ## FASE 14 — INCREMENTO 14: CONFIGURACIÓN, REDIRECTS AUTH Y PRECIO
@@ -178,6 +178,12 @@ FUNCIONES PENDIENTES
 - El log CI mostró contraste temporal (fondo #78797b) en paginador y footer al ejecutar axe inmediatamente después del cambio de tema móvil; valores finales de tema oscuro son accesibles y el resto de pruebas pasó.
 - Se añadió espera de 500 ms tras el cambio de tema en el test móvil, igual que en el test de portada. No cambia el comportamiento del producto.
 - `pnpm test:e2e` local pasa 5/5; GitHub Actions pasó todos los steps para `5a958f2`, y Vercel marcó el deployment exitoso. `/registro` responde HTTP 200.
+
+## FASE 15 — INCREMENTO 8: MUESTRAS LIGHTHOUSE DE LA PORTADA
+- Lighthouse 13.6.0 auditó una vez la portada pública en perfil móvil y otra en escritorio. Ambas dieron rendimiento 99; accesibilidad, buenas prácticas y SEO 100.
+- Móvil: FCP/LCP 1.0 s; CLS 0; TBT 70 ms; Speed Index 2.8 s; TTI 5.2 s. Escritorio: FCP 0.4 s; LCP 0.5 s; CLS 0; TBT 10 ms; Speed Index 1.2 s; respuesta del documento 70 ms.
+- Es laboratorio sintético, no INP/CrUX de usuarios. Hallazgos orientativos móvil: 366 KiB en imágenes y 323 KiB en caché; JS no usado ~103 KiB, CSS ~25 KiB y dos motivos de exclusión de bfcache. Escritorio estima ~102 KiB JS y ~25 KiB CSS no usados.
+- JSON temporales en `/tmp/paradise-home-mobile.json` y `/tmp/paradise-home-desktop.json`; ambas muestras y límites están en `docs/PERFORMANCE.md`. Repetir y auditar catálogo antes de optimizar.
 
 ERRORES CONOCIDOS
 - El usuario confirma que RLS está aprobado; la sesión no accedió a identidades separadas para inspeccionarlo. El primer sondeo anónimo dio `PGRST125`; una llamada posterior a la ruta RPC canónica devolvió HTTP 200 y una ficha, y la consulta de catálogo devolvió HTTP 200 y una ficha. No se inspeccionó el historial remoto de migraciones.

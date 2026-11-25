@@ -1,6 +1,6 @@
 # Despliegue y operación
 
-**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. El deploy del commit `5a958f2` fue marcado exitoso por Vercel; `/registro` responde HTTP 200. GitHub Actions pasó lint, tipos, unitarias, build y E2E para ese commit. Backups, monitorización y dominio propio no constan configurados/verificados.
+**Estado:** Paradise está desplegado en Vercel y el usuario confirma la experiencia móvil. El commit `554b45c` (documentación posterior al código de `5a958f2`) pasó CI y Vercel; `/registro` responde HTTP 200. Lighthouse móvil de `/` dio 99 en rendimiento y 100 en las otras categorías; ver `docs/PERFORMANCE.md`. Backups, monitorización y dominio propio no constan configurados/verificados.
 
 ## Vercel — destino solicitado
 

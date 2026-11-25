@@ -2,7 +2,7 @@
 
 Plataforma inmobiliaria modular en planeación para un ejercicio académico. El objetivo es administrar propiedades y publicaciones, clientes, agentes, CRM, visitas, suscripciones Premium simuladas, analítica y configuración desde una experiencia pública y paneles con permisos.
 
-> **Estado:** Fase 15 (QA y entrega) en curso. El usuario confirma RLS aprobado; no se inspeccionó la matriz remota de forma independiente. Fase 15 incluye 15 unitarias y 5 E2E Chromium; axe analiza páginas públicas, registro, estados oscuro y controles móviles sin violaciones en las corridas actuales. `pnpm test`, `pnpm test:e2e`, lint, typecheck y build pasan localmente. Se añadió CI con GitHub Actions; el usuario autorizó push para disparar su primera corrida. Faltan Lighthouse/Web Vitals y la matriz remota por roles. El deployment respondió 200 en rutas públicas y envía cabeceras de seguridad básicas en una verificación previa; no se comprobó tras los cambios locales. El usuario reporta que móvil funciona al 100%. Por decisión del usuario, se omite el rate limit WAF de Vercel por costo; los límites de CRM/analítica son de aplicación y no cubren globalmente por IP. `public/icons/paradise.png` es la marca unificada para pestaña, vista previa, navbar y footer.
+> **Estado:** Fase 15 (QA y entrega) en curso. El usuario confirma RLS aprobado; no se inspeccionó la matriz remota de forma independiente. Fase 15 incluye 15 unitarias y 5 E2E Chromium; axe analiza páginas públicas, registro, estados oscuro y controles móviles sin violaciones en las corridas actuales. `pnpm test`, `pnpm test:e2e`, lint, typecheck y build pasan localmente; GitHub Actions y Vercel pasaron para la última versión. Dos muestras Lighthouse de la portada (móvil/escritorio) dieron rendimiento 99 y accesibilidad/buenas prácticas/SEO 100; no son datos de campo para validar INP/Core Web Vitals. Falta medir el catálogo, repetición y matriz remota por roles. El usuario reporta que móvil funciona al 100%. Por decisión del usuario, se omite el rate limit WAF de Vercel por costo; los límites de CRM/analítica son de aplicación y no cubren globalmente por IP. `public/icons/paradise.png` es la marca unificada para pestaña, vista previa, navbar y footer.
 
 ## Objetivos y problema
 
@@ -115,6 +115,7 @@ La estrategia incluye pruebas unitarias, integración de repositorios/RLS y E2E.
 - [API propuesta](docs/API.md)
 - [Despliegue](docs/DEPLOYMENT.md)
 - [Estrategia de pruebas](docs/TESTING.md)
+- [Rendimiento Lighthouse y Web Vitals](docs/PERFORMANCE.md)
 - [Presentación académica](docs/PRESENTATION.md)
 - [Registro de avance](PROGRESO.txt)
 - [Guía de continuidad para agentes de código](AGENTS.md)
