@@ -20,7 +20,7 @@ export default async function CustomerActivityPage() {
     listOwnCustomerActivity(),
     listPublicProperties(),
   ]);
-  const publicProperties = new Map(properties.filter((property) => !property.demo).map((property) => [property.id, property]));
+  const publicProperties = new Map(properties.map((property) => [property.id, property]));
 
   return (
     <div className="site-frame">

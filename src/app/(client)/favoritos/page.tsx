@@ -17,7 +17,7 @@ export default async function FavoritesPage() {
     listPublicProperties(),
   ]);
   const favoriteIds = new Set(ids);
-  const properties = catalog.filter((property) => favoriteIds.has(property.id) && !property.demo);
+  const properties = catalog.filter((property) => favoriteIds.has(property.id));
 
   return (
     <div className="site-frame">

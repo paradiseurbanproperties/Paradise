@@ -26,7 +26,6 @@ export default async function HomePage() {
   const favoriteIds = new Set(favoriteState.ids);
   const featured = properties
     .filter((property) => property.featured)
-    .sort((first, second) => Number(second.demo) - Number(first.demo))
     .slice(0, 12);
 
   return (
@@ -77,9 +76,7 @@ export default async function HomePage() {
             </motion.form>
             <p className="intro__note">
               <span aria-hidden="true" className="intro__note-dot" />
-              {properties.some((property) => property.demo)
-                ? "Selección editorial de espacios residenciales"
-                : "Inventario actualizado desde Paradise"}
+              Inventario actualizado desde Paradise
             </p>
           </motion.div>
 
@@ -127,11 +124,6 @@ export default async function HomePage() {
             </div>
             <Link className="text-link" href="/propiedades">Explorar el catálogo ↗</Link>
           </div>
-          {featured.some((property) => property.demo) ? (
-            <p className="demo-banner">
-              Las fichas con sello «Ilustrativa» muestran referencias de precio, ubicación y fotografía; no representan ofertas vigentes.
-            </p>
-          ) : null}
           {featured.length ? (
             <div className="property-grid">
               {featured.map((property, index) => (

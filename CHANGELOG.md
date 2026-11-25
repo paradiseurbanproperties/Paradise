@@ -2,6 +2,22 @@
 
 Los cambios relevantes del proyecto se registran aquí. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado semántico cuando exista software ejecutable.
 
+## [0.20.7] — 2026-11-25
+
+### Inventario y funciones de propiedades
+- El código habilita los flujos normales para las doce propiedades: consulta, favoritos, listas, comparación, vistas, actividad, visitas, mapas y administración CRUD. Se eliminaron las restricciones de interfaz que ocultaban estas acciones.
+- Se retiró el publicador por lote para evitar que reemplazara cambios guardados; las fichas existentes se editan desde el formulario estándar de Admin.
+- El catálogo ya no sustituye una conexión Supabase ausente con filas locales; las URLs antiguas se normalizan al slug canónico.
+- Migración 0025 limpia slugs, textos y la nota interna de ubicación. El usuario reporta 0024 aplicada; 0025 aún debe aplicarse en Supabase, pues el RPC remoto seguirá rechazando slugs antiguos hasta entonces. `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan; no se ejecutó build ni pruebas.
+
+## [0.20.6] — 2026-11-25 (local)
+
+### Solicitudes y agenda de visitas
+- Clientes autenticados pueden proponer una visita de una hora desde una propiedad disponible y consultar/cancelar sus solicitudes en `/mis-visitas`.
+- Agente asignado y Admin gestionan solicitudes en `/agente/visitas` y `/admin/visitas`; pueden confirmar, rechazar, reprogramar, cancelar y registrar resultado. El historial queda guardado por trigger.
+- Migración 0024 restringe lectura/escritura por RLS y usa RPC/advisory lock para validar conflictos de propiedad/agente, fechas, estados y límite por Cliente; el acceso del agente también requiere una asignación que siga vigente.
+- Solo local: no se aplicó la migración ni se probó Supabase remoto. `pnpm lint` y `pnpm typecheck` pasan; build y pruebas no ejecutados.
+
 ## [0.20.5] — 2026-11-25 (local)
 
 ### Selección residencial ilustrativa

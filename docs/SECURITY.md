@@ -111,3 +111,10 @@ No hay proyecto Supabase, políticas activas, pruebas de penetración, rate limi
 ## Avisos SMTP de CRM
 
 El envío usa una contraseña de aplicación Gmail en `CRM_GMAIL_APP_PASSWORD`, variable solo de servidor. El destinatario está fijo al correo del proyecto; el correo validado del visitante solo se usa como Reply-To. Los datos proceden del formulario ya validado en servidor. SMTP no se ejecuta cuando la RPC rechaza la consulta. La migración 0023 desactiva las funciones de respuesta/cola de 0022. Aún no se ha comprobado entrega real ni estado remoto de la migración.
+
+## Solicitudes de visita — migración 0024
+
+- Solo Cliente activo puede crear/cancelar su propia solicitud mediante RPC; agente activo con asignación vigente a la propiedad y Admin activo pueden leer y gestionar visitas dentro de su alcance. Revocar la asignación retira de inmediato el acceso del agente. No existe INSERT/UPDATE/DELETE directo concedido a roles de usuario.
+- Las RPC validan propiedad aprobada/disponible y elegibilidad Premium, fechas de 2 horas a 90 días, límite de cinco solicitudes activas por Cliente en 24 h y transiciones de estado. Tras aplicar 0025, las doce propiedades actuales cumplen el mismo flujo.
+- Una advisory lock transaccional serializa solicitudes, confirmaciones y reprogramaciones; rechaza solapes de una hora por propiedad o agente. El trigger registra estados/horarios previos y nuevos; el historial es de solo lectura para los actores autorizados.
+- El usuario reporta que 0024 ya fue aplicada; no verificamos el historial remoto. La migración 0025 normaliza sus filas para que no activen el filtro legado de slug/descripción de la RPC; aún debe aplicarse en Supabase. La prueba de concurrencia y la matriz de RLS siguen pendientes.

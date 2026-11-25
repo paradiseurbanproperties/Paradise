@@ -2,12 +2,12 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { AdminPropertyForm } from "@/features/properties/components/admin-property-form";
-import { DemoPropertiesPublisher } from "@/features/properties/components/demo-properties-publisher";
 import { DeletePropertyButton, PropertyPublicationForm } from "@/features/properties/components/admin-property-controls";
 import { PropertyImageManager } from "@/features/properties/components/property-image-manager";
 import { requireProfileRole } from "@/lib/permissions/access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createPropertyImageUrlMap } from "@/features/properties/services/property-images";
+import { cleanLegacyPropertyCopy, getCanonicalPropertySlug } from "@/features/properties/repositories/property-repository";
 import type { PropertyStatus, PropertyVisibility } from "@/features/properties/types/property";
 
 export const metadata = { title: "Administrar propiedades" };
@@ -63,10 +63,6 @@ export default async function AdminPropertiesPage() {
             </p>
           </header>
 
-          <section className="admin-properties-panel admin-demo-properties-panel" aria-label="Propiedades de demostración">
-            <DemoPropertiesPublisher />
-          </section>
-
           <section className="admin-properties-panel" aria-labelledby="create-property-heading">
             <div className="admin-properties-panel__heading">
               <div><p className="eyebrow">Nuevo inmueble</p><h2 id="create-property-heading">Crear una propiedad</h2></div>
@@ -93,8 +89,9 @@ export default async function AdminPropertiesPage() {
                     .map((image) => ({
                       id: image.id,
                       src: signedUrls.get(image.storage_path) ?? "/images/property-placeholder.svg",
-                      alt: image.alt_text || property.title,
+                      alt: cleanLegacyPropertyCopy(image.alt_text || property.title),
                     }));
+                  const canonicalSlug = getCanonicalPropertySlug(property.slug);
 
                   return (
                     <article className="admin-property-row" key={property.id}>
@@ -102,7 +99,7 @@ export default async function AdminPropertiesPage() {
                         <div>
                           <p className="eyebrow">{typeLabels[property.property_type] ?? property.property_type} · {property.city}, {property.state}</p>
                           <h3>{property.title}</h3>
-                          <p>{property.slug} · {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(Number(property.price))}</p>
+                          <p>{canonicalSlug} · {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(Number(property.price))}</p>
                         </div>
                         <span className={`property-publication-badge property-publication-badge--${property.publication_status}`}>
                           {property.publication_status === "approved" ? "Publicada" : property.publication_status === "pending" ? "Pendiente" : property.publication_status === "archived" ? "Archivada" : property.publication_status === "rejected" ? "Rechazada" : "Borrador"}
@@ -122,7 +119,7 @@ export default async function AdminPropertiesPage() {
                         <AdminPropertyForm initial={{
                           id: property.id,
                           title: property.title,
-                          description: property.description,
+                          description: cleanLegacyPropertyCopy(property.description),
                           features: (property.property_feature_values ?? []).flatMap((item) => {
                             const feature = Array.isArray(item.property_features) ? item.property_features[0] : item.property_features;
                             return feature?.label ? [feature.label] : [];
@@ -134,7 +131,7 @@ export default async function AdminPropertiesPage() {
                           parking: property.parking,
                           builtArea: Number(property.built_area),
                           landArea: Number(property.land_area),
-                          address: details.address,
+                          address: cleanLegacyPropertyCopy(details.address),
                           neighborhood: property.neighborhood,
                           city: property.city,
                           state: property.state,
@@ -152,7 +149,7 @@ export default async function AdminPropertiesPage() {
                       </div>
 
                       <div className="admin-property-row__footer">
-                        <Link className="text-link" href={`/propiedad/${property.slug}`}>Ver ficha pública ↗</Link>
+                        <Link className="text-link" href={`/propiedad/${canonicalSlug}`}>Ver ficha pública ↗</Link>
                         <DeletePropertyButton propertyId={property.id} />
                       </div>
                     </article>

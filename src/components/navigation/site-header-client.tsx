@@ -254,6 +254,7 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
                       <ProfileMenuLink current={isCurrent("/premium")} href="/premium" label="Premium y suscripción" onClick={closeMenus} />
                       {session.role === "client" ? <>
                         <ProfileMenuLink current={isCurrent("/favoritos")} href="/favoritos" label="Favoritos y listas" onClick={closeMenus} />
+                        <ProfileMenuLink current={isCurrent("/mis-visitas")} href="/mis-visitas" label="Mis visitas" onClick={closeMenus} />
                         <ProfileMenuLink current={isCurrent("/mi-actividad")} href="/mi-actividad" label="Mi actividad" onClick={closeMenus} />
                         <ProfileMenuLink badge={profileStats?.unreadCount} current={isCurrent("/notificaciones")} href="/notificaciones" label="Notificaciones" onClick={closeMenus} />
                       </> : null}
@@ -263,6 +264,7 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
                         <p className="site-profile-menu__heading">Herramientas de agente</p>
                         <ProfileMenuLink current={isCurrent("/agente")} href="/agente" label="Mi cartera" onClick={closeMenus} />
                         <ProfileMenuLink current={isCurrent("/agente/leads")} href="/agente/leads" label="CRM" onClick={closeMenus} />
+                        <ProfileMenuLink current={isCurrent("/agente/visitas")} href="/agente/visitas" label="Visitas" onClick={closeMenus} />
                       </div>
                     ) : null}
                     {session.role === "admin" ? (
@@ -274,6 +276,7 @@ export function SiteHeaderClient({ session }: SiteHeaderClientProps) {
                         <ProfileMenuLink current={isCurrent("/admin/usuarios")} href="/admin/usuarios" label="Usuarios" onClick={closeMenus} />
                         <ProfileMenuLink current={isCurrent("/admin/agentes")} href="/admin/agentes" label="Agentes" onClick={closeMenus} />
                         <ProfileMenuLink current={isCurrent("/admin/leads")} href="/admin/leads" label="CRM" onClick={closeMenus} />
+                        <ProfileMenuLink current={isCurrent("/admin/visitas")} href="/admin/visitas" label="Visitas" onClick={closeMenus} />
                         <ProfileMenuLink current={isCurrent("/admin/configuracion")} href="/admin/configuracion" label="Configuración" onClick={closeMenus} />
                       </div>
                     ) : null}

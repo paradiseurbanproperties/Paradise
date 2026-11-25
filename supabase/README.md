@@ -8,8 +8,10 @@ Al iniciar las fases de backend se deberá:
 2. Confirmar disponibilidad de PostGIS y políticas de Storage en el plan elegido.
 3. Las migraciones 0001–0020 constan funcionales según los reportes del usuario; no repetirlas. No se inspeccionó el historial remoto.
 4. Activar RLS y grants mínimos en todas las tablas expuestas antes de conceder acceso vía Data API.
-5. Probar políticas bajo cada rol y crear `seed.sql` con datos demostrativos identificados como ficticios.
+5. Probar políticas bajo cada rol y conservar un inventario de propiedades consistente con las funciones habilitadas en la aplicación.
 6. Mantener la clave `service_role` exclusivamente en el servidor.
+
+Fase de visitas: `migrations/202611250024_property_visits.sql` agrega solicitudes, historial, RLS y RPC transaccionales; el usuario reporta que ya la aplicó, sin verificación independiente. `migrations/202611250025_property_inventory_standardization.sql` limpia los slugs/textos del inventario y mantiene sus relaciones para habilitar el mismo flujo en las doce propiedades. 0025 está en el repositorio, pero no se ha aplicado en Supabase.
 
 Fase 4: configurar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` en `.env.local`, y permitir `http://localhost:3000/auth/callback` en Supabase Auth. El usuario reportó aplicar `202611230001_auth_foundation.sql`.
 

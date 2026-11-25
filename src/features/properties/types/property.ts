@@ -33,7 +33,6 @@ export type Property = {
   features: string[];
   images: PropertyImage[];
   featured: boolean;
-  demo: boolean;
 };
 
 export type PropertySearchParams = Record<string, string | string[] | undefined>;

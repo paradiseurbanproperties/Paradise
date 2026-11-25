@@ -4,11 +4,11 @@
 
 ## Esquema versionado implementado en Fase 6
 
-La migración `202611230003_properties.sql` define `properties`, `agent_assignments`, `property_images`, `property_features` y `property_feature_values`, con claves foráneas, restricciones, índices y RLS. El usuario informa que la aplicó sin error. `202611230004_property_price_history.sql` añade valores anterior/nuevo, actor, fecha y motivo opcional con trigger transaccional, acceso de lectura por visibilidad y sin grants de modificación directa; el usuario confirmó que el historial funciona. Las tablas pueden seguir vacías hasta que se ingresen inmuebles; la interfaz no carga ejemplos ficticios cuando Supabase está configurado.
+La migración `202611230003_properties.sql` define `properties`, `agent_assignments`, `property_images`, `property_features` y `property_feature_values`, con claves foráneas, restricciones, índices y RLS. El usuario informa que la aplicó sin error. `202611230004_property_price_history.sql` añade valores anterior/nuevo, actor, fecha y motivo opcional con trigger transaccional, acceso de lectura por visibilidad y sin grants de modificación directa; el usuario confirmó que el historial funciona. El catálogo siempre consulta Supabase; una conexión ausente o inventario vacío produce un estado vacío, sin filas locales de reemplazo.
 
-### Carga por lote de propiedades ficticias
+### Inventario actual
 
-`/admin/propiedades` incluye una Server Action Admin-only que, tras un clic, prepara hasta doce propiedades ilustrativas con precios/superficies referenciales, colonia/ciudad, puntos de mapa aproximados, características y una foto por propiedad en `property-images`. El identificador interno es `FICHA DE DEMOSTRACIÓN`; la capa pública presenta una etiqueta discreta de contenido ilustrativo e informa que las cifras son referenciales y no una oferta vigente. Slugs fijos permiten evitar duplicados. La acción actualiza los títulos, descripciones y textos alternativos de las fichas previas. Las filas de Supabase aún requieren que un Admin ejecute el botón tras el despliegue; no se verificó inserción remota en esta sesión.
+El usuario reporta que las doce propiedades ya están guardadas en Supabase. Se gestionan desde la lista y los formularios CRUD de `/admin/propiedades`, igual que cualquier otra fila. Las migraciones `202611250024_property_visits.sql` y `202611250025_property_inventory_standardization.sql` mantienen la misma autorización y las mismas funciones de catálogo; 0025 normaliza los slugs, descripción, textos alternativos y ubicación interna sin cambiar IDs ni relaciones.
 
 - `properties` conserva la ficha, precio, ubicación, coordenadas, estado comercial, visibilidad y moderación. `created_by` y `approved_by` enlazan a `profiles`.
 - `agent_assignments` enlaza agentes (`profiles`) y propiedades; una asignación puede revocarse y solo puede existir una asignación activa por pareja.
@@ -43,7 +43,7 @@ La ubicación indexada PostGIS se sincroniza con la coordenada aproximada públi
 
 ### Persistencia de propiedades e imágenes
 
-Cada casa/departamento/terreno real tendrá una fila en `properties`, y cada fotografía asociada tendrá su propia fila en `property_images` con FK a la propiedad, ruta Storage, texto alternativo, orden e indicador de portada. Los archivos binarios se guardarán en Supabase Storage del mismo proyecto, no en columnas `bytea` de PostgreSQL; la ruta y metadatos persistidos en Postgres mantienen la relación consultable entre ficha e imágenes. La aplicación lee el catálogo y metadata desde Supabase y sirve las fotos desde Storage con reglas acordes al estado de publicación y visibilidad. Los datos de demostración solo se usan cuando Supabase no está configurado.
+Cada inmueble tiene una fila en `properties`, y cada fotografía asociada tiene su propia fila en `property_images` con FK a la propiedad, ruta Storage, texto alternativo, orden e indicador de portada. Los archivos binarios se guardan en Supabase Storage del mismo proyecto, no en columnas `bytea` de PostgreSQL; la ruta y metadatos persistidos en Postgres mantienen la relación consultable entre ficha e imágenes. La aplicación lee el catálogo y metadata desde Supabase y sirve las fotos desde Storage con reglas acordes al estado de publicación y visibilidad.
 
 El bucket privado `property-images` está preparado en la migración inicial; las policies de objetos esperan a las tablas de propiedades/asignaciones para validar acceso con precisión.
 
@@ -60,9 +60,11 @@ La ubicación física de Storage se versionará por propiedad, por ejemplo `{pro
 
 ## Visitas y agenda
 
-- `visit_requests`: UUID, propiedad, cliente autenticado opcional (admite consulta pública si se decide), agente asignado, nombre/correo/teléfono necesarios para contacto, `starts_at`, `ends_at`, comentarios, estado, creador, timestamps.
-- `visit_request_history`: UUID, visita, estado anterior/nuevo, actor, comentario, fecha; solo inserción para usuario común.
-- `agent_availability`: UUID, agente, inicio/fin, tipo de disponibilidad/bloqueo y recurrencia definida explícitamente. Restricciones para intervalos válidos.
+- La migración `202611250024_property_visits.sql` crea `visit_requests` y `visit_request_history`. La solicitud requiere Cliente autenticado y guarda nombre/correo del perfil, propiedad, horario propuesto de una hora, mensaje opcional, agente asignado activo (si lo hay), estado y timestamps.
+- El cliente propone una fecha en su zona local; el navegador la normaliza a UTC. El agente asignado o Admin confirma, rechaza, reprograma, cancela o registra resultado. El cliente consulta su agenda e historial y puede cancelar antes del inicio.
+- Las escrituras pasan por `request_property_visit`, `change_property_visit` y `cancel_own_property_visit`; el usuario no puede actualizar directamente estados o actores. El trigger registra estado y horario anterior/nuevo.
+- Las políticas RLS dejan leer al Cliente propietario, al Agente activo asignado y a Admin activo. Una advisory lock serializa escritura/confirmación y la RPC rechaza cruces horarios para la misma propiedad o agente.
+- El usuario reporta 0024 aplicada en Supabase; esta sesión no inspeccionó su historial. La migración 0025 está en el repositorio y debe aplicarse para normalizar las doce propiedades. No hay selector de espacios libres publicado: el cliente propone horario y el equipo confirma disponibilidad.
 
 Los conflictos de horario se deben evitar en una transacción con restricción de exclusión PostgreSQL para el agente y periodo (requiere `btree_gist`) o una rutina SQL atómica; no depender de una comprobación solo en navegador.
 

@@ -1,9 +1,7 @@
-import { demoProperties } from "@/features/properties/data/demo-properties";
 import type { Property } from "@/features/properties/types/property";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createPropertyImageUrlMap } from "@/features/properties/services/property-images";
-import { illustrativePropertyCopy } from "@/features/properties/data/demo-property-copy";
 
 const propertyTypeLabels: Record<string, Property["type"]> = {
   house: "Casa",
@@ -16,6 +14,25 @@ const placeholderImage = {
   src: "/images/property-placeholder.svg",
   alt: "Propiedad sin fotografía disponible",
 };
+
+const legacyPropertySlugs: Record<string, string> = {
+  "demo-casa-patio-de-luz": "casa-patio-de-luz",
+  "demo-casa-juriquilla-encino": "casa-juriquilla-encino",
+  "demo-casa-lomas-del-parque": "casa-lomas-del-parque",
+  "demo-casa-chapalita": "casa-arboleda-chapalita",
+  "demo-casa-valle-norte": "casa-valle-norte",
+  "demo-casa-fresnos-coyoacan": "casa-fresnos-de-coyoacan",
+  "demo-casa-valle-real-zapopan": "casa-vistahermosa-valle-real",
+  "demo-casa-roble-temozon": "casa-roble-de-temozon",
+  "demo-casa-mar-de-cortes": "casa-mar-de-cortes",
+  "demo-casa-bosque-niebla": "casa-bosque-de-niebla",
+  "demo-casa-arboledas-calera": "casa-arboledas-de-la-calera",
+  "demo-casa-cumbres-monterrey": "casa-cumbres-del-norte",
+};
+
+export function getCanonicalPropertySlug(slug: string): string {
+  return legacyPropertySlugs[slug] ?? slug;
+}
 
 type PropertyCatalogRow = {
   id: string;
@@ -65,14 +82,13 @@ function summarize(description: string): string {
   return clean.length > 150 ? `${clean.slice(0, 147).trimEnd()}…` : clean;
 }
 
-function isIllustrativeProperty(row: Pick<PropertyCatalogRow, "slug" | "description">): boolean {
-  return row.slug.startsWith("demo-casa-") || row.description.startsWith("FICHA DE DEMOSTRACIÓN");
-}
-
-function getPublicDescription(row: Pick<PropertyCatalogRow, "slug" | "description">): string {
-  if (!isIllustrativeProperty(row)) return row.description;
-  return illustrativePropertyCopy[row.slug]
-    ?? row.description.replace(/^FICHA DE DEMOSTRACIÓN\.\s*/u, "");
+export function cleanLegacyPropertyCopy(value: string): string {
+  return value
+    .replace(/^FICHA DE DEMOSTRACIÓN\.\s*/u, "")
+    .replace(/^Fotografía ilustrativa de una casa en /u, "Fotografía de una casa en ")
+    .replace(/^Domicilio de referencia en /u, "")
+    .replace(/; no usar para visitas\.$/u, "")
+    .replace(/^Demo\s*·\s*/u, "");
 }
 
 async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> {
@@ -84,8 +100,8 @@ async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> 
       .sort((a, b) => Number(b.is_cover) - Number(a.is_cover) || a.sort_order - b.sort_order)
       .flatMap((image) => {
         const src = signedUrls.get(image.storage_path);
-        const title = row.title.replace(/^Demo\s*·\s*/u, "");
-        return src ? [{ src, alt: isIllustrativeProperty(row) ? `Fotografía ilustrativa de ${title}` : image.alt_text || title }] : [];
+        const title = cleanLegacyPropertyCopy(row.title);
+        return src ? [{ src, alt: cleanLegacyPropertyCopy(image.alt_text || title) }] : [];
       });
     const features = row.property_feature_values.flatMap((featureValue) => {
       const feature = Array.isArray(featureValue.property_features)
@@ -96,10 +112,10 @@ async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> 
 
     return {
       id: row.id,
-      slug: row.slug,
-      title: row.title.replace(/^Demo\s*·\s*/u, ""),
-      summary: summarize(getPublicDescription(row)),
-      description: getPublicDescription(row),
+      slug: getCanonicalPropertySlug(row.slug),
+      title: cleanLegacyPropertyCopy(row.title),
+      summary: summarize(cleanLegacyPropertyCopy(row.description)),
+      description: cleanLegacyPropertyCopy(row.description),
       type: propertyTypeLabels[row.property_type] ?? "Casa",
       price: Number(row.price),
       currency: "MXN",
@@ -120,16 +136,13 @@ async function mapPropertyRows(rows: PropertyCatalogRow[]): Promise<Property[]> 
       features,
       images: images.length ? images : [placeholderImage],
       featured: row.featured,
-      demo: isIllustrativeProperty(row),
     } satisfies Property;
   });
 }
 
-/** Lee únicamente el inventario autorizado por RLS; los ejemplos solo se usan sin Supabase. */
+/** Lee únicamente publicaciones autorizadas por RLS. */
 export async function listPublicProperties(): Promise<Property[]> {
-  if (!getSupabasePublicConfig()) {
-    return demoProperties.filter((property) => property.visibility !== "premium");
-  }
+  if (!getSupabasePublicConfig()) return [];
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
@@ -152,7 +165,7 @@ export async function listPublicPropertySitemapEntries(): Promise<Array<{ slug: 
   if (!getSupabasePublicConfig()) return [];
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.from("properties")
-    .select("slug,updated_at,description")
+    .select("slug,updated_at")
     .eq("publication_status", "approved")
     .in("visibility", ["public", "both"])
     .order("updated_at", { ascending: false })
@@ -161,9 +174,7 @@ export async function listPublicPropertySitemapEntries(): Promise<Array<{ slug: 
     console.error("[properties] No se pudieron cargar URLs públicas para sitemap", { code: error.code });
     return [];
   }
-  return (data ?? [])
-    .filter((row) => !isIllustrativeProperty(row))
-    .map((row) => ({ slug: row.slug, updatedAt: row.updated_at }));
+  return (data ?? []).map((row) => ({ slug: getCanonicalPropertySlug(row.slug), updatedAt: row.updated_at }));
 }
 
 export async function listPublicPropertiesNearby({
@@ -212,7 +223,8 @@ export async function listPublicPropertiesNearby({
 }
 
 export async function findPublicPropertyBySlug(slug: string): Promise<Property | undefined> {
-  return (await listPublicProperties()).find((property) => property.slug === slug);
+  const canonicalSlug = getCanonicalPropertySlug(slug);
+  return (await listPublicProperties()).find((property) => property.slug === canonicalSlug);
 }
 
 export type PublicPriceHistoryEntry = {

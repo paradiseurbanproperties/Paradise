@@ -29,7 +29,7 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
           className="property-card__image"
           fill
           priority={priority}
-          unoptimized={!property.demo || cover.src.includes("/storage/v1/object/")}
+          unoptimized
           sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw"
           src={cover.src}
         />
@@ -40,7 +40,7 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
       </Link>
 
       <div className="property-card__tools">
-        {showFavoriteControl && !property.demo ? <FavoriteToggle canFavorite={canFavorite} isFavorite={isFavorite} propertyId={property.id} /> : null}
+        {showFavoriteControl ? <FavoriteToggle canFavorite={canFavorite} isFavorite={isFavorite} propertyId={property.id} /> : null}
         <CompareToggle propertyId={property.id} />
       </div>
 
@@ -62,7 +62,7 @@ export function PropertyCard({ property, priority = false, showFavoriteControl =
         </ul>
         <div className="property-card__footer">
           <p className="property-card__price">
-            <span>{property.demo ? "Precio referencial" : "Precio"}</span>
+            <span>Precio</span>
             {formatPropertyPrice(property.price, property.currency)}
           </p>
           <Link className="property-card__link" href={`/propiedad/${property.slug}`}>

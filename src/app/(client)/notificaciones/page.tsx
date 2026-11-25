@@ -24,7 +24,7 @@ export default async function NotificationsPage() {
     listOwnNotifications(),
     listPublicProperties(),
   ]);
-  const visibleProperties = new Map(properties.filter((property) => !property.demo).map((property) => [property.id, property]));
+  const visibleProperties = new Map(properties.map((property) => [property.id, property]));
 
   return (
     <div className="site-frame">

@@ -28,7 +28,7 @@ export default async function FavoriteListDetailPage({ params }: { params: Promi
     notFound();
   }
 
-  const propertyById = new Map(catalog.filter((property) => !property.demo).map((property) => [property.id, property]));
+  const propertyById = new Map(catalog.map((property) => [property.id, property]));
   const properties = listResult.list.propertyIds.flatMap((propertyId) => {
     const property = propertyById.get(propertyId);
     return property ? [property] : [];
@@ -36,7 +36,7 @@ export default async function FavoriteListDetailPage({ params }: { params: Promi
   const currentFavorites = new Set(favoriteResult.ids);
   const candidates = favoriteResult.unavailable
     ? []
-    : catalog.filter((property) => !property.demo && currentFavorites.has(property.id) && !listResult.list?.propertyIds.includes(property.id))
+    : catalog.filter((property) => currentFavorites.has(property.id) && !listResult.list?.propertyIds.includes(property.id))
       .map(({ id: propertyId, title }) => ({ id: propertyId, title }));
 
   return (

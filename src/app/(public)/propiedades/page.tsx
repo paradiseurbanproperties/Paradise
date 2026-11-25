@@ -35,7 +35,6 @@ export default async function PropertiesPage({
   const canFavorite = access?.role === "client" && access.status === "active";
   const showFavoriteControl = !access || canFavorite;
   const favoriteIds = new Set(favoriteState.ids);
-  const isDemoCatalog = properties.some((property) => property.demo);
   const result = filterAndPaginateProperties(properties, filters);
   const firstResult = result.totalItems === 0 ? 0 : (result.page - 1) * result.pageSize + 1;
   const lastResult = Math.min(result.page * result.pageSize, result.totalItems);
@@ -54,9 +53,7 @@ export default async function PropertiesPage({
             <p className="eyebrow">Catálogo · Paradise</p>
             <h1 className="page-title">Encuentra un lugar para llamar tuyo.</h1>
             <p className="page-description">
-              {isDemoCatalog
-                ? "Explora una selección editorial de espacios. Las fichas con sello «Ilustrativa» presentan información y precios referenciales."
-                : "Explora las propiedades disponibles y encuentra el espacio adecuado para ti."}
+              Explora las propiedades disponibles y encuentra el espacio adecuado para ti.
             </p>
           </motion.header>
 
@@ -78,9 +75,7 @@ export default async function PropertiesPage({
 
           <div className="catalog-results-heading">
             <div>
-              <p className="catalog-results-heading__eyebrow">
-                {isDemoCatalog ? "Selección editorial" : "Propiedades publicadas"}
-              </p>
+              <p className="catalog-results-heading__eyebrow">Propiedades publicadas</p>
               <h2>
                 {result.totalItems} {result.totalItems === 1 ? "propiedad" : "propiedades"}
               </h2>

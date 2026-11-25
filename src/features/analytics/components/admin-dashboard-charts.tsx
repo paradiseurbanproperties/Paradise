@@ -189,7 +189,7 @@ export function PropertyViewTrendChart({ points, windowDays }: { points: Propert
           ))}
         </svg>
       )}
-      <p className="analytics-chart__caption">Una vista por ficha, por pestaña y día. Los datos de demostración no se cuentan.</p>
+      <p className="analytics-chart__caption">Una vista por ficha, por pestaña y día; se omiten las recargas repetidas.</p>
     </figure>
   );
 }

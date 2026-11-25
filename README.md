@@ -32,7 +32,7 @@ Catálogo y detalle de propiedades; búsqueda y mapas; autenticación y perfiles
 
 ### Estado implementado del catálogo
 
-La experiencia pública incluye portada con búsqueda, tarjetas, filtros, ordenamiento, paginación, fichas con mapa cuando la propiedad tiene coordenadas y una vista `/propiedades/mapa`. Si Supabase no está configurado se usan ejemplos ficticios etiquetados; si está configurado, se consultan publicaciones aprobadas y un inventario vacío no se sustituye por anuncios ficticios. Las fichas viven en Postgres; cada foto tiene registro en `property_images` y su archivo binario se almacena en el bucket privado de Supabase Storage, vinculado por ruta y FK. El historial transaccional de precios de la migración 0004 ya fue probado por el usuario. Mapas sincroniza resultados por radio usando PostGIS; la migración 0005 consta aplicada según consulta del usuario; el mapa no inventa coordenadas para propiedades sin ubicación guardada.
+La experiencia pública incluye portada con búsqueda, tarjetas, filtros, ordenamiento, paginación, fichas con mapa cuando la propiedad tiene coordenadas y una vista `/propiedades/mapa`. El catálogo carga desde Supabase y muestra un estado vacío cuando el servicio no está configurado o no hay publicaciones aprobadas. Las fichas viven en Postgres; cada foto tiene registro en `property_images` y su archivo binario se almacena en el bucket privado de Supabase Storage, vinculado por ruta y FK. El historial transaccional de precios de la migración 0004 ya fue probado por el usuario. Mapas sincroniza resultados por radio usando PostGIS; la migración 0005 consta aplicada según consulta del usuario; el mapa no inventa coordenadas para propiedades sin ubicación guardada.
 
 ## Diseño funcional previsto
 
@@ -50,7 +50,7 @@ Fase 6 conecta el catálogo con Supabase y su panel Admin para gestionar fichas,
 
 ### Herramientas del cliente
 
-Clientes pueden guardar favoritos, organizarlos en listas propias, comparar hasta cuatro propiedades y consultar su actividad. Solicitudes de visita siguen pendientes. El historial personal conserva consultas a fichas, favoritos y consultas CRM, con límite de 500 eventos por cuenta; el usuario confirma que funciona. Las visitas no reservan ni compran una propiedad. El historial de precio registra actor, fecha, valor anterior/nuevo y motivo opcional mediante operación atómica.
+Clientes pueden guardar favoritos, organizarlos en listas propias, comparar hasta cuatro propiedades, consultar su actividad y solicitar una visita en horario propuesto. El equipo confirma, rechaza o reprograma desde las agendas de Agente/Admin; la base impide cruces para la misma propiedad o agente. El usuario reporta que aplicó 0024; no se verificó el historial remoto. La migración 0025 normaliza los slugs y descripciones del inventario existente y aún debe aplicarse en Supabase. El historial personal conserva consultas a fichas, favoritos y consultas CRM, con límite de 500 eventos por cuenta; el usuario confirma que funciona.
 
 ### Premium simulado
 

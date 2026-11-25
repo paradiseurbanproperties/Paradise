@@ -60,6 +60,15 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - Se tomó una sola muestra de TTFB por ruta; no reemplaza Lighthouse, Web Vitals ni prueba de carga.
 - La inspección visual con teclado/lector de pantalla, iPhone/Safari y Android/Chrome y los flujos con cuentas Supabase no se repitieron en este incremento.
 
+## Visitas — migraciones 0024 y 0025
+
+- El usuario reporta que aplicó `202611250024_property_visits.sql`; esta sesión no inspeccionó el historial remoto. Antes de validar el inventario actual, aplicar `202611250025_property_inventory_standardization.sql` después de 0024 y comprobar que conserva las doce filas y sus relaciones.
+- Cliente activo: solicitud desde propiedad disponible, horario local convertido a UTC, validación de dos horas–90 días, consulta propia, historial y cancelación antes del inicio; rechazar cliente suspendido, visitante, propiedad cerrada/no visible, UUID/fecha inválidos y exceso de longitud del mensaje.
+- Agente: ver únicamente solicitudes de propiedades con asignación vigente; confirmar/rechazar, reprogramar, cancelar y marcar realizada/inasistencia. Tras revocar la asignación debe perder lectura y gestión de visitas previas. Admin: gestionar todas. Agente no asignado, Cliente y cuenta suspendida no deben cambiar estados ni leer solicitudes ajenas.
+- En base aislada, dos solicitudes solapadas de la misma propiedad y de un mismo agente no deben confirmarse simultáneamente; probar escrituras concurrentes, reprogramación, cancelación que libera el horario y transiciones inválidas. Verificar que cada cambio de estado/horario aparezca en `visit_request_history`.
+- El flujo usa propuestas de horario con confirmación del equipo; todavía no publica un selector de disponibilidad en tiempo real.
+- Como Cliente, comprobar en las doce fichas guardar/quitar favorito, lista, comparar, actividad, consulta CRM y solicitud de visita; como Agente/Admin comprobar agenda, CRM, mapa y CRUD. Las fichas deben pasar por las reglas normales de publicación y disponibilidad.
+
 ## Fase 4 — Auth y migración inicial
 
 - Unitarias: normalización/validación de email, longitud de contraseña, coincidencia de confirmación, rechazo de parámetros extras de redirección.
@@ -131,7 +140,7 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - Implementación inicial revisada con `pnpm lint`, `pnpm typecheck` y `git diff --check`.
 - El usuario confirma que los perfiles 0011 funcionan tras aplicarla. Admin puede crear/editar perfil de cuenta con rol Agente; slug duplicado se rechaza; los límites de listas y biografía se validan; visitante lee solo perfil publicado de agente activo; cuenta suspendida y perfil despublicado no aparecen; Cliente/Agente no guardan datos profesionales; Admin puede despublicar incluso perfil de cuenta suspendida.
 - El usuario confirma que el dashboard de cartera y las asignaciones funcionan tras aplicar 0012. La matriz independiente pendiente de Fase 14 comprobará roles, cuenta suspendida, asignación revocada, borrador y visibilidad pública.
-- CRM 0013: una consulta válida crea un lead y lo asigna al agente activo de la propiedad; sin agente activo queda visible solo a Admin; propiedad demo, vendida, no aprobada, privada sin entitlement o consentimiento falso no crea lead; el cuarto envío reciente del mismo correo/propiedad se limita; visitante/Cliente no leen leads; agente asignado sí; otro agente y cuenta suspendida no; cambios de etapa generan historial; notas solo aparecen a equipo autorizado; Admin y Agente no escriben notas como otro actor.
+- CRM 0013: una consulta válida crea un lead y lo asigna al agente activo de la propiedad; sin agente activo queda visible solo a Admin; propiedad vendida, no aprobada, privada sin entitlement o consentimiento falso no crea lead; el cuarto envío reciente del mismo correo/propiedad se limita; visitante/Cliente no leen leads; agente asignado sí; otro agente y cuenta suspendida no; cambios de etapa generan historial; notas solo aparecen a equipo autorizado; Admin y Agente no escriben notas como otro actor.
 - API CRM: rechazar origin ausente/foráneo, content type distinto de JSON, JSON inválido y body mayor a 4 KiB; en desarrollo local aceptar solo origen con el mismo host; honeypot lleno responde éxito sin insertar lead; el rate limit por correo/propiedad del RPC sigue activo. El usuario decidió omitir el rate limit WAF por costo, así que no se espera un 429 de firewall.
 - API analytics: confirmar que el body mayor a 512 bytes se corta durante lectura, no tras cargarlo completo; comprobar origin/content type/JSON/UUID inválidos y respuesta 503 controlada ante fallo de RPC.
 - Revisar estados sin migración, sin agentes, sin biografía/listas y en móvil. No presentar un perfil ficticio si no hay cuentas reales.
@@ -142,7 +151,7 @@ La fase que introduzca cada función define sus casos de prueba y resultado obse
 - Estado del incremento: favoritos y comparación implementados; `pnpm lint`, `pnpm typecheck`, parseo PostCSS y `git diff --check` se ejecutan tras los cambios. No se ejecutó suite de pruebas ni pruebas de producto.
 - Aplicar 0014 en el proyecto Supabase antes de probar persistencia. Con dos Clientes, confirmar que cada uno solo ve/retira sus propios favoritos; una cuenta suspendida o rol distinto no debe leer ni escribir. Comprobar alta, baja, duplicado idempotente y rechazo de propiedad que no sea visible.
 - Probar `/favoritos` vacío, propiedad eliminada/archivada, error de esquema pendiente y acceso no Cliente. Confirmar que al volver a cargar se conservan filas guardadas.
-- Probar comparación con una, cuatro y cinco propiedades; persistencia al navegar/recargar; quitar una y vaciar lista. Si hay IDs viejos/no visibles, deben quedar fuera de la tabla y la página debe permitir limpiar la selección guardada. La interfaz debe identificar datos demo y no presentar datos ficticios como reales.
+- Probar comparación con una, cuatro y cinco propiedades; persistencia al navegar/recargar; quitar una y vaciar lista. Si hay IDs viejos/no visibles, deben quedar fuera de la tabla y la página debe permitir limpiar la selección guardada. Las doce propiedades del inventario actual deben admitir favoritos, comparación y consultas bajo las mismas reglas que el resto.
 
 ## Fase 11 — Listas personales, incremento 2
 
@@ -236,6 +245,6 @@ El log local registró errores internos repetidos `CellId ... no longer exists` 
 
 Los `select` sencillos ahora reciben flecha de marca, estados de hover/foco, tema oscuro y tamaño táctil. Confirmar selección en Safari iOS, Chrome Android y escritorio; el menú de opciones sigue siendo nativo.
 
-## Lote de casas ficticias — 2026-11-25
+## Inventario de doce propiedades — 2026-11-25
 
-La acción de Admin preconfigura doce casas (las primeras cinco y siete adicionales) con fotos en Storage, puntos aproximados y featured. La comprobación local confirma doce slugs y doce fuentes de foto únicas. Tras el despliegue, probar con Admin activo: si las primeras cinco ya existen, la acción debe crear solo las otras siete y actualizar su copy; si todavía no, crear las doce. Cada propiedad debe tener detalle privado, foto cubierta y cuatro características; en Catálogo deben quedar aprobadas/públicas y aparecer las doce en Inicio y Mapa. Confirmar el sello «Ficha ilustrativa», precio referencial y aviso de que no es una oferta vigente; que las vistas no entren a la analítica; que una segunda ejecución no duplique filas; y que una cuenta Cliente/anon no pueda invocar la acción. La sesión actual no tenía navegador ni credencial Admin remota, así que no se insertaron filas ni se comprobó Storage remoto.
+El usuario reporta que las doce filas ya están en Supabase. Con Admin, verificar que cada una se edita mediante el formulario estándar, conserva fotos/coordenadas/características y mantiene su publicación. Con Cliente, probar favorita y lista, comparación, actividad, consultas CRM y solicitud/cancelación de visitas. En mapa comprobar que cada ubicación aparezca si tiene coordenadas. La migración 0025 renombra los slugs antiguos, limpia texto almacenado y conserva IDs y relaciones. El usuario reporta 0024 aplicada; 0025 está local y pendiente de aplicar. No se hizo push.

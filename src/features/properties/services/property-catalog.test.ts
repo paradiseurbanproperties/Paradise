@@ -22,7 +22,6 @@ const baseProperty: Property = {
   features: ["Terraza"],
   images: [],
   featured: false,
-  demo: true,
 };
 
 const defaultFilters: PropertyFilters = {

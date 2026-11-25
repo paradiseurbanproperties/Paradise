@@ -16,7 +16,7 @@
 - Valida datos en servidor, verifica permisos en servidor y conserva RLS como segunda barrera. Nunca expongas `service_role` ni confíes en roles o estados enviados por el navegador.
 - Cada inmueble y metadata de imágenes se guarda en Postgres; los binarios de fotos viven en Supabase Storage del mismo proyecto.
 - Premium es una suscripción de cliente, no un rol. La pasarela Premium es completamente ficticia: no aceptar ni almacenar tarjeta, CVV o datos bancarios reales.
-- No uses estadísticas o publicaciones ficticias como si fueran reales. Los datos demo actuales deben estar identificados.
+- Las doce propiedades del inventario existente se tratan como publicaciones normales en catálogo, CRUD, mapas, CRM y herramientas de cliente. No infieras restricciones por slug/descripción ni muestres etiquetas académicas o de prueba para esas fichas.
 - No instales dependencias sin necesidad. Cuando el entorno aislado falle por red, registra el comando exacto para Arch y continúa el trabajo independiente.
 - No afirmes que los servicios externos, backups, monitorización o despliegues están operativos sin verificarlos.
 

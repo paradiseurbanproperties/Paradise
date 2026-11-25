@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import * as motion from "motion/react-client";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { PropertyCard } from "@/features/properties/components/property-card";
@@ -15,6 +15,7 @@ import { listOwnFavoritePropertyIds } from "@/features/favorites/repositories/fa
 import { findPublicPropertyBySlug, listPublicProperties, listPublicPropertyPriceHistory } from "@/features/properties/repositories/property-repository";
 import { formatPropertyPrice } from "@/features/properties/services/property-catalog";
 import { getCurrentAccessContext } from "@/lib/permissions/access";
+import { VisitRequestForm } from "@/features/visits/components/visit-request-form";
 
 type PropertyPageProps = {
   params: Promise<{ slug: string }>;
@@ -28,7 +29,6 @@ export async function generateMetadata({ params }: PropertyPageProps): Promise<M
     title: property.title,
     description: property.summary,
     alternates: { canonical: `/propiedad/${encodeURIComponent(property.slug)}` },
-    ...(property.demo ? { robots: { index: false, follow: false } } : {}),
     openGraph: { images: [property.images[0]?.src ?? "/images/property-placeholder.svg"] },
   };
 }
@@ -37,6 +37,7 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
   const { slug } = await params;
   const property = await findPublicPropertyBySlug(slug);
   if (!property) notFound();
+  if (slug !== property.slug) permanentRedirect(`/propiedad/${encodeURIComponent(property.slug)}`);
 
   const gallery = property.images.length
     ? property.images
@@ -52,13 +53,13 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
   const canFavorite = access?.role === "client" && access.status === "active";
   const showFavoriteControl = !access || canFavorite;
   const favoriteIds = new Set(favoriteState.ids);
-  if (!property.demo && canFavorite) await recordCustomerActivity("property_viewed", property.id);
+  if (canFavorite) await recordCustomerActivity("property_viewed", property.id);
 
   return (
     <div className="site-frame">
       <SiteHeader />
       <main className="site-main detail-main" id="main-content">
-        {!property.demo ? <PropertyViewTracker propertyId={property.id} /> : null}
+        <PropertyViewTracker propertyId={property.id} />
         <div className="property-detail">
           <Link className="back-link" href="/propiedades">← Volver al catálogo</Link>
 
@@ -69,14 +70,14 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             <div>
-              <p className="eyebrow">{property.type}{property.demo ? " · Ilustrativa" : property.visibility === "premium" ? " · Exclusiva Premium" : " · Paradise"}</p>
+              <p className="eyebrow">{property.type}{property.visibility === "premium" ? " · Exclusiva Premium" : ""}</p>
               <h1 className="page-title">{property.title}</h1>
               <p className="property-detail__location">
                 {property.location.neighborhood}, {property.location.city}, {property.location.state}
               </p>
             </div>
             <div className="property-detail__price">
-              <span>{property.demo ? "Precio referencial" : "Precio"}</span>
+              <span>Precio</span>
               <strong>{formatPropertyPrice(property.price, property.currency)}</strong>
             </div>
           </motion.header>
@@ -88,25 +89,19 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
             transition={{ delay: 0.12, duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
           >
             <motion.figure className="property-gallery__main" initial={{ opacity: 0, scale: 1.035 }} transition={{ duration: 0.8 }} viewport={{ once: true }} whileInView={{ opacity: 1, scale: 1 }}>
-              <Image alt={cover.alt} fill priority sizes="(max-width: 800px) 100vw, 66vw" src={cover.src} unoptimized={!property.demo || cover.src.includes("/storage/v1/object/")} />
+              <Image alt={cover.alt} fill priority sizes="(max-width: 800px) 100vw, 66vw" src={cover.src} unoptimized />
             </motion.figure>
             <motion.figure initial={{ opacity: 0, y: 16 }} transition={{ delay: 0.1, duration: 0.55 }} viewport={{ once: true }} whileInView={{ opacity: 1, y: 0 }}>
-              <Image alt={secondImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={secondImage.src} unoptimized={!property.demo || secondImage.src.includes("/storage/v1/object/")} />
+              <Image alt={secondImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={secondImage.src} unoptimized />
             </motion.figure>
             <motion.figure initial={{ opacity: 0, y: 16 }} transition={{ delay: 0.18, duration: 0.55 }} viewport={{ once: true }} whileInView={{ opacity: 1, y: 0 }}>
-              <Image alt={thirdImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={thirdImage.src} unoptimized={!property.demo || thirdImage.src.includes("/storage/v1/object/")} />
+              <Image alt={thirdImage.alt} fill sizes="(max-width: 800px) 50vw, 33vw" src={thirdImage.src} unoptimized />
             </motion.figure>
-            <span className="property-gallery__label">{property.demo ? "Fotografía ilustrativa" : "Fotografía de la propiedad"}</span>
+            <span className="property-gallery__label">Fotografías</span>
           </motion.div>
 
           <div className="property-detail__content">
             <div className="property-detail__main-column">
-              {property.demo ? (
-                <div className="demo-disclosure">
-                  <strong>Información referencial</strong>
-                  <span>Ubicación, precio y fotografías de carácter ilustrativo; esta ficha no representa una oferta vigente.</span>
-                </div>
-              ) : null}
               <motion.section className="detail-section" aria-labelledby="property-description-title" initial={{ opacity: 0, y: 20 }} transition={{ duration: 0.56 }} viewport={{ amount: 0.2, once: true }} whileInView={{ opacity: 1, y: 0 }}>
                 <p className="eyebrow">Sobre el espacio</p>
                 <h2 id="property-description-title">Un espacio con personalidad</h2>
@@ -159,7 +154,7 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
 
             <aside aria-label="Resumen de la propiedad" className="property-facts-panel">
               <p className="eyebrow">Resumen</p>
-              {!property.demo && showFavoriteControl ? <FavoriteToggle canFavorite={canFavorite} isFavorite={favoriteIds.has(property.id)} propertyId={property.id} /> : null}
+              {showFavoriteControl ? <FavoriteToggle canFavorite={canFavorite} isFavorite={favoriteIds.has(property.id)} propertyId={property.id} /> : null}
               <dl>
                 {property.bedrooms > 0 ? <div><dt>Recámaras</dt><dd>{property.bedrooms}</dd></div> : null}
                 {property.bathrooms > 0 ? <div><dt>Baños</dt><dd>{property.bathrooms}</dd></div> : null}
@@ -168,8 +163,11 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
                 <div><dt>Terreno</dt><dd>{property.landArea} m²</dd></div>
                 <div><dt>Estado</dt><dd>{property.status === "in_deal" ? "En trato" : property.status === "sold" ? "Vendida" : "Disponible"}</dd></div>
               </dl>
-              {!property.demo && property.status === "available" ? (
-                <PropertyInquiryForm propertyId={property.id} propertyTitle={property.title} />
+              {property.status === "available" ? (
+                <>
+                  <PropertyInquiryForm propertyId={property.id} propertyTitle={property.title} />
+                  {access?.role === "client" && access.status === "active" ? <VisitRequestForm propertyId={property.id} propertyTitle={property.title} /> : !access ? <section className="visit-login-note"><h2>¿Quieres conocer esta propiedad?</h2><p>Inicia sesión como cliente para solicitar una visita.</p><Link className="button button--secondary button--medium" href={`/login?next=%2Fpropiedad%2F${encodeURIComponent(property.slug)}`}>Iniciar sesión</Link></section> : null}
+                </>
               ) : (
                 <p className="property-facts-panel__note">Esta ficha no recibe consultas en este momento.</p>
               )}

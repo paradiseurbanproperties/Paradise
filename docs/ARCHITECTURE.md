@@ -6,17 +6,17 @@
 
 Los tokens globales están en `src/styles/tokens.css`. La portada combina neutros de alto contraste con acentos verde jade, arcilla y arena; el bloque de herramientas usa un fondo bosque persistente en ambos temas y superficies translúcidas. Los controles mantienen estados de foco visibles. Los datos de inventario y conteos siguen viniendo del repositorio; no se agregan métricas de muestra como si fueran reales.
 
-## Fichas de demostración en Supabase
+## Inventario de propiedades
 
-`/admin/propiedades` ofrece una acción de lote exclusiva para Admin que crea hasta doce casas ilustrativas, carga una imagen por ficha al bucket privado `property-images`, registra las coordenadas privadas aproximadas y publica las fichas como destacadas. El identificador interno es el prefijo `FICHA DE DEMOSTRACIÓN` en la descripción; el repositorio lo transforma en un sello visual discreto de contenido ilustrativo y evita registrar vistas/favoritos. Los slugs son fijos para que la acción no duplique las fichas. Al repetir la acción también se actualizan los títulos y descripciones públicos de las cinco casas previas. Los enlaces de imagen se generan desde Storage y las fichas aparecen en portada, catálogo y mapa.
+`/admin/propiedades` administra todas las fichas con el mismo flujo de crear, editar, moderar, cargar fotografías y mantener características. Las doce filas existentes se integran al catálogo público, búsqueda geográfica, historial de visitas, actividad, favoritos, comparación y consultas CRM. La lógica de producto no clasifica propiedades por prefijos de slug ni por texto de descripción.
 
-La acción valida rol Admin y RLS en las tablas/Storage; intenta limpiar filas y objetos subidos si alguna parte falla. La sesión local no dispone de llave administrativa para modificar Supabase directamente: después del despliegue, un Admin debe ejecutar la acción una vez. Esta preparación de código no implica que las filas ya existan en la base remota.
+El repositorio carga publicaciones aprobadas desde Supabase y no sustituye un catálogo vacío o una conexión ausente con filas locales. La migración `202611250025_property_inventory_standardization.sql` transforma los slugs anteriores a URLs normales, limpia textos de sistema y conserva IDs y relaciones existentes. El usuario reporta que 0024 ya fue aplicada; 0025 está en el repositorio y aún no se ha aplicado en Supabase.
 
 ## Límites y responsabilidades
 
 - `app/`: rutas, layouts y composición por audiencia; no contiene consultas complejas ni reglas de negocio.
 - `features/<dominio>/`: casos de uso y componentes específicos del dominio. `services/` aplica reglas; `repositories/` traduce persistencia; `schemas/`, `types/`, `actions/`, `hooks/` y `components/` se crean según necesidad.
-- `features/properties/`: tipos, fichas de demostración, repositorio público temporal, reglas de filtro/orden/paginación y componentes de tarjetas/filtros. El repositorio es el punto previsto para conectar Supabase.
+- `features/properties/`: tipos de propiedad, repositorio Supabase, reglas de filtro/orden/paginación y componentes de tarjetas/filtros.
 - Dirección, código postal y coordenadas exactas viven en `property_private_details`; el catálogo recibe solo columnas permitidas y coordenadas redondeadas. RLS limita dirección y ubicación exacta a Admin y agente activo asignado.
 - Persistencia objetivo: las fichas se almacenan en PostgreSQL (`properties`); cada imagen tiene metadata/ruta con FK en `property_images` y su archivo binario vive en Supabase Storage. No se almacenarán fotos en `bytea`; los permisos de Storage seguirán publicación, visibilidad y asignaciones.
 - `lib/supabase/`: clientes diferenciados de navegador, servidor y operaciones administrativas; acceso administrativo solo en servidor.
@@ -96,6 +96,8 @@ Fase 9 consulta agregados de tablas operativas bajo sesión Admin/RLS. El tracki
 
 Fase 10: `features/agents` administra perfiles, asignaciones y cartera. `features/crm` valida consultas, etapas y notas. El formulario público envía JSON al Route Handler `POST /api/crm/property-inquiry`, que valida origen, tamaño y honeypot antes de invocar la RPC SQL. `/admin/leads` y `/agente/leads` muestran un tablero por etapa y permiten añadir notas internas. El usuario confirma que CRM funciona; 0013 se considera funcional por su reporte, sin inspección del historial remoto.
 
+Fase 7, módulo de visitas: Clientes autenticados proponen horarios desde una ficha disponible en `/mis-visitas`; el equipo gestiona solicitudes en `/agente/visitas` o `/admin/visitas`. RPC SQL autoriza cada transición, una advisory lock evita cruces por propiedad/agente y un trigger conserva los cambios. La migración 0024 está local; falta aplicarla y probar con sesiones distintas en Supabase.
+
 Fase 11, incremento 1: `features/favorites` persiste favoritos por usuario y `features/comparison` conserva hasta cuatro IDs en `localStorage`, sin registrar datos de comparación en servidor. El usuario confirma que funcionan; 0014 se considera validada por su reporte.
 
 Fase 11, incremento 2: `/favoritos/listas` y `/favoritos/listas/[id]` permiten gestionar listas propias y organizar favoritos. `favorite_lists` y `favorite_list_properties` usan RLS de Cliente activo propietario; el usuario confirma que funcionan y 0015 se considera validada por su reporte.
@@ -131,10 +133,10 @@ Auth SSR utiliza `@supabase/ssr`: cliente de navegador, cliente servidor con coo
 
 ## Estado de implementación pública
 
-- La portada ofrece búsqueda; `/propiedades` muestra el catálogo con filtros GET, ordenamiento y paginación; `/propiedad/[slug]` presenta metadatos, galería, descripción y características.
-- El repositorio público omite registros de visibilidad exclusivamente Premium hasta que existan autenticación y entitlements.
-- Las imágenes usan `next/image` y una allowlist limitada a `images.unsplash.com`. Son ilustrativas; las ubicaciones, precios y propiedades de muestra son ficticios.
-- Persistencia, mapas, contacto real, favoritos, visitas e historial no están implementados en esta fase.
+- La portada ofrece búsqueda; `/propiedades` muestra el catálogo con filtros GET, ordenamiento y paginación; `/propiedad/[slug]` presenta metadatos, galería, descripción, características, mapa, contacto y visita.
+- El repositorio lee publicaciones aprobadas desde Supabase; visibilidad Premium requiere una suscripción vigente. Sin configuración o filas visibles, el catálogo muestra estado vacío.
+- Favoritos, comparación, historial de actividad, analítica, consultas CRM, visitas y CRUD Admin usan las mismas reglas para todas las propiedades publicadas.
+- Las imágenes públicas usan URLs firmadas de Supabase Storage. Los slugs canónicos están normalizados; enlaces con el formato previo redirigen a la ruta actual.
 
 ## SEO y configuración del sitio — Fase 13
 

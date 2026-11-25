@@ -7,7 +7,7 @@ ESTADO GENERAL
 - Fase actual: FASE 15 — QA y entrega
 - Avance estimado: 87% (el usuario confirma RLS aprobado; Fase 13 y flujo de verificación Auth reportados funcionales; búsqueda PostGIS con datos reales y tareas operativas siguen abiertas)
 - Estado: Fase 0 [x]; Fase 1 [x]; Fase 2 [x]; Fase 3 [x]; Fase 4 [~]; Fase 5 [~]; Fase 6 [x]; Fase 7 [~]; Fase 8 [x]; Fase 9 [x]; Fase 10 [x]; Fase 11 [x]; Fase 12 [x]; Fase 13 [x]; Fase 14 [~]; Fase 15 [~]
-- Próxima actividad: después del deploy, entrar como Admin a `/admin/propiedades` y pulsar “Actualizar propiedades”; la acción completa el lote, actualiza los textos de las fichas previas y deja doce casas en Inicio, Catálogo y Mapa. No se insertaron filas remotas desde esta sesión porque no había navegador ni sesión Admin conectada.
+- Próxima actividad: comprobar el resultado del workflow/deploy tras el push autorizado; aplicar `202611250025_property_inventory_standardization.sql` en Supabase después de 0024 y probar con Cliente/Agente/Admin.
 
 TECNOLOGÍAS PROPUESTAS
 - Next.js 16.3.0 App Router, React/React DOM 19.3.0, TypeScript 5.9.x y Tailwind CSS 4.3.0.
@@ -36,12 +36,12 @@ ESTRUCTURA DE CARPETAS
 ALCANCE TOTAL — LO QUE QUEREMOS CONSTRUIR
 Este resumen representa el alcance aprobado del proyecto; no significa que los módulos estén implementados. Los detalles técnicos y decisiones están en `README.md` y `docs/`.
 - [x] Sistema visual responsive: tokens, temas, persistencia local y distintivo Premium implementados; usuario confirmó tema oscuro y vista móvil. Sincronización con perfiles autenticados al implementar Auth.
-- [~] Experiencia pública: portada, catálogo demostrativo con filtros/orden/paginación y fichas implementados; agentes, contacto, SEO completo y datos reales siguen pendientes.
+- [~] Experiencia pública: portada, catálogo Supabase con filtros/orden/paginación, fichas, consultas, mapas y metadatos implementados; falta QA integral de rutas y roles.
 - [~] Identidad y acceso: pantallas y acciones de Auth, callbacks, recuperación y perfil mínimo; el usuario reporta que el enlace de verificación ahora funciona. La interfaz de roles/permisos funciona según el usuario; faltan pruebas negativas completas de RLS.
 - [x] Propiedades: usuario confirma flujo funcional al 100%: CRUD, fotos, publicación y cambios/historial de precio. RLS negativa con otros roles aún queda en la lista global de seguridad.
 - [~] Mapas: usuario confirma mapa Admin y ficha pública; consulta de Supabase confirma columna geográfica y RPC de 0005; falta probar búsqueda con datos reales.
-- [x] Herramientas de cliente: el usuario confirma favoritos, comparación, listas e historial de actividad; 0014–0016 se consideran funcionales según su reporte, sin inspección directa del historial remoto. Solicitudes de visita siguen pendientes.
-- [ ] Visitas: solicitud, agenda/disponibilidad, cambios de estado, historial y prevención de conflictos.
+- [x] Herramientas de cliente: el usuario confirma favoritos, comparación, listas e historial de actividad; 0014–0016 se consideran funcionales según su reporte, sin inspección directa del historial remoto.
+- [~] Visitas: solicitud autenticada, agenda de Cliente/Agente/Admin, estados, historial y prevención transaccional de cruces implementados en código; el usuario reporta 0024 aplicada, sin verificación remota. La migración local 0025 normaliza el inventario para permitir ese flujo.
 - [x] Premium: `/premium` ofrece planes, checkout simulado, historial y cancelación; distintivo por vigencia; Admin gestiona planes en `/admin/suscripciones`. El usuario confirma que el flujo completo funciona.
 - [x] Agentes y CRM: el usuario confirma perfiles, cartera, captación de leads, Kanban y notas; 0013 queda validada funcionalmente según su reporte, sin inspección directa del historial remoto.
 - [ ] Administración: usuarios, agentes, publicaciones, suscripciones, reclamaciones, ajustes, auditoría e informes.
@@ -626,3 +626,15 @@ PRUEBAS
 - La acción Admin actualiza título, descripción y texto alternativo de las cinco fichas existentes antes de completar las faltantes. El repositorio también normaliza contenido antiguo para que el sitio se vea limpio aun antes de volver a ejecutar la acción.
 - `pnpm lint`, `pnpm typecheck`, `git diff --check`, búsqueda de textos retirados en vistas públicas y unicidad de 12 slugs/fotos pasan. No se ejecutó build ni pruebas de producto para evitar modificar `.next` mientras el servidor dev pueda estar activo.
 - El usuario autorizó el push; commit `9162a41` quedó en `main`. El estado del deploy de Vercel no se verificó. Después del deploy, un Admin debe pulsar “Actualizar propiedades” para completar el lote y sincronizar las fichas previas en Supabase.
+
+## MÓDULO DE VISITAS — IMPLEMENTACIÓN LOCAL (2026-11-25)
+- Añadido `visit_requests`/`visit_request_history` con RLS y RPC de solicitud, cancelación y gestión; horario fijo de una hora, perfil de contacto autenticado, validación de fechas y advisory lock para evitar cruces en una propiedad o agenda de agente. El agente requiere asignación activa tanto para leer como para gestionar; revocarla retira el acceso.
+- Interfaz: solicitud en ficha de propiedad para Cliente activo; `/mis-visitas`; agendas de equipo `/agente/visitas` y `/admin/visitas`; menú de perfil y controles de confirmación/rechazo/reprogramación/cancelación/resultado.
+- Estado: el usuario autorizó el push de este avance. Reporta haber aplicado 0024 en Supabase; no se inspeccionó el historial remoto. Falta validar con base/cuentas aisladas y comprobar UI en navegador.
+
+## INVENTARIO ESTÁNDAR PARA LAS DOCE PROPIEDADES — IMPLEMENTACIÓN LOCAL (2026-11-25)
+- Se quitó la clasificación por slug/descripción que escondía Guardar, actividad, conteo de vistas, consulta CRM y solicitud de visita. El código usa los mismos componentes, repositorios y permisos que cualquier propiedad; para visitas remotas, 0025 primero debe normalizar los slugs existentes.
+- Inicio, catálogo, detalle, comparación, favoritos, listas, notificaciones y actividad ya no muestran avisos especiales para ese inventario. Admin gestiona las filas desde el CRUD habitual; se retiró el publicador por lote que podía sobrescribir cambios guardados.
+- El repositorio ya no muestra filas locales sustitutas cuando falta Supabase. Para enlaces anteriores normaliza los doce slugs y redirige a la URL canónica.
+- Nueva migración 0025 cambia slugs, limpia prefijos antiguos, actualiza textos alternativos y elimina la nota interna que desaconsejaba visitas; conserva IDs y relaciones.
+- `pnpm lint`, `pnpm typecheck` y `git diff --check` pasan. No se ejecutó build ni pruebas de producto; tampoco se aplicó la migración en Supabase. El usuario autorizó el push del avance.
